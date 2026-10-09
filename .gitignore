@@ -24,6 +24,7 @@ htmlcov/
 dist/
 build/
 *.spec
+!km_tables.spec
 *.msi
 *.exe
 
