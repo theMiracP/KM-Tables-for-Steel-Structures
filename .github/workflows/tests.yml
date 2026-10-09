@@ -8,15 +8,16 @@ on:
 
 jobs:
   test:
-    runs-on: ${{ matrix.os }}
+    name: Test (Windows / Python ${{ matrix.python-version }})
+    runs-on: windows-latest
     strategy:
       fail-fast: false
       matrix:
-        os: [windows-latest]
         python-version: ["3.11", "3.12"]
 
     steps:
-    - uses: actions/checkout@v4
+    - name: Checkout repository
+      uses: actions/checkout@v4
 
     - name: Set up Python ${{ matrix.python-version }}
       uses: actions/setup-python@v5
@@ -32,4 +33,11 @@ jobs:
       env:
         QT_QPA_PLATFORM: offscreen
       run: |
-        python -m pytest
+        python -m pytest --junitxml=test-results.xml
+        $xml = [xml](Get-Content test-results.xml)
+        $failures = [int]$xml.testsuites.testsuite.failures
+        $errors = [int]$xml.testsuites.testsuite.errors
+        Write-Host "Total Tests: $($xml.testsuites.testsuite.tests) | Failures: $failures | Errors: $errors"
+        if ($failures -gt 0 -or $errors -gt 0) {
+          exit 1
+        }

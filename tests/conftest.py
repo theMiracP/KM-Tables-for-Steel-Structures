@@ -1,7 +1,16 @@
 import pytest
+from PySide6.QtWidgets import QApplication
 from PySide6.QtGui import QClipboard
 
 _CLIPBOARD_STORE = ""
+
+@pytest.fixture(scope="session")
+def qapp():
+    """Tüm Qt testleri için oturum düzeyinde tekil QApplication örneği."""
+    app = QApplication.instance()
+    if app is None:
+        app = QApplication([])
+    return app
 
 @pytest.fixture(autouse=True)
 def mock_clipboard_on_os_lock(monkeypatch):
