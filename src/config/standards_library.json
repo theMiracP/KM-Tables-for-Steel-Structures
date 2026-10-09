@@ -1,0 +1,252 @@
+[
+  {
+    "id": "std_gost_27751",
+    "designation": "ГОСТ 27751-2014",
+    "title_ru": "Надёжность строительных конструкций и оснований. Основные положения",
+    "title_tr": "Yapı Taşıyıcı Sistemlerinin ve Temellerin Güvenilirliği. Temel Hükümler",
+    "title_en": "Reliability of Construction Structures and Foundations. General Principles",
+    "section": "Ссылочные документы",
+    "category": "Temel & Güvenilirlik",
+    "note": ""
+  },
+  {
+    "id": "std_sp_16",
+    "designation": "СП 16.13330.2017",
+    "title_ru": "Стальные конструкции",
+    "title_tr": "Çelik Yapılar (Güncellenmiş SNiP II-23-81*)",
+    "title_en": "Steel Structures (Updated SNiP II-23-81*)",
+    "section": "Ссылочные документы",
+    "category": "КМ Çelik Yapılar",
+    "note": ""
+  },
+  {
+    "id": "std_sp_20",
+    "designation": "СП 20.13330.2016",
+    "title_ru": "Нагрузки и воздействия",
+    "title_tr": "Yükler ve Etkiler (Güncellenmiş SNiP 2.01.07-85*)",
+    "title_en": "Loads and Actions (Updated SNiP 2.01.07-85*)",
+    "section": "Ссылочные документы",
+    "category": "Yükler & Hesap",
+    "note": ""
+  },
+  {
+    "id": "std_sp_28",
+    "designation": "СП 28.13330.2017",
+    "title_ru": "Защита строительных конструкций от коррозии",
+    "title_tr": "Yapı Elemanlarının Korozyondan Korunması (Güncellenmiş SNiP 2.03.11-85)",
+    "title_en": "Corrosion Protection of Building Structures (Updated SNiP 2.03.11-85)",
+    "section": "Ссылочные документы",
+    "category": "Korozyon & Boya",
+    "note": ""
+  },
+  {
+    "id": "std_sp_48",
+    "designation": "СП 48.13330.2019",
+    "title_ru": "Организация строительства",
+    "title_tr": "İnşaat Organizasyonu ve Yönetimi (Güncellenmiş SNiP 12-01-2004)",
+    "title_en": "Organization of Construction (Updated SNiP 12-01-2004)",
+    "section": "Ссылочные документы",
+    "category": "Uygulama & Şantiye",
+    "note": ""
+  },
+  {
+    "id": "std_sp_70",
+    "designation": "СП 70.13330.2012",
+    "title_ru": "Несущие и ограждающие конструкции",
+    "title_tr": "Taşıyıcı ve Cephe/Kuşatıcı Yapı Elemanları (Güncellenmiş SNiP 3.03.01-87)",
+    "title_en": "Load-bearing and Enclosing Structures (Updated SNiP 3.03.01-87)",
+    "section": "Ссылочные документы",
+    "category": "Uygulama & Şantiye",
+    "note": ""
+  },
+  {
+    "id": "std_sp_72",
+    "designation": "СП 72.13330.2016",
+    "title_ru": "Защита строительных конструкций и сооружений от коррозии",
+    "title_tr": "Yapı ve Tesislerin Korozyona Karşı Korunması (Uygulama Kuralları)",
+    "title_en": "Corrosion Protection of Building Structures and Facilities",
+    "section": "Ссылочные документы",
+    "category": "Korozyon & Boya",
+    "note": ""
+  },
+  {
+    "id": "std_sto_arss",
+    "designation": "СТО АРСС 11251254.001-018-5",
+    "title_ru": "Изготовление и контроль качества стальных строительных конструкций",
+    "title_tr": "Çelik Yapı İmalatı ve Kalite Kontrolü (ARSS Standardı)",
+    "title_en": "Manufacturing and Quality Control of Steel Building Structures (ARSS Standard)",
+    "section": "Ссылочные документы",
+    "category": "КМ Çelik Yapılar",
+    "note": ""
+  },
+  {
+    "id": "std_sp_470",
+    "designation": "СП 470.1325800.2019",
+    "title_ru": "Конструкции стальные. Правила производства работ",
+    "title_tr": "Çelik Yapılar. İmalat ve Montaj İş Kuralları",
+    "title_en": "Steel Structures. Rules for Execution of Work",
+    "section": "Ссылочные документы",
+    "category": "КМ Çelik Yapılar",
+    "note": ""
+  },
+  {
+    "id": "std_gost_23118",
+    "designation": "ГОСТ 23118-2019",
+    "title_ru": "Конструкции стальные строительные. Общие технические условия",
+    "title_tr": "Çelik Yapı İmalatı. Genel Teknik Şartlar",
+    "title_en": "Steel Construction Structures. General Specifications",
+    "section": "Ссылочные документы",
+    "category": "КМ Çelik Yapılar",
+    "note": ""
+  },
+  {
+    "id": "std_snip_12_03",
+    "designation": "СНиП 12-03-2001",
+    "title_ru": "Безопасность труда в строительстве. Часть 1. Общие требования",
+    "title_tr": "İnşaatta İş Sağlığı ve Güvenliği. Bölüm 1. Genel Gereklilikler",
+    "title_en": "Occupational Safety in Construction. Part 1. General Requirements",
+    "section": "Ссылочные документы",
+    "category": "İş Sağlığı & Güvenlik",
+    "note": ""
+  },
+  {
+    "id": "std_snip_12_04",
+    "designation": "СНиП 12-04-2002",
+    "title_ru": "Безопасность труда в строительстве. Часть 2. Строительное производство",
+    "title_tr": "İnşaatta İş Sağlığı ve Güvenliği. Bölüm 2. İnşaat Üretim Sahası",
+    "title_en": "Occupational Safety in Construction. Part 2. Construction Production",
+    "section": "Ссылочные документы",
+    "category": "İş Sağlığı & Güvenlik",
+    "note": ""
+  },
+  {
+    "id": "std_sp_112",
+    "designation": "СП 112.13330.2011",
+    "title_ru": "Пожарная безопасность зданий и сооружений",
+    "title_tr": "Bina ve Yapıların Yangın Güvenliği (Güncellenmiş SNiP 21-01-97*)",
+    "title_en": "Fire Safety of Buildings and Structures (Updated SNiP 21-01-97*)",
+    "section": "Ссылочные документы",
+    "category": "Yangın Güvenliği",
+    "note": ""
+  },
+  {
+    "id": "std_fz_123",
+    "designation": "ФЗ №123-ФЗ",
+    "title_ru": "Технический регламент о требованиях пожарной безопасности",
+    "title_tr": "Yangın Güvenliği Şartlarına İlişkin Federal Teknik Yönetmelik",
+    "title_en": "Technical Regulations on Fire Safety Requirements (Federal Law 123-FZ)",
+    "section": "Ссылочные документы",
+    "category": "Yangın Güvenliği",
+    "note": ""
+  },
+  {
+    "id": "std_gost_21_502",
+    "designation": "ГОСТ 21.502-2007",
+    "title_ru": "Правила выполнения проектной и рабочей документации металлических конструкций",
+    "title_tr": "Metal / Çelik Konstrüksiyon Çizim ve Dokümantasyon Kuralları",
+    "title_en": "Rules for Execution of Steel Structure Project and Working Documentation",
+    "section": "Ссылочные документы",
+    "category": "КМ Çelik Yapılar",
+    "note": ""
+  },
+  {
+    "id": "std_gost_21_101",
+    "designation": "ГОСТ Р 21.101-2020",
+    "title_ru": "Основные требования к проектной и рабочей документации",
+    "title_tr": "Proje ve Uygulama Dokümantasyonu Temel Kuralları (SPDS)",
+    "title_en": "Basic Requirements for Design and Working Documentation",
+    "section": "Ссылочные документы",
+    "category": "Genel Proje Standartları",
+    "note": ""
+  },
+  {
+    "id": "std_gost_27772",
+    "designation": "ГОСТ 27772-2021",
+    "title_ru": "Прокат для строительных стальных конструкций. Общие технические условия",
+    "title_tr": "Yapı Çelikleri Malzeme Standardı (C245, C255, C345, C355 vb.)",
+    "title_en": "Rolled Steel for Building Structures. General Specifications",
+    "section": "Ссылочные документы",
+    "category": "Malzeme & Çelik",
+    "note": ""
+  },
+  {
+    "id": "std_gost_26020",
+    "designation": "ГОСТ 26020-83",
+    "title_ru": "Двутавры стальные горячекатаные с параллельными гранями полок",
+    "title_tr": "Sıcak Haddelenmiş Paralel Başlıklı I-Kiriş Profilleri",
+    "title_en": "Hot-rolled Steel I-beams with Parallel Flange Edges",
+    "section": "Ссылочные документы",
+    "category": "Profiller & Kesitler",
+    "note": ""
+  },
+  {
+    "id": "std_gost_8240",
+    "designation": "ГОСТ 8240-97",
+    "title_ru": "Швеллеры стальные горячекатаные",
+    "title_tr": "Sıcak Haddelenmiş Çelik U-Profilleri (Şveller)",
+    "title_en": "Hot-rolled Steel Channels",
+    "section": "Ссылочные документы",
+    "category": "Profiller & Kesitler",
+    "note": ""
+  },
+  {
+    "id": "std_gost_8509",
+    "designation": "ГОСТ 8509-93",
+    "title_ru": "Уголки стальные горячекатаные равнополочные",
+    "title_tr": "Sıcak Haddelenmiş Eşit Kollu Köşebentler",
+    "title_en": "Hot-rolled Steel Equal-leg Angles",
+    "section": "Ссылочные документы",
+    "category": "Profiller & Kesitler",
+    "note": ""
+  },
+  {
+    "id": "std_gost_30245",
+    "designation": "ГОСТ 30245-2003",
+    "title_ru": "Профили стальные гнутые замкнутые сварные квадратные и прямоугольные",
+    "title_tr": "Kaynaklı Kutu ve Dikdörtgen Çelik Profil Boruları",
+    "title_en": "Steel Welded Cold-formed Hollow Square and Rectangular Structural Sections",
+    "section": "Ссылочные документы",
+    "category": "Profiller & Kesitler",
+    "note": ""
+  },
+  {
+    "id": "std_gost_19903",
+    "designation": "ГОСТ 19903-2015",
+    "title_ru": "Прокат листовой горячекатаный. Сортамент",
+    "title_tr": "Sıcak Haddelenmiş Sac ve Levha Boyut Standardı",
+    "title_en": "Hot-rolled Steel Sheets and Plates. Dimensions",
+    "section": "Ссылочные документы",
+    "category": "Malzeme & Sac",
+    "note": ""
+  },
+  {
+    "id": "att_km_vm",
+    "designation": "КМ.ВМ",
+    "title_ru": "Ведомость потребности в металле",
+    "title_tr": "Metal İhtiyaç Tablosu",
+    "title_en": "Bill of Metal Requirements",
+    "section": "Прилагаемые документы",
+    "category": "Ek Dokümanlar",
+    "note": ""
+  },
+  {
+    "id": "att_km_tb",
+    "designation": "КМ.ТБ",
+    "title_ru": "Таблица монтажных болтов",
+    "title_tr": "Montaj Civata Tablosu",
+    "title_en": "Schedule of Erection Bolts",
+    "section": "Прилагаемые документы",
+    "category": "Ek Dokümanlar",
+    "note": ""
+  },
+  {
+    "id": "att_km_ol",
+    "designation": "КМ.ОЛ",
+    "title_ru": "Опросный лист",
+    "title_tr": "Sipariş ve Teknik Talep Formu",
+    "title_en": "Inquiry / Technical Specification Sheet",
+    "section": "Прилагаемые документы",
+    "category": "Ek Dokümanlar",
+    "note": ""
+  }
+]
