@@ -8,16 +8,15 @@ on:
 
 jobs:
   test:
-    name: Test (Windows / Python ${{ matrix.python-version }})
-    runs-on: windows-latest
+    runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
       matrix:
+        os: [windows-latest]
         python-version: ["3.11", "3.12"]
 
     steps:
-    - name: Checkout repository
-      uses: actions/checkout@v4
+    - uses: actions/checkout@v4
 
     - name: Set up Python ${{ matrix.python-version }}
       uses: actions/setup-python@v5
@@ -33,12 +32,4 @@ jobs:
       env:
         QT_QPA_PLATFORM: offscreen
       run: |
-        python -m pytest -v --tb=short *>&1 | Tee-Object -FilePath pytest_output.log
-        $code = $LASTEXITCODE
-        if ($code -ne 0) {
-          Write-Output "### ❌ PyTest Summary (Exit Code $code)" >> $env:GITHUB_STEP_SUMMARY
-          Write-Output '```text' >> $env:GITHUB_STEP_SUMMARY
-          Get-Content pytest_output.log -Tail 120 >> $env:GITHUB_STEP_SUMMARY
-          Write-Output '```' >> $env:GITHUB_STEP_SUMMARY
-          exit $code
-        }
+        python -m pytest
