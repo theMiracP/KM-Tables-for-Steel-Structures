@@ -82,3 +82,26 @@ coll = COLLECT(
     upx_exclude=[],
     name='KM-Layout-Tables-v1.2.0-win64',
 )
+
+# 2. Tek parça Standalone EXE (Tek dosya doğrudan çalıştırma)
+exe_standalone = EXE(
+    pyz,
+    a.scripts,
+    a.binaries,
+    a.zipfiles,
+    a.datas,
+    [],
+    name='KM-Layout-Tables-v1.2.0-Standalone',
+    debug=False,
+    bootloader_ignore_signals=False,
+    strip=False,
+    upx=False,
+    console=False,
+    disable_windowed_traceback=False,
+    argv_emulation=False,
+    target_arch=None,
+    codesign_identity=None,
+    entitlements_file=None,
+    icon='assets/app_icon.ico',
+)
+

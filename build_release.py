@@ -65,13 +65,25 @@ def build_portable():
     create_zip_archive(portable_folder, zip_file)
 
     # Checksum hesapla
-    sha256 = calculate_sha256(zip_file)
     checksum_file = os.path.join(DIST_DIR, "checksums.txt")
-    with open(checksum_file, "a", encoding="utf-8") as f:
-        f.write(f"{sha256}  {os.path.basename(zip_file)}\n")
+    checksum_lines = []
 
-    print(f"\n🔑 SHA-256: {sha256}")
-    print(f"🎉 Dağıtım paketi hazır: {zip_file}")
+    zip_file = os.path.join(DIST_DIR, f"{BUNDLE_NAME}.zip")
+    if os.path.exists(zip_file):
+        sha_zip = calculate_sha256(zip_file)
+        checksum_lines.append(f"{sha_zip}  {os.path.basename(zip_file)}\n")
+        print(f"\n🔑 ZIP SHA-256: {sha_zip}")
+        print(f"🎉 Taşınabilir Paket: {zip_file}")
+
+    standalone_exe = os.path.join(DIST_DIR, f"KM-Layout-Tables-v{VERSION}-Standalone.exe")
+    if os.path.exists(standalone_exe):
+        sha_exe = calculate_sha256(standalone_exe)
+        checksum_lines.append(f"{sha_exe}  {os.path.basename(standalone_exe)}\n")
+        print(f"🔑 EXE SHA-256: {sha_exe}")
+        print(f"🎉 Tek Parça EXE: {standalone_exe} ({os.path.getsize(standalone_exe) / (1024*1024):.2f} MB)")
+
+    with open(checksum_file, "w", encoding="utf-8") as f:
+        f.writelines(checksum_lines)
 
 if __name__ == "__main__":
     build_portable()

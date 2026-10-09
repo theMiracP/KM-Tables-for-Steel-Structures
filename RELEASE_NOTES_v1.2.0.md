@@ -49,12 +49,17 @@
 
 ---
 
-## 📦 İndirme ve Kurulum (Windows x64)
+## 📦 İndirme Seçenekleri (Windows x64)
 
-1. Aşağıdaki **Assets** bölümünden `KM-Layout-Tables-v1.2.0-win64.zip` arşivini indirin.
-2. Arşivi bilgisayarınızda istediğiniz bir klasöre çıkartın.
-3. `KM-Layout-Tables.exe` dosyasına çift tıklayarak uygulamayı başlatın.
-   *(Python veya ek yazılım kurulumu gerektirmez, doğrudan çalışır).*
+İhtiyacınıza göre iki farklı dağıtım seçeneğinden birini tercih edebilirsiniz:
+
+- **🚀 1. Tek Parça EXE (`KM-Layout-Tables-v1.2.0-Standalone.exe`):**  
+  Arşiv açma veya kurulum gerektirmez. Tek bir `.exe` dosyasıdır, doğrudan çift tıklayarak çalışır. Masaüstünde veya USB bellekte taşımak için son derece pratiktir.
+
+- **⚡ 2. Taşınabilir Klasör / ZIP (`KM-Layout-Tables-v1.2.0-win64.zip`):**  
+  Arşivi bir klasöre çıkartın ve içindeki `KM-Layout-Tables.exe`'ye tıklayın. Önceden ayıklanmış kütüphaneleri sayesinde **0.3 saniyede anında (jet hızında)** açılır.
+
+*(Her iki sürüm de Python veya AutoCAD kurulumu gerektirmez, bağımsız çalışır).*
 
 ---
 
