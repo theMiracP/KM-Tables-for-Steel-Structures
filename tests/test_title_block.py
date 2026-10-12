@@ -139,14 +139,18 @@ def test_title_block_table_builder():
     assert pytest.approx(rect_comp.width, 0.001) == 50.0
     assert pytest.approx(rect_comp.height, 0.001) == 15.0
 
-    # Mühendis Kadrosu Satır 5..10
+    # Mühendis Kadrosu Satır 5..10 (Графа 10: 20 mm, Графа 11: 25 mm - 1 soldan)
     row_sig0 = table.rows[5]
     assert row_sig0.cells[0].text == "Разраб."
-    assert row_sig0.cells[3].text == "Иванов"
+    assert row_sig0.cells[0].colspan == 2
+    assert row_sig0.cells[2].text == "Иванов"
+    assert row_sig0.cells[2].colspan == 2
 
     row_sig5 = table.rows[10]
     assert row_sig5.cells[0].text == "ГИП"
-    assert row_sig5.cells[3].text == "Попов"
+    assert row_sig5.cells[0].colspan == 2
+    assert row_sig5.cells[2].text == "Попов"
+    assert row_sig5.cells[2].colspan == 2
 
 
 # -----------------------------------------------------------------------------

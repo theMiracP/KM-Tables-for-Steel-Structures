@@ -478,9 +478,10 @@ class CadGraphicsView(QGraphicsView):
 
                 # Kesit Eskizi / Kurumsal Logo
                 if cell.sketch and cell.sketch.sketch_type != SketchType.NONE:
-                    self._draw_sketch(cell.sketch, rect, border_color)
+                    has_text = bool(cell.text and cell.text.strip())
+                    self._draw_sketch(cell.sketch, rect, border_color, has_text=has_text)
 
-    def _draw_sketch(self, sketch: SectionSketch, rect: Rect2D, color: QColor) -> None:
+    def _draw_sketch(self, sketch: SectionSketch, rect: Rect2D, color: QColor, has_text: bool = False) -> None:
         """Hücre içerisine parametrik kesit eskizini veya logoyu çizer."""
         cx1, cy_top = self._cad_to_scene(rect.x_min, rect.y_max)
 
@@ -488,18 +489,38 @@ class CadGraphicsView(QGraphicsView):
         if sketch.sketch_type == SketchType.LOGO_EMBLEM and sketch.image_path and os.path.exists(sketch.image_path):
             pixmap = QPixmap(sketch.image_path)
             if not pixmap.isNull():
-                avail_w = min(20.0, rect.width * 0.38)
-                avail_h = max(2.0, rect.height - 4.0)
+                if has_text:
+                    avail_w = min(20.0, rect.width * 0.38)
+                    avail_h = max(2.0, rect.height - 4.0)
+                else:
+                    avail_w = max(2.0, rect.width - 6.0)
+                    avail_h = max(2.0, rect.height - 4.0)
+
                 scaled = pixmap.scaled(
                     int(avail_w * 4.0), int(avail_h * 4.0),
                     Qt.AspectRatioMode.KeepAspectRatio,
                     Qt.TransformationMode.SmoothTransformation
                 )
                 img_item = self._scene.addPixmap(scaled)
-                img_scale = avail_h / max(1.0, float(scaled.height()))
+
+                aspect = float(pixmap.width()) / max(1.0, float(pixmap.height()))
+                if (avail_w / avail_h) > aspect:
+                    draw_h = avail_h
+                    draw_w = avail_h * aspect
+                else:
+                    draw_w = avail_w
+                    draw_h = avail_w / aspect
+
+                img_scale = draw_h / max(1.0, float(scaled.height()))
                 img_item.setScale(img_scale)
-                px = cx1 + 3.0
-                py = cy_top + (rect.height - scaled.height() * img_scale) / 2.0
+
+                if has_text:
+                    px = cx1 + 3.0
+                    py = cy_top + (rect.height - draw_h) / 2.0
+                else:
+                    px = cx1 + (rect.width - draw_w) / 2.0
+                    py = cy_top + (rect.height - draw_h) / 2.0
+
                 img_item.setPos(px, py)
                 return
 
@@ -529,3 +550,58 @@ class CadGraphicsView(QGraphicsView):
                 t_item.setScale(t_scale)
                 t_item.setBrush(QBrush(color))
                 t_item.setPos(px, py)
+
+    def render_multi_sheet(self, multi_sheet_layout, auto_fit: bool = True) -> None:
+        """Tüm paftaları ve üzerine yerleştirilmiş tabloları tuvalde çizer."""
+        self._scene.clear()
+        if not multi_sheet_layout or not multi_sheet_layout.pages:
+            return
+
+        for page in multi_sheet_layout.pages:
+            # 1. Kağıt ve İç Çizim Çerçevesi
+            s = page.sheet_rect
+            sx, sy = self._cad_to_scene(s.x_min, s.y_max)
+            paper_brush = QBrush(QColor("#080808"))
+            paper_pen = QPen(QColor(theme.COLOR_ACCENT), 0.6)
+            self._scene.addRect(sx, sy, s.width, s.height, paper_pen, paper_brush)
+
+            f = page.inner_frame_rect
+            fx, fy = self._cad_to_scene(f.x_min, f.y_max)
+            frame_pen = QPen(QColor(theme.COLOR_ACCENT), 0.8)
+            self._scene.addRect(fx, fy, f.width, f.height, frame_pen, QBrush(Qt.BrushStyle.NoBrush))
+
+            # 2. Format Etiketi
+            if hasattr(self._layout_config, "get_format_designation"):
+                fmt_text = self._layout_config.get_format_designation()
+                fmt_cad_x = f.x_max - 25.0
+                fmt_cad_y = (s.y_min + f.y_min) / 2.0
+                px, py = self._cad_to_scene(fmt_cad_x, fmt_cad_y)
+                t_fmt = self._scene.addSimpleText(fmt_text)
+                f_fmt = QFont("ISOCPEUR")
+                if not f_fmt.exactMatch():
+                    f_fmt = QFont("Segoe UI")
+                f_fmt.setPixelSize(36)
+                fm_fmt = QFontMetricsF(f_fmt)
+                cap_h = fm_fmt.capHeight() if fm_fmt.capHeight() > 0 else (fm_fmt.ascent() * 0.8)
+                font_h = 2.5
+                scale_f = font_h / (cap_h if cap_h > 0 else 36.0)
+                t_fmt.setFont(f_fmt)
+                t_fmt.setBrush(QBrush(QColor(theme.COLOR_TEXT_PRIMARY)))
+                t_fmt.setScale(scale_f)
+                lw = t_fmt.boundingRect().width() * scale_f
+                lh = t_fmt.boundingRect().height() * scale_f
+                t_fmt.setPos(px - lw / 2.0, py - lh / 2.0)
+
+            # 3. Sol Kenar Boşluğu Ek Tabloları
+            self._draw_side_stamps(f)
+
+            # 4. Form 3 Başlık Bloğu (Bu sayfaya özel dinamik Лист / Листов)
+            tb = page.title_block_rect
+            self._draw_table_content(Point2D(tb.x_min, tb.y_min), is_sheet=True, table=page.title_block_table)
+
+            # 5. Yerleştirilen Tablolar
+            for item in page.placed_tables:
+                self._draw_table_content(item.origin, is_sheet=True, table=item.table)
+
+        if auto_fit:
+            self.fit_to_view()

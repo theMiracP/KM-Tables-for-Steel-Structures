@@ -88,12 +88,94 @@ class DxfExporter(BaseExporter):
         doc.saveas(output_path, encoding="utf-8")
         return True
 
+    def export_multi_sheet(
+        self,
+        multi_sheet_layout,
+        output_path: str,
+        table_config: Optional[TableConfig] = None,
+        layout_config: Optional[LayoutConfig] = None
+    ) -> bool:
+        """
+        Otomatik olarak oluşturulmuş çoklu pafta yerleşimini tek bir DXF belgesinde Modelspace'e dışa aktarır.
+        """
+        if table_config is None:
+            table_config = DEFAULT_TABLE_CONFIG
+        if layout_config is None:
+            layout_config = DEFAULT_LAYOUT_CONFIG
+
+        doc = ezdxf.new("R2010", setup=True)
+        doc.header["$INSUNITS"] = 4
+        doc.header["$MEASUREMENT"] = 1
+
+        self._setup_layers(doc)
+        doc.styles.new("GOST_STYLE", dxfattribs={"font": "isocpeur.ttf"})
+        msp = doc.modelspace()
+
+        layer_grid = self._get_layer_name("KM_TABLO_IZGARA", LAYER_GRID.name)
+        layer_sheet = self._get_layer_name("KM_SAYFA_CERCEVE", LAYER_SHEET_FRAME.name)
+        layer_text = self._get_layer_name("KM_TABLO_METIN", LAYER_TEXT.name)
+
+        for page in multi_sheet_layout.pages:
+            s = page.sheet_rect
+            f = page.inner_frame_rect
+
+            # 1. Kağıt Dış Sınırı (İnce Çizgi)
+            msp.add_lwpolyline(
+                [(s.x_min, s.y_min), (s.x_max, s.y_min), (s.x_max, s.y_max), (s.x_min, s.y_max)],
+                close=True,
+                dxfattribs={"layer": layer_grid}
+            )
+
+            # 2. İç Çizim Çerçevesi (Kalın Çizgi)
+            msp.add_lwpolyline(
+                [(f.x_min, f.y_min), (f.x_max, f.y_min), (f.x_max, f.y_max), (f.x_min, f.y_max)],
+                close=True,
+                dxfattribs={"layer": layer_sheet}
+            )
+
+            # 3. Sayfa Format Etiketi
+            if layout_config and hasattr(layout_config, "get_format_designation"):
+                fmt_text = layout_config.get_format_designation()
+                fmt_cad_x = f.x_max - 25.0
+                fmt_cad_y = (s.y_min + f.y_min) / 2.0
+                msp.add_text(
+                    fmt_text,
+                    dxfattribs={"layer": layer_text, "height": 2.5, "style": "GOST_STYLE"}
+                ).set_placement((fmt_cad_x, fmt_cad_y), align=TextEntityAlignment.MIDDLE_CENTER)
+
+            # 4. Sol Kenar Boşluğu Ek Tabloları
+            self._draw_side_stamps(msp, f)
+
+            # 5. Form 3 Antet (Ortak proje bilgisi + dinamik pafta no)
+            tb = page.title_block_rect
+            self._draw_table(msp, page.title_block_table, Point2D(tb.x_min, tb.y_min), table_config, doc=doc)
+
+            # 6. Bu sayfaya yerleştirilmiş tüm tabloları çiz
+            for item in page.placed_tables:
+                self._draw_table(msp, item.table, item.origin, table_config, doc=doc)
+
+        doc.saveas(output_path, encoding="utf-8")
+        return True
+
     # Geriye dönük ve arayüz uyumluluğu için takma ad (alias)
     export_table = export
 
+    def _get_layer_name(self, key: str, fallback: str) -> str:
+        try:
+            from src.services.settings import SettingsManager
+            return SettingsManager.get_instance().get_layer_name(key)
+        except Exception:
+            return fallback
+
     def _setup_layers(self, doc) -> None:
-        """Standart KM katmanlarını DXF belgesine ekler."""
-        for layer_cfg in ALL_LAYERS:
+        """Standart KM katmanlarını DXF belgesine ekler (SettingsManager ile senkronize)."""
+        try:
+            from src.services.settings import SettingsManager
+            layers = SettingsManager.get_instance().get_all_cad_layers()
+        except Exception:
+            layers = ALL_LAYERS
+
+        for layer_cfg in layers:
             if layer_cfg.name not in doc.layers:
                 doc.layers.add(
                     name=layer_cfg.name,
@@ -116,6 +198,10 @@ class DxfExporter(BaseExporter):
         t_h = layout_info.total_height
         table_top = origin.y + t_h
 
+        layer_text = self._get_layer_name("KM_TABLO_METIN", LAYER_TEXT.name)
+        layer_border = self._get_layer_name("KM_TABLO_CERCEVE", LAYER_BORDER.name)
+        layer_grid = self._get_layer_name("KM_TABLO_IZGARA", LAYER_GRID.name)
+
         # A. Tablo Başlığı (örn: "Ведомость элементов")
         if table.title:
             title_x = origin.x + t_w / 2.0
@@ -123,7 +209,7 @@ class DxfExporter(BaseExporter):
             msp.add_text(
                 table.title,
                 dxfattribs={
-                    "layer": LAYER_TEXT.name,
+                    "layer": layer_text,
                     "height": config.typography.title_height,
                     "style": "GOST_STYLE"
                 }
@@ -139,7 +225,7 @@ class DxfExporter(BaseExporter):
                 (origin.x, origin.y),
             ],
             close=True,
-            dxfattribs={"layer": LAYER_BORDER.name}
+            dxfattribs={"layer": layer_border}
         )
 
         # C. Hücreleri, İç Çizgileri ve Metinleri Çiz
@@ -153,7 +239,7 @@ class DxfExporter(BaseExporter):
                 # 1. İç ızgara çizgileri (İnce veya kalın çizgi)
                 # Üst çizgi (dış çerçeveye denk gelmiyorsa ve cell.border_top ise)
                 if cell.border_top and rect.y_max < table_top - 0.001:
-                    top_layer = LAYER_BORDER.name if getattr(cell, "border_top_thick", False) else LAYER_GRID.name
+                    top_layer = layer_border if getattr(cell, "border_top_thick", False) else layer_grid
                     msp.add_line(
                         (rect.x_min, rect.y_max),
                         (rect.x_max, rect.y_max),
@@ -161,7 +247,7 @@ class DxfExporter(BaseExporter):
                     )
                 # Sağ dikey çizgi (dış çerçeveye denk gelmiyorsa ve cell.border_right ise)
                 if cell.border_right and rect.x_max < (origin.x + t_w - 0.001):
-                    right_layer = LAYER_BORDER.name if getattr(cell, "border_right_thick", False) else LAYER_GRID.name
+                    right_layer = layer_border if getattr(cell, "border_right_thick", False) else layer_grid
                     msp.add_line(
                         (rect.x_max, rect.y_min),
                         (rect.x_max, rect.y_max),
@@ -174,7 +260,8 @@ class DxfExporter(BaseExporter):
 
                 # 3. Kesit Eskizi / Kurumsal Logo
                 if cell.sketch and cell.sketch.sketch_type != SketchType.NONE:
-                    self._draw_cell_sketch(msp, cell.sketch, rect, doc=doc)
+                    has_text = bool(cell.text and cell.text.strip())
+                    self._draw_cell_sketch(msp, cell.sketch, rect, doc=doc, has_text=has_text)
 
     def _draw_cell_text(self, msp, cell: TableCell, rect: Rect2D, config: TableConfig) -> None:
         """Hücre metnini hizalama ve GOST kelime kaydırma (wrap) kurallarına göre çizer."""
@@ -236,28 +323,35 @@ class DxfExporter(BaseExporter):
             start_y = rect.center_y + ((line_count - 1) * line_spacing / 2.0)
 
         curr_y = start_y
+        layer_text = self._get_layer_name("KM_TABLO_METIN", LAYER_TEXT.name)
         for line in text_lines:
             if line.strip():
                 msp.add_text(
                     line,
                     dxfattribs={
-                        "layer": LAYER_TEXT.name,
+                        "layer": layer_text,
                         "height": font_h,
                         "style": "GOST_STYLE"
                     }
                 ).set_placement((base_x, curr_y), align=align_code)
             curr_y -= line_spacing
 
-    def _draw_cell_sketch(self, msp, sketch: SectionSketch, rect: Rect2D, doc=None) -> None:
+    def _draw_cell_sketch(self, msp, sketch: SectionSketch, rect: Rect2D, doc=None, has_text: bool = False) -> None:
         """Hücre içindeki profil kesit eskizini veya kurumsal logoyu çizer."""
+        layer_sketch = self._get_layer_name("KM_TABLO_ESKIZ", LAYER_SKETCH.name)
         # Eğer kurumsal logo resmi varsa ve doc sağlanmışsa DXF raster image olarak ekle
         if sketch.sketch_type == SketchType.LOGO_EMBLEM and sketch.image_path and os.path.exists(sketch.image_path) and doc and PilImage:
             try:
                 with PilImage.open(sketch.image_path) as img:
                     img_w_px, img_h_px = img.size
                 if img_w_px > 0 and img_h_px > 0:
-                    avail_w = min(20.0, rect.width * 0.38)
-                    avail_h = max(2.0, rect.height - 4.0)
+                    if has_text:
+                        avail_w = min(20.0, rect.width * 0.38)
+                        avail_h = max(2.0, rect.height - 4.0)
+                    else:
+                        avail_w = max(2.0, rect.width - 6.0)
+                        avail_h = max(2.0, rect.height - 4.0)
+
                     aspect = img_w_px / img_h_px
                     if (avail_w / avail_h) > aspect:
                         cad_h = avail_h
@@ -266,14 +360,18 @@ class DxfExporter(BaseExporter):
                         cad_w = avail_w
                         cad_h = avail_w / aspect
 
-                    insert_x = rect.x_min + 3.0
+                    if has_text:
+                        insert_x = rect.x_min + 3.0
+                    else:
+                        insert_x = rect.x_min + (rect.width - cad_w) / 2.0
+
                     insert_y = rect.y_min + (rect.height - cad_h) / 2.0
                     img_def = doc.add_image_def(sketch.image_path, (img_w_px, img_h_px))
                     msp.add_image(
                         img_def,
                         insert=(insert_x, insert_y),
                         size_in_units=(cad_w, cad_h),
-                        dxfattribs={"layer": LAYER_SKETCH.name}
+                        dxfattribs={"layer": layer_sketch}
                     )
                     return
             except Exception:
@@ -283,22 +381,22 @@ class DxfExporter(BaseExporter):
         for prim in prims:
             if prim.kind == "line":
                 x1, y1, x2, y2 = prim.coords
-                msp.add_line((x1, y1), (x2, y2), dxfattribs={"layer": LAYER_SKETCH.name})
+                msp.add_line((x1, y1), (x2, y2), dxfattribs={"layer": layer_sketch})
             elif prim.kind == "rect":
                 rx, ry, rw, rh = prim.coords
                 msp.add_lwpolyline(
                     [(rx, ry), (rx + rw, ry), (rx + rw, ry + rh), (rx, ry + rh)],
                     close=True,
-                    dxfattribs={"layer": LAYER_SKETCH.name}
+                    dxfattribs={"layer": layer_sketch}
                 )
             elif prim.kind == "circle":
                 cx, cy, r = prim.coords
-                msp.add_circle((cx, cy), r, dxfattribs={"layer": LAYER_SKETCH.name})
+                msp.add_circle((cx, cy), r, dxfattribs={"layer": layer_sketch})
             elif prim.kind == "leader_text" and prim.text:
                 tx, ty, _, _ = prim.coords
                 msp.add_text(
                     prim.text,
-                    dxfattribs={"layer": LAYER_SKETCH.name, "height": 1.8, "style": "GOST_STYLE"}
+                    dxfattribs={"layer": layer_sketch, "height": 1.8, "style": "GOST_STYLE"}
                 ).set_placement((tx, ty), align=TextEntityAlignment.BOTTOM_LEFT)
 
     def _draw_sheet_frames_only(
@@ -313,18 +411,22 @@ class DxfExporter(BaseExporter):
         if not s or not f:
             return
 
+        layer_grid = self._get_layer_name("KM_TABLO_IZGARA", LAYER_GRID.name)
+        layer_sheet = self._get_layer_name("KM_SAYFA_CERCEVE", LAYER_SHEET_FRAME.name)
+        layer_text = self._get_layer_name("KM_TABLO_METIN", LAYER_TEXT.name)
+
         # 1. Sayfa Dış Sınırı (İnce Çizgi)
         msp.add_lwpolyline(
             [(s.x_min, s.y_min), (s.x_max, s.y_min), (s.x_max, s.y_max), (s.x_min, s.y_max)],
             close=True,
-            dxfattribs={"layer": LAYER_GRID.name}
+            dxfattribs={"layer": layer_grid}
         )
 
         # 2. İç Çizim Çerçevesi (Kalın Çizgi: sol 20 mm, diğerleri 5 mm)
         msp.add_lwpolyline(
             [(f.x_min, f.y_min), (f.x_max, f.y_min), (f.x_max, f.y_max), (f.x_min, f.y_max)],
             close=True,
-            dxfattribs={"layer": LAYER_SHEET_FRAME.name}
+            dxfattribs={"layer": layer_sheet}
         )
 
         # 3. Sayfa Format Etiketi (ГОСТ 2.301-68 / СПДС: alt 5 mm marjinde, sağ köşe Form 3 altında ortalı)
@@ -334,7 +436,7 @@ class DxfExporter(BaseExporter):
             fmt_cad_y = (s.y_min + f.y_min) / 2.0
             msp.add_text(
                 fmt_text,
-                dxfattribs={"layer": LAYER_TEXT.name, "height": 2.5, "style": "GOST_STYLE"}
+                dxfattribs={"layer": layer_text, "height": 2.5, "style": "GOST_STYLE"}
             ).set_placement((fmt_cad_x, fmt_cad_y), align=TextEntityAlignment.MIDDLE_CENTER)
 
         # 4. Sol Kenar Boşluğu Ek Tabloları / Yan Şerit (ГОСТ 2.104 / ГОСТ Р 21.101: İnventar & Согласовано)
@@ -345,18 +447,22 @@ class DxfExporter(BaseExporter):
         x0 = f.x_min
         y0 = f.y_min
 
+        layer_sheet = self._get_layer_name("KM_SAYFA_CERCEVE", LAYER_SHEET_FRAME.name)
+        layer_grid = self._get_layer_name("KM_TABLO_IZGARA", LAYER_GRID.name)
+        layer_text = self._get_layer_name("KM_TABLO_METIN", LAYER_TEXT.name)
+
         # 1. Tablo 1: İnventar Bilgileri (85 x 12 mm)
         # Dış Kalın Çerçeve
         msp.add_lwpolyline(
             [(x0, y0), (x0 - 12.0, y0), (x0 - 12.0, y0 + 85.0), (x0, y0 + 85.0)],
             close=False,
-            dxfattribs={"layer": LAYER_SHEET_FRAME.name}
+            dxfattribs={"layer": layer_sheet}
         )
         # Boyuna İnce Ayırıcı (5 mm metin + 7 mm boş alan)
-        msp.add_line((x0 - 7.0, y0), (x0 - 7.0, y0 + 85.0), dxfattribs={"layer": LAYER_GRID.name})
+        msp.add_line((x0 - 7.0, y0), (x0 - 7.0, y0 + 85.0), dxfattribs={"layer": layer_grid})
         # Enine İnce Ayırıcılar
-        msp.add_line((x0 - 12.0, y0 + 25.0), (x0, y0 + 25.0), dxfattribs={"layer": LAYER_GRID.name})
-        msp.add_line((x0 - 12.0, y0 + 60.0), (x0, y0 + 60.0), dxfattribs={"layer": LAYER_GRID.name})
+        msp.add_line((x0 - 12.0, y0 + 25.0), (x0, y0 + 25.0), dxfattribs={"layer": layer_grid})
+        msp.add_line((x0 - 12.0, y0 + 60.0), (x0, y0 + 60.0), dxfattribs={"layer": layer_grid})
 
         # Metinler (90 derece saat yönünün tersine döndürülmüş)
         inv_texts = [
@@ -367,7 +473,7 @@ class DxfExporter(BaseExporter):
         for txt, cad_y in inv_texts:
             msp.add_text(
                 txt,
-                dxfattribs={"layer": LAYER_TEXT.name, "height": 2.5, "style": "GOST_STYLE", "rotation": 90.0}
+                dxfattribs={"layer": layer_text, "height": 2.5, "style": "GOST_STYLE", "rotation": 90.0}
             ).set_placement((x0 - 9.5, cad_y), align=TextEntityAlignment.MIDDLE_CENTER)
 
         # 2. Tablo 2: Согласовано (65 x 15 mm)
@@ -375,19 +481,19 @@ class DxfExporter(BaseExporter):
         msp.add_lwpolyline(
             [(x0 - 12.0, y0 + 85.0), (x0 - 15.0, y0 + 85.0), (x0 - 15.0, y0 + 150.0), (x0, y0 + 150.0)],
             close=False,
-            dxfattribs={"layer": LAYER_SHEET_FRAME.name}
+            dxfattribs={"layer": layer_sheet}
         )
         # Boyuna İnce Ayırıcılar (5 mm başlık + 5 mm satır 1 + 5 mm satır 2)
-        msp.add_line((x0 - 10.0, y0 + 85.0), (x0 - 10.0, y0 + 150.0), dxfattribs={"layer": LAYER_GRID.name})
-        msp.add_line((x0 - 5.0, y0 + 85.0), (x0 - 5.0, y0 + 150.0), dxfattribs={"layer": LAYER_GRID.name})
+        msp.add_line((x0 - 10.0, y0 + 85.0), (x0 - 10.0, y0 + 150.0), dxfattribs={"layer": layer_grid})
+        msp.add_line((x0 - 5.0, y0 + 85.0), (x0 - 5.0, y0 + 150.0), dxfattribs={"layer": layer_grid})
         # Enine İnce Ayırıcılar (İç 10 mm ızgara: 20 mm, 20 mm, 15 mm, 10 mm)
         for dy in [20.0, 40.0, 55.0]:
-            msp.add_line((x0 - 10.0, y0 + 85.0 + dy), (x0, y0 + 85.0 + dy), dxfattribs={"layer": LAYER_GRID.name})
+            msp.add_line((x0 - 10.0, y0 + 85.0 + dy), (x0, y0 + 85.0 + dy), dxfattribs={"layer": layer_grid})
 
         # Başlık Metni
         msp.add_text(
             "Согласовано",
-            dxfattribs={"layer": LAYER_TEXT.name, "height": 2.5, "style": "GOST_STYLE", "rotation": 90.0}
+            dxfattribs={"layer": layer_text, "height": 2.5, "style": "GOST_STYLE", "rotation": 90.0}
         ).set_placement((x0 - 12.5, y0 + 117.5), align=TextEntityAlignment.MIDDLE_CENTER)
 
     def _draw_sheet_and_titleblock(

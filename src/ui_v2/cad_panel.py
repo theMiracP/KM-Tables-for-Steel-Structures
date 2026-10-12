@@ -24,42 +24,80 @@ class FloatingHudToolbar(QFrame):
     Tuvalin üzerinde yüzen (Floating Glass HUD) modern hap araç çubuğu.
     """
     close_clicked = Signal()
+    multi_sheet_clicked = Signal()
 
     def __init__(self, parent=None):
         super().__init__(parent)
+        self.setObjectName("floatingHudToolbar")
         self.setFixedHeight(36)
         self.setStyleSheet(f"""
-            QFrame {{
-                background-color: rgba(23, 24, 31, 0.88);
-                border: 1px solid {theme.BORDER_LIGHT};
+            QFrame#floatingHudToolbar {{
+                background-color: rgba(18, 20, 28, 0.90);
+                border: 1px solid rgba(255, 255, 255, 0.12);
                 border-radius: 18px;
             }}
             QPushButton {{
                 background-color: transparent;
                 border: none;
-                color: {theme.TEXT_PRIMARY};
+                color: #e2e8f0;
                 font-size: 11px;
                 font-weight: 500;
-                padding: 4px 8px;
-                border-radius: 12px;
+                padding: 3px 8px;
+                border-radius: 6px;
             }}
             QPushButton:hover {{
-                background-color: {theme.BG_SURFACE_HOVER};
+                background-color: rgba(255, 255, 255, 0.10);
+                color: #ffffff;
+            }}
+            QPushButton:pressed {{
+                background-color: rgba(255, 255, 255, 0.16);
             }}
             QLabel {{
-                color: {theme.TEXT_MUTED};
+                background: transparent;
+                border: none;
+                color: rgba(255, 255, 255, 0.70);
                 font-size: 11px;
+            }}
+            QPushButton#hudMultiSheet {{
+                background-color: rgba(99, 102, 241, 0.18);
+                color: #c7d2fe;
+                border: 1px solid rgba(99, 102, 241, 0.38);
+                border-radius: 12px;
+                padding: 2px 10px;
+                font-weight: 500;
+                font-size: 11px;
+            }}
+            QPushButton#hudMultiSheet:hover {{
+                background-color: rgba(99, 102, 241, 0.35);
+                border-color: rgba(99, 102, 241, 0.65);
+                color: #ffffff;
+            }}
+            QPushButton#hudClose {{
+                border-radius: 12px;
+            }}
+            QPushButton#hudClose:hover {{
+                background-color: rgba(239, 68, 68, 0.25);
+                color: #fca5a5;
             }}
         """)
 
         # Hafif gölge efekti
         shadow = QGraphicsDropShadowEffect(self)
-        shadow.setBlurRadius(16)
-        shadow.setColor(QColor(0, 0, 0, 160))
+        shadow.setBlurRadius(20)
+        shadow.setColor(QColor(0, 0, 0, 180))
         shadow.setOffset(0, 4)
         self.setGraphicsEffect(shadow)
 
         self._build_ui()
+
+    def _create_divider(self) -> QFrame:
+        div = QFrame(self)
+        div.setFrameShape(QFrame.Shape.VLine)
+        div.setFrameShadow(QFrame.Shadow.Plain)
+        div.setFixedWidth(1)
+        div.setFixedHeight(14)
+        div.setStyleSheet("background-color: rgba(255, 255, 255, 0.14); border: none;")
+        return div
 
     def _build_ui(self):
         layout = QHBoxLayout(self)
@@ -84,16 +122,36 @@ class FloatingHudToolbar(QFrame):
         self.btn_zoom_out.setCursor(Qt.CursorShape.PointingHandCursor)
         layout.addWidget(self.btn_zoom_out)
 
-        sep = QLabel("|")
-        layout.addWidget(sep)
+        layout.addWidget(self._create_divider())
 
         self.lbl_coords = QLabel("X: 0.0 mm · Y: 0.0 mm")
+        self.lbl_coords.setStyleSheet("""
+            QLabel {
+                font-family: 'Consolas', 'JetBrains Mono', 'Segoe UI Mono', monospace;
+                font-size: 11px;
+                color: rgba(255, 255, 255, 0.75);
+                background: transparent;
+                border: none;
+                padding: 0 4px;
+            }
+        """)
+        self.lbl_coords.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        self.lbl_coords.setMinimumWidth(165)
         layout.addWidget(self.lbl_coords)
 
-        sep2 = QLabel("|")
-        layout.addWidget(sep2)
+        layout.addWidget(self._create_divider())
+
+        self.btn_multi_sheet = QPushButton(f"📑 {i18n.t('btn_multi_sheet')}")
+        self.btn_multi_sheet.setObjectName("hudMultiSheet")
+        self.btn_multi_sheet.setToolTip(i18n.t("tooltip_multi_sheet"))
+        self.btn_multi_sheet.setCursor(Qt.CursorShape.PointingHandCursor)
+        self.btn_multi_sheet.clicked.connect(self.multi_sheet_clicked.emit)
+        layout.addWidget(self.btn_multi_sheet)
+
+        layout.addWidget(self._create_divider())
 
         self.btn_close = QPushButton()
+        self.btn_close.setObjectName("hudClose")
         self.btn_close.setIcon(icons.get_icon(icons.ICON_CLOSE, color=icons.COLOR_MUTED))
         self.btn_close.setIconSize(icons.icon_size(12))
         self.btn_close.setToolTip(i18n.t("btn_cad_panel_close_tooltip"))
@@ -107,6 +165,8 @@ class FloatingHudToolbar(QFrame):
     def _update_translations(self, lang_code: str = ""):
         try:
             self.btn_fit.setText(f"⛶ {i18n.t('zoom_fit')}")
+            self.btn_multi_sheet.setText(f"📑 {i18n.t('btn_multi_sheet')}")
+            self.btn_multi_sheet.setToolTip(i18n.t("tooltip_multi_sheet"))
             self.btn_close.setToolTip(i18n.t("btn_cad_panel_close_tooltip"))
         except RuntimeError:
             pass
@@ -121,6 +181,7 @@ class CadViewportPanel(QWidget):
     Floating HUD barı tuvalin üstünde konumlandırır ve pencere boyutu değiştikçe ortalar.
     """
     toggle_requested = Signal()
+    multi_sheet_requested = Signal()
 
     def __init__(self, parent=None):
         super().__init__(parent)
@@ -136,6 +197,7 @@ class CadViewportPanel(QWidget):
         self.hud.btn_zoom_actual.clicked.connect(self.canvas.zoom_actual)
         self.hud.btn_zoom_in.clicked.connect(self.canvas.zoom_in)
         self.hud.btn_zoom_out.clicked.connect(self.canvas.zoom_out)
+        self.hud.multi_sheet_clicked.connect(self.multi_sheet_requested.emit)
         self.hud.close_clicked.connect(self.toggle_requested.emit)
 
         # Sol Üstteki Başlık Rozeti (Floating Badge)
@@ -170,8 +232,9 @@ class CadViewportPanel(QWidget):
 
     def resizeEvent(self, event):
         super().resizeEvent(event)
-        # HUD'ı alt merkeze yerleştir (floating)
-        hud_w = 370
+        # HUD'ı alt merkeze yerleştir (floating, dinamik genişlik)
+        req_w = max(self.hud.sizeHint().width() + 16, 520)
+        hud_w = min(req_w, max(self.width() - 24, 200))
         hud_h = 36
         x = (self.width() - hud_w) // 2
         y = self.height() - hud_h - 16

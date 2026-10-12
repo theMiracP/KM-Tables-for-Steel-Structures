@@ -45,8 +45,9 @@ Tablo sütunları ГОСТ 21.502 standardına tam uyumlu olmalıdır:
 2. **Эскиз (Eskiz):** Profil kesit geometrisi (I-kiriş, Kutu, Boru, Levha, Kaynaklı vb.).
 3. **Сечение / Состав (Kesit / Profil):** Standart profil veya kaynaklı levha kalınlıkları (örn. `20К1`, `400х200х10`).
 4. **Усилия (Kuvvetler):**
-   - `N, кН`: Eksenel / Normal kuvvet.
-   - `M, кН·м`: Eğilme momenti.
+   - `A, кН`: Kesme kuvveti (Mesnet tepkisi / Поперечная сила).
+   - `N, кН`: Eksenel yük (Normal / boyuna kuvvet / Продольная сила).
+   - `M, кН·м`: Eğilme momenti (Изгибающий момент).
    - *(Not: Veri girişinde gereksiz "Q" veya kaymış kuvvet kolonları bulunmaz).*
 5. **Сталь (Çelik Kalitesi):** Malzeme standardı (örn. `С255`, `С345`, `09Г2С`).
 6. **Примечание (Notlar):** Mühendislik açıklamaları.

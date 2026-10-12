@@ -158,10 +158,10 @@ def create_title_block_table(
     # -------------------------------------------------------------------------
     s0 = get_sig(0, "Разраб.")
     cells_r5 = [
-        TableCell(text=s0.role, colspan=3, halign=HAlign.LEFT, font_size=2.5),
+        TableCell(text=s0.role, colspan=2, halign=HAlign.LEFT, font_size=2.5),
         TableCell(is_merged_continuation=True),
+        TableCell(text=s0.surname, colspan=2, halign=HAlign.LEFT, font_size=2.5),
         TableCell(is_merged_continuation=True),
-        TableCell(text=s0.surname, halign=HAlign.LEFT, font_size=2.5),
         TableCell(text=s0.signature, halign=HAlign.CENTER, font_size=2.5),
         TableCell(text=s0.date, halign=HAlign.CENTER, font_size=2.2, border_right_thick=True),
         # Yapı / Bölüm Adı: 65 x 15 mm (Rowspan: 3 satır, Colspan: 1 sütun)
@@ -186,10 +186,10 @@ def create_title_block_table(
     # -------------------------------------------------------------------------
     s1 = get_sig(1, "Проверил")
     cells_r6 = [
-        TableCell(text=s1.role, colspan=3, halign=HAlign.LEFT, font_size=2.5),
+        TableCell(text=s1.role, colspan=2, halign=HAlign.LEFT, font_size=2.5),
         TableCell(is_merged_continuation=True),
+        TableCell(text=s1.surname, colspan=2, halign=HAlign.LEFT, font_size=2.5),
         TableCell(is_merged_continuation=True),
-        TableCell(text=s1.surname, halign=HAlign.LEFT, font_size=2.5),
         TableCell(text=s1.signature, halign=HAlign.CENTER, font_size=2.5),
         TableCell(text=s1.date, halign=HAlign.CENTER, font_size=2.2, border_right_thick=True),
         TableCell(is_merged_continuation=True),
@@ -207,10 +207,10 @@ def create_title_block_table(
     # -------------------------------------------------------------------------
     s2 = get_sig(2, "Гл. констр.")
     cells_r7 = [
-        TableCell(text=s2.role, colspan=3, halign=HAlign.LEFT, font_size=2.5),
+        TableCell(text=s2.role, colspan=2, halign=HAlign.LEFT, font_size=2.5),
         TableCell(is_merged_continuation=True),
+        TableCell(text=s2.surname, colspan=2, halign=HAlign.LEFT, font_size=2.5),
         TableCell(is_merged_continuation=True),
-        TableCell(text=s2.surname, halign=HAlign.LEFT, font_size=2.5),
         TableCell(text=s2.signature, halign=HAlign.CENTER, font_size=2.5),
         TableCell(text=s2.date, halign=HAlign.CENTER, font_size=2.2, border_right_thick=True),
         TableCell(is_merged_continuation=True),
@@ -232,10 +232,10 @@ def create_title_block_table(
     company_halign = HAlign.RIGHT if has_logo else HAlign.CENTER
 
     cells_r8 = [
-        TableCell(text=s3.role, colspan=3, halign=HAlign.LEFT, font_size=2.5),
+        TableCell(text=s3.role, colspan=2, halign=HAlign.LEFT, font_size=2.5),
         TableCell(is_merged_continuation=True),
+        TableCell(text=s3.surname, colspan=2, halign=HAlign.LEFT, font_size=2.5),
         TableCell(is_merged_continuation=True),
-        TableCell(text=s3.surname, halign=HAlign.LEFT, font_size=2.5),
         TableCell(text=s3.signature, halign=HAlign.CENTER, font_size=2.5),
         TableCell(text=s3.date, halign=HAlign.CENTER, font_size=2.2, border_right_thick=True),
         # Pafta Başlığı / İçeriği: 65 x 15 mm (Rowspan: 3 satır)
@@ -269,10 +269,10 @@ def create_title_block_table(
     # -------------------------------------------------------------------------
     s4 = get_sig(4, "Нач. отд.")
     cells_r9 = [
-        TableCell(text=s4.role, colspan=3, halign=HAlign.LEFT, font_size=2.5),
+        TableCell(text=s4.role, colspan=2, halign=HAlign.LEFT, font_size=2.5),
         TableCell(is_merged_continuation=True),
+        TableCell(text=s4.surname, colspan=2, halign=HAlign.LEFT, font_size=2.5),
         TableCell(is_merged_continuation=True),
-        TableCell(text=s4.surname, halign=HAlign.LEFT, font_size=2.5),
         TableCell(text=s4.signature, halign=HAlign.CENTER, font_size=2.5),
         TableCell(text=s4.date, halign=HAlign.CENTER, font_size=2.2, border_right_thick=True),
         TableCell(is_merged_continuation=True),
@@ -287,10 +287,10 @@ def create_title_block_table(
     # -------------------------------------------------------------------------
     s5 = get_sig(5, "ГИП")
     cells_r10 = [
-        TableCell(text=s5.role, colspan=3, halign=HAlign.LEFT, font_size=2.5),
+        TableCell(text=s5.role, colspan=2, halign=HAlign.LEFT, font_size=2.5),
         TableCell(is_merged_continuation=True),
+        TableCell(text=s5.surname, colspan=2, halign=HAlign.LEFT, font_size=2.5),
         TableCell(is_merged_continuation=True),
-        TableCell(text=s5.surname, halign=HAlign.LEFT, font_size=2.5),
         TableCell(text=s5.signature, halign=HAlign.CENTER, font_size=2.5),
         TableCell(text=s5.date, halign=HAlign.CENTER, font_size=2.2, border_right_thick=True),
         TableCell(is_merged_continuation=True),

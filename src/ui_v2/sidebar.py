@@ -294,30 +294,6 @@ class LinearSidebar(QFrame):
         # Dil değişimini dinle
         i18n.language_changed.connect(self._on_language_changed)
 
-        # C) GOST DURUM KARTI (Notion Callout)
-        self.status_callout = QFrame()
-        self.status_callout.setStyleSheet(f"""
-            QFrame {{
-                background-color: {theme.COLOR_SUCCESS_BG};
-                border: 1px solid {theme.COLOR_SUCCESS_BORDER};
-                border-radius: 6px;
-                padding: 6px;
-            }}
-        """)
-        callout_layout = QVBoxLayout(self.status_callout)
-        callout_layout.setContentsMargins(8, 8, 8, 8)
-        callout_layout.setSpacing(4)
-
-        self.lbl_callout_title = QLabel(i18n.t("sidebar_status_compliant"))
-        self.lbl_callout_title.setStyleSheet(f"font-weight: 600; color: {theme.COLOR_SUCCESS}; font-size: 11px;")
-        self.lbl_callout_desc = QLabel(i18n.t("sidebar_status_compliant_desc"))
-        self.lbl_callout_desc.setStyleSheet(f"color: {theme.TEXT_SECONDARY}; font-size: 10px;")
-        self.lbl_callout_desc.setWordWrap(True)
-
-        callout_layout.addWidget(self.lbl_callout_title)
-        callout_layout.addWidget(self.lbl_callout_desc)
-        scroll_layout.addWidget(self.status_callout)
-
         scroll_layout.addStretch(1)
         scroll.setWidget(scroll_widget)
         main_layout.addWidget(scroll, 1)
@@ -529,6 +505,8 @@ class LinearSidebar(QFrame):
             self.lbl_callout_desc.setText(i18n.t("sidebar_status_compliant_desc"))
 
     def set_status_message(self, is_valid: bool, msg: str):
+        if not hasattr(self, "status_callout"):
+            return
         if is_valid:
             self.status_callout.setStyleSheet(f"""
                 QFrame {{

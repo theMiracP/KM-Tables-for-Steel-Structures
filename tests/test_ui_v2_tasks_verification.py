@@ -75,8 +75,8 @@ def test_task_02_03_07_eight_dual_language_columns(qapp):
     assert "Марка\n(Marka)" in headers[0]
     assert "Эскиз\n(Eskiz)" in headers[1]
     assert "Сечение / Состав\n(Kesit / Profil)" in headers[2]
-    assert "A, кН\n(Eksenel)" in headers[3]
-    assert "N, кН\n(Normal)" in headers[4]
+    assert "A, кН\n(Kesme)" in headers[3]
+    assert "N, кН\n(Eksenel)" in headers[4]
     assert "M, кН·м\n(Moment)" in headers[5]
     assert "Сталь\n(Çelik)" in headers[6]
     assert "Примечание\n(Not)" in headers[7]
@@ -89,9 +89,9 @@ def test_task_02_03_07_eight_dual_language_columns(qapp):
     editor._load_items_to_table(items)
 
     # 1. satır için sütun kontrolleri:
-    # Col 3: Eksenel kuvvet (force_a = "85")
+    # Col 3: Kesme kuvveti (force_a = "85")
     assert tw.item(0, 3).text() == "85"
-    # Col 4: Normal kuvvet (force_n = "45")
+    # Col 4: Eksenel yük (force_n = "45")
     assert tw.item(0, 4).text() == "45"
     # Col 5: Moment (force_m = "11,5")
     assert tw.item(0, 5).text() == "11,5"
@@ -292,8 +292,8 @@ def test_task_16_fixed_russian_with_selected_language_headers(qapp):
         "Марка\n(Marka)",
         "Эскиз\n(Eskiz)",
         "Сечение / Состав\n(Kesit / Profil)",
-        "A, кН\n(Eksenel)",
-        "N, кН\n(Normal)",
+        "A, кН\n(Kesme)",
+        "N, кН\n(Eksenel)",
         "M, кН·м\n(Moment)",
         "Сталь\n(Çelik)",
         "Примечание\n(Not)",
@@ -307,8 +307,8 @@ def test_task_16_fixed_russian_with_selected_language_headers(qapp):
         "Марка\n(Mark)",
         "Эскиз\n(Sketch)",
         "Сечение / Состав\n(Section / Profile)",
-        "A, кН\n(Axial)",
-        "N, кН\n(Normal)",
+        "A, кН\n(Shear)",
+        "N, кН\n(Axial)",
         "M, кН·м\n(Moment)",
         "Сталь\n(Steel)",
         "Примечание\n(Note)",
@@ -322,8 +322,8 @@ def test_task_16_fixed_russian_with_selected_language_headers(qapp):
         "Марка\n(Марка)",
         "Эскиз\n(Эскиз)",
         "Сечение / Состав\n(Сечение / Профиль)",
-        "A, кН\n(Осевое)",
-        "N, кН\n(Нормальное)",
+        "A, кН\n(Сдвиг)",
+        "N, кН\n(Осевое)",
         "M, кН·м\n(Момент)",
         "Сталь\n(Марка стали)",
         "Примечание\n(Инфо)",
@@ -347,7 +347,7 @@ def test_task_16_fixed_russian_with_selected_language_headers(qapp):
 
 def test_task_17_force_a_data_entry(qapp):
     """
-    TASK-17: Veri giriş tablosunda 'A, кН' (Eksenel kuvvet) sütununun
+    TASK-17: Veri giriş tablosunda 'A, кН' (Kesme kuvveti) sütununun
     varlığını, varsayılan değerleri yüklediğini ve veri senkronizasyonunu doğrula.
     """
     editor = ElementsScheduleWidget()
@@ -573,8 +573,8 @@ def test_task_28_cell_editor_solid_background_and_no_text_overlap(qapp):
     # 1. SolidItemDelegate atanmış olduğunu doğrula
     assert isinstance(tbl.itemDelegate(), SolidItemDelegate)
 
-    # Sütun 0 genişliğinin 'Должность (Görev)' başlığını kesmeyecek genişlikte olduğunu doğrula
-    assert tbl.columnWidth(0) >= 110
+    # Sütun 0 genişliğinin GOST 20 mm oranına uygun olduğunu doğrula (TASK-52 ile 90px)
+    assert tbl.columnWidth(0) >= 90
 
     # 2. Hücre düzenleme modunu başlat
     tbl.setCurrentCell(3, 1)

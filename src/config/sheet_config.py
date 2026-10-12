@@ -74,9 +74,16 @@ class LayoutConfig:
         Örn: 'Формат А1А' (Yatay A1), 'Формат А3А' (Yatay A3), 'Формат А4' (Dikey A4).
         """
         # Kiril 'А' harfi (U+0410)
-        base = f"А{self.size.value[1:]}"
+        size_str = self.size.value if hasattr(self.size, "value") else str(self.size)
+        base = f"А{size_str[1:]}" if len(size_str) > 1 else size_str
         # СПДС standardında yatay (альбомная) paftalarda sonuna Kiril 'А' eklenir
-        suffix = "А" if self.orientation == SheetOrientation.LANDSCAPE else ""
+        is_landscape = (
+            self.orientation == SheetOrientation.LANDSCAPE or
+            "Yatay" in str(self.orientation) or
+            "Альбомная" in str(self.orientation) or
+            "LANDSCAPE" in str(self.orientation).upper()
+        )
+        suffix = "А" if is_landscape else ""
         return f"Формат {base}{suffix}"
 
 DEFAULT_LAYOUT_CONFIG = LayoutConfig()

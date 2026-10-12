@@ -2,8 +2,10 @@
 Linear / Notion SaaS Üst Gezinme Çubuğu (TopBar).
 Breadcrumbs, Command Palette (Ctrl+K) tetikleyicisi, GOST uyumluluk rozeti ve DXF dışa aktarma eylemi.
 """
+import os
 from typing import Optional
-from PySide6.QtCore import Qt, Signal
+from PySide6.QtCore import Qt, Signal, QSize
+from PySide6.QtGui import QIcon
 from PySide6.QtWidgets import (
     QFrame, QHBoxLayout, QLabel, QPushButton, QWidget, QSizePolicy
 )
@@ -23,6 +25,7 @@ class LinearTopBar(QFrame):
     toggle_cad_requested = Signal()
     language_changed = Signal(str)
     about_requested = Signal()
+    settings_requested = Signal()
 
     def __init__(self, parent=None):
         super().__init__(parent)
@@ -41,7 +44,7 @@ class LinearTopBar(QFrame):
         layout.setContentsMargins(12, 0, 16, 0)
         layout.setSpacing(12)
 
-        # 1. SOL BÖLÜM: Kenar Çubuğu Aç/Kapa & Breadcrumb Gezintisi
+        # 1. SOL BÖLÜM: Kenar Çubuğu Aç/Kapa & Logo + KM Studio
         self.btn_toggle_sidebar = QPushButton()
         self.btn_toggle_sidebar.setIcon(icons.get_icon(icons.ICON_MENU, color=icons.COLOR_NEUTRAL))
         self.btn_toggle_sidebar.setIconSize(icons.icon_size(14))
@@ -51,25 +54,15 @@ class LinearTopBar(QFrame):
         self.btn_toggle_sidebar.clicked.connect(self.toggle_sidebar_requested.emit)
         layout.addWidget(self.btn_toggle_sidebar)
 
-        self.lbl_workspace = QLabel("🏢 KM Studio")
+        self.lbl_workspace = QLabel("📐 KM Studio")
         self.lbl_workspace.setStyleSheet(f"font-weight: 600; color: {theme.TEXT_PRIMARY}; font-size: 13px;")
         layout.addWidget(self.lbl_workspace)
 
-        lbl_sep1 = QLabel("/")
-        lbl_sep1.setStyleSheet(f"color: {theme.TEXT_MUTED}; font-size: 12px;")
-        layout.addWidget(lbl_sep1)
-
-        self.lbl_standard = QLabel("ГОСТ 21.502")
-        self.lbl_standard.setStyleSheet(f"color: {theme.TEXT_SECONDARY}; font-size: 12px;")
-        layout.addWidget(self.lbl_standard)
-
-        lbl_sep2 = QLabel("/")
-        lbl_sep2.setStyleSheet(f"color: {theme.TEXT_MUTED}; font-size: 12px;")
-        layout.addWidget(lbl_sep2)
-
-        self.lbl_active_table = QLabel("Ведомость элементов")
-        self.lbl_active_table.setStyleSheet(f"font-weight: 500; color: {theme.TEXT_PRIMARY}; font-size: 12px;")
-        layout.addWidget(self.lbl_active_table)
+        # Geriye dönük uyumluluk ve testler için dummy etiketler
+        self.lbl_standard = QLabel("")
+        self.lbl_standard.hide()
+        self.lbl_active_table = QLabel("")
+        self.lbl_active_table.hide()
 
         # 2. ORTA BÖLÜM: Linear Command Palette Tetikleyici Butonu (Ctrl+K)
         layout.addStretch(1)
@@ -101,21 +94,10 @@ class LinearTopBar(QFrame):
 
         layout.addStretch(1)
 
-        # 3. SAĞ BÖLÜM: GOST Uyum Rozeti, Dil Seçicisi ve Ana Eylem Butonu
-        self.badge_gost = QLabel(f"● {i18n.t('badge_gost_compliant')}")
-        self.badge_gost.setFixedHeight(24)
-        self.badge_gost.setStyleSheet(f"""
-            QLabel {{
-                background-color: {theme.COLOR_SUCCESS_BG};
-                color: {theme.COLOR_SUCCESS};
-                border: 1px solid {theme.COLOR_SUCCESS_BORDER};
-                border-radius: 12px;
-                padding: 0 10px;
-                font-size: 11px;
-                font-weight: 600;
-            }}
-        """)
-        layout.addWidget(self.badge_gost)
+        # 3. SAĞ BÖLÜM: Dil Seçicisi ve Ana Eylem Butonları
+        # (GOST badge kaldırıldı, geriye dönük uyumluluk için referans korundu)
+        self.badge_gost = QLabel("")
+        self.badge_gost.hide()
 
         # Dil hapları (Pills)
         self._build_language_pills(layout)
@@ -142,6 +124,16 @@ class LinearTopBar(QFrame):
         self.btn_about.clicked.connect(self.about_requested.emit)
         layout.addWidget(self.btn_about)
 
+        # Ayarlar Butonu
+        self.btn_settings = QPushButton(f" {i18n.t('btn_settings')}")
+        self.btn_settings.setIcon(icons.get_icon(icons.ICON_SETTINGS, color=icons.COLOR_NEUTRAL))
+        self.btn_settings.setIconSize(icons.icon_size(14))
+        self.btn_settings.setObjectName("ghostButton")
+        self.btn_settings.setFixedHeight(30)
+        self.btn_settings.setCursor(Qt.CursorShape.PointingHandCursor)
+        self.btn_settings.clicked.connect(self.settings_requested.emit)
+        layout.addWidget(self.btn_settings)
+
         # Linear Ana Eylem: Export DXF (Sağdan sola jilet parlamalı buton)
         self.btn_export = LinearShimmerButton(" DXF Dışa Aktar")
         self.btn_export.setIcon(icons.get_icon(icons.ICON_BOLT, color=icons.COLOR_WHITE))
@@ -158,13 +150,19 @@ class LinearTopBar(QFrame):
         lang_layout.setContentsMargins(0, 0, 0, 0)
         lang_layout.setSpacing(2)
 
+        assets_dir = os.path.join(os.path.dirname(__file__), "assets")
         self.lang_btns = {}
-        for code, label in [("tr", "TR"), ("ru", "RU"), ("en", "EN")]:
-            btn = QPushButton(label)
-            btn.setFixedSize(26, 24)
+        for code, label, svg_name in [("tr", "TR", "flag_tr.svg"), ("ru", "RU", "flag_ru.svg"), ("en", "EN", "flag_en.svg")]:
+            btn = QPushButton(f" {label}")
+            svg_path = os.path.join(assets_dir, svg_name)
+            if os.path.exists(svg_path):
+                btn.setIcon(QIcon(svg_path))
+                btn.setIconSize(QSize(16, 11))
+            btn.setFixedSize(52, 24)
             btn.setCursor(Qt.CursorShape.PointingHandCursor)
             btn.clicked.connect(lambda checked=False, c=code: self._on_lang_clicked(c))
             self.lang_btns[code] = btn
+            self.lang_btns[code.upper()] = btn
             lang_layout.addWidget(btn)
 
         self._update_lang_styles()
@@ -176,9 +174,9 @@ class LinearTopBar(QFrame):
         self._update_lang_styles()
 
     def _update_lang_styles(self):
-        curr = i18n.current_language
+        curr = i18n.current_language.lower()
         for code, btn in self.lang_btns.items():
-            if code == curr:
+            if code.lower() == curr:
                 btn.setStyleSheet(f"""
                     QPushButton {{
                         background-color: {theme.BG_SURFACE_ACTIVE};
@@ -186,8 +184,8 @@ class LinearTopBar(QFrame):
                         border: 1px solid {theme.BORDER_LIGHT};
                         border-radius: 4px;
                         font-weight: 600;
-                        font-size: 10px;
-                        padding: 0;
+                        font-size: 11px;
+                        padding: 0 4px;
                     }}
                 """)
             else:
@@ -195,13 +193,14 @@ class LinearTopBar(QFrame):
                     QPushButton {{
                         background-color: transparent;
                         color: {theme.TEXT_MUTED};
-                        border: none;
+                        border: 1px solid transparent;
                         border-radius: 4px;
-                        font-size: 10px;
-                        padding: 0;
+                        font-size: 11px;
+                        padding: 0 4px;
                     }}
                     QPushButton:hover {{
                         color: {theme.TEXT_PRIMARY};
+                        background-color: {theme.BG_SURFACE_HOVER};
                     }}
                 """)
 
@@ -298,5 +297,7 @@ class LinearTopBar(QFrame):
             self.btn_toggle_cad.setText(f" {i18n.t('btn_cad_panel')}")
         if hasattr(self, "btn_about"):
             self.btn_about.setText(f" {i18n.t('action_about')}")
+        if hasattr(self, "btn_settings"):
+            self.btn_settings.setText(f" {i18n.t('btn_settings')}")
         self.set_validation_status(getattr(self, "_is_valid", True))
         self._update_active_table_label()

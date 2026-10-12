@@ -128,22 +128,23 @@ class LinearAboutDialog(QDialog):
         web_container.addWidget(lbl_web_prefix)
 
         self.btn_web_link = QPushButton(f" {COMPANY_DISPLAY_URL}")
-        self.btn_web_link.setIcon(icons.get_icon(icons.ICON_GLOBE, color=icons.COLOR_ACCENT_BLUE))
+        self.btn_web_link.setIcon(icons.get_icon(icons.ICON_GLOBE, color=icons.COLOR_WHITE))
         self.btn_web_link.setIconSize(icons.icon_size(14))
         self.btn_web_link.setCursor(Qt.CursorShape.PointingHandCursor)
         self.btn_web_link.setStyleSheet(f"""
             QPushButton {{
-                background-color: transparent;
-                color: {theme.TEXT_ACCENT};
-                border: none;
+                background-color: #0369a1;
+                color: #ffffff;
+                border: 1px solid #38bdf8;
+                border-radius: 4px;
                 font-size: 11px;
                 font-weight: 600;
-                text-align: left;
-                padding: 0;
+                padding: 3px 8px;
             }}
             QPushButton:hover {{
+                background-color: #0284c7;
+                border-color: #ffffff;
                 color: #ffffff;
-                text-decoration: underline;
             }}
         """)
         self.btn_web_link.clicked.connect(lambda: self._open_external_url(COMPANY_WEBSITE))
@@ -190,26 +191,26 @@ class LinearAboutDialog(QDialog):
         self.btn_check_update.setCursor(Qt.CursorShape.PointingHandCursor)
         self.btn_check_update.setStyleSheet(f"""
             QPushButton {{
-                background-color: #222533;
-                color: #f3f4f6;
-                border: 1px solid #3e445b;
+                background-color: #4338ca;
+                color: #ffffff;
+                border: 1px solid #6366f1;
                 border-radius: 6px;
                 padding: 0 14px;
                 font-size: 11px;
                 font-weight: 600;
             }}
             QPushButton:hover {{
-                background-color: {theme.ACCENT_PRIMARY};
-                border-color: {theme.ACCENT_PRIMARY_HOVER};
+                background-color: #4f46e5;
+                border-color: #a5b4fc;
                 color: #ffffff;
             }}
             QPushButton:pressed {{
-                background-color: {theme.ACCENT_PRIMARY_PRESSED};
+                background-color: #3730a3;
             }}
             QPushButton:disabled {{
-                background-color: #17181f;
-                color: {theme.TEXT_MUTED};
-                border-color: {theme.BORDER_SUBTLE};
+                background-color: #1e1b4b;
+                color: #6b7280;
+                border-color: #312e81;
             }}
         """)
         self.btn_check_update.clicked.connect(self.check_for_updates)
@@ -236,9 +237,27 @@ class LinearAboutDialog(QDialog):
         self.btn_open_product_page = QPushButton(" zadax.net'te Ürün Sayfasını Aç (İndir)")
         self.btn_open_product_page.setIcon(icons.get_icon(icons.ICON_EXTERNAL_LINK, color=icons.COLOR_WHITE))
         self.btn_open_product_page.setIconSize(icons.icon_size(14))
-        self.btn_open_product_page.setObjectName("primaryButton")
         self.btn_open_product_page.setFixedHeight(28)
         self.btn_open_product_page.setCursor(Qt.CursorShape.PointingHandCursor)
+        self.btn_open_product_page.setStyleSheet(f"""
+            QPushButton {{
+                background-color: #047857;
+                color: #ffffff;
+                border: 1px solid #10b981;
+                border-radius: 6px;
+                padding: 0 14px;
+                font-size: 11px;
+                font-weight: 600;
+            }}
+            QPushButton:hover {{
+                background-color: #059669;
+                border-color: #6ee7b7;
+                color: #ffffff;
+            }}
+            QPushButton:pressed {{
+                background-color: #065f46;
+            }}
+        """)
         self.btn_open_product_page.clicked.connect(self._open_update_link)
         action_row.addWidget(self.btn_open_product_page)
 
@@ -299,21 +318,21 @@ class LinearAboutDialog(QDialog):
         self.btn_close.setCursor(Qt.CursorShape.PointingHandCursor)
         self.btn_close.setStyleSheet(f"""
             QPushButton {{
-                background-color: #202330;
-                color: #f3f4f6;
-                border: 1px solid #3c4258;
+                background-color: #334155;
+                color: #f8fafc;
+                border: 1px solid #64748b;
                 border-radius: 6px;
                 padding: 0 20px;
                 font-size: 12px;
                 font-weight: 600;
             }}
             QPushButton:hover {{
-                background-color: {theme.ACCENT_PRIMARY};
-                border-color: {theme.ACCENT_PRIMARY_HOVER};
+                background-color: #dc2626;
+                border-color: #ef4444;
                 color: #ffffff;
             }}
             QPushButton:pressed {{
-                background-color: {theme.ACCENT_PRIMARY_PRESSED};
+                background-color: #b91c1c;
             }}
         """)
         self.btn_close.clicked.connect(self.reject)

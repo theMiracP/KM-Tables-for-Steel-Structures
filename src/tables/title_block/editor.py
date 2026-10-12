@@ -262,7 +262,7 @@ class TitleBlockEditorWidget(QWidget):
         hs.setSectionResizeMode(1, QHeaderView.ResizeMode.Stretch)
         hs.setSectionResizeMode(2, QHeaderView.ResizeMode.Fixed)
         hs.setSectionResizeMode(3, QHeaderView.ResizeMode.Fixed)
-        self.tbl_signatories.setColumnWidth(0, 110)
+        self.tbl_signatories.setColumnWidth(0, 90)
         self.tbl_signatories.setColumnWidth(2, 54)
         self.tbl_signatories.setColumnWidth(3, 75)
 

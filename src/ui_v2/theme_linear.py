@@ -9,6 +9,7 @@ import os
 ASSETS_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "assets")).replace("\\", "/")
 CHEVRON_DOWN_SVG = f"{ASSETS_DIR}/chevron_down.svg"
 CHEVRON_DOWN_HOVER_SVG = f"{ASSETS_DIR}/chevron_down_hover.svg"
+CHECKMARK_SVG = f"{ASSETS_DIR}/checkmark.svg"
 
 # -----------------------------------------------------------------------------
 # RENK PALETİ (DESIGN TOKENS - LINEAR OBSIDIAN THEME)
@@ -76,16 +77,23 @@ def get_linear_stylesheet() -> str:
 
     /* --- SPLITTER (PANEL AYIRICILAR) --- */
     QSplitter::handle {{
-        background-color: {BORDER_SUBTLE};
+        background-color: {BG_SURFACE};
     }}
     QSplitter::handle:horizontal {{
-        width: 1px;
+        width: 6px;
+        background-color: {BG_SURFACE};
+        border-left: 1px solid {BORDER_SUBTLE};
+        border-right: 1px solid {BORDER_SUBTLE};
     }}
     QSplitter::handle:vertical {{
-        height: 1px;
+        height: 6px;
+        background-color: {BG_SURFACE};
+        border-top: 1px solid {BORDER_SUBTLE};
+        border-bottom: 1px solid {BORDER_SUBTLE};
     }}
-    QSplitter::handle:hover {{
+    QSplitter::handle:horizontal:hover, QSplitter::handle:vertical:hover {{
         background-color: {ACCENT_PRIMARY};
+        border-color: {ACCENT_PRIMARY_HOVER};
     }}
 
     /* --- BUTONLAR (LINEAR STİLİ) --- */
@@ -136,6 +144,40 @@ def get_linear_stylesheet() -> str:
     QPushButton#ghostButton:hover {{
         background-color: {BG_SURFACE_HOVER};
         color: {TEXT_PRIMARY};
+    }}
+
+    /* --- ONAY KUTULARI (QCHECKBOX) --- */
+    QCheckBox {{
+        color: {TEXT_PRIMARY};
+        spacing: 8px;
+        font-size: 12px;
+    }}
+    QCheckBox:hover {{
+        color: #ffffff;
+    }}
+    QCheckBox::indicator {{
+        width: 16px;
+        height: 16px;
+        border-radius: 4px;
+        border: 1px solid {BORDER_LIGHT};
+        background-color: {BG_SURFACE};
+    }}
+    QCheckBox::indicator:hover {{
+        border-color: {ACCENT_PRIMARY};
+        background-color: {BG_SURFACE_HOVER};
+    }}
+    QCheckBox::indicator:checked {{
+        border-color: {ACCENT_PRIMARY};
+        background-color: {ACCENT_PRIMARY};
+        image: url({CHECKMARK_SVG});
+    }}
+    QCheckBox::indicator:checked:hover {{
+        border-color: {ACCENT_PRIMARY_HOVER};
+        background-color: {ACCENT_PRIMARY_HOVER};
+    }}
+    QCheckBox::indicator:disabled {{
+        border-color: {BORDER_SUBTLE};
+        background-color: {BG_APP};
     }}
 
     /* --- METİN GİRDİLERİ (QLINEEDIT & QCOMBOBOX) --- */

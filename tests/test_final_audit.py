@@ -50,7 +50,7 @@ def test_audit_1_application_shell(qapp):
     assert statusbar.height() == 24 or statusbar.maximumHeight() == 24
 
     # Kompakt Header & Aktif Tablo Adı & Dil Seçimi
-    assert window.lbl_active_table_title.text() == "Ведомость элементов (ГОСТ 21.502 / КМ)"
+    assert "Ведомость элементов" in window.lbl_active_table_title.text()
     assert window.cb_lang.currentText() in ["TR", "EN", "RU"]
     window.close()
 

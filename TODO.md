@@ -3,7 +3,7 @@
 **Proje:** KM Tablo Oluşturucu (CAD Layout Tables Studio)  
 **Hedef Standartlar:** ГОСТ 21.502-2007 (КМ Çelik Tabloları), ГОСТ Р 21.101-2020 / ГОСТ 2.301 (Pafta & Antet), ГОСТ 2.302-68 (Ölçek)  
 **Geçerli Mimari:** Linear / Notion SaaS Dashboard (UI v2)  
-**Doküman Sürümü:** 1.5.0 · **Tarih:** 2026-10-08  
+**Doküman Sürümü:** 1.6.0 · **Tarih:** 2026-10-12  
 
 ---
 
@@ -12,7 +12,7 @@ Bu belge, Rusya GOST standartlarına tam uyumlu KM Çelik Konstrüksiyon çizim 
 
 ---
 
-### 🎯 BÖLÜM 1: Yapılacaklar Listesi (0 Bekleyen / 45 Onay Bekliyor)
+### 🎯 BÖLÜM 1: Yapılacaklar Listesi (0 Bekleyen / 71 Onay Bekliyor)
 
 > **Kural:** Tüm görevlerin geliştirmesi ve birim/entegrasyon testleri başarıyla tamamlanmıştır. Kullanıcı bizzat inceleyip onay verene kadar görevler Bölüm 1'de `🔍 Onay Bekliyor` durumunda tutulur; Bölüm 3'e taşınmaz.
 
@@ -65,6 +65,32 @@ Bu belge, Rusya GOST standartlarına tam uyumlu KM Çelik Konstrüksiyon çizim 
 | **TASK-43** | **Örnek Şablon Verilerinin Jenerik/Kurgusal Hale Getirilmesi (Standartlar Tablosu Sabit)** | `P1 - High` | `src/tables/title_block/*`<br>`src/tables/main_drawings/*`<br>`src/tables/working_drawings/*` | 🔍 Onay Bekliyor |
 | **TASK-44** | **Çok Dilli Başlık/Üst Bilgi Senkronizasyonu & GOST Form 2 Bölüm (Раздел) Mimarisi** | `P1 - High` | `src/ui/i18n.py`<br>`src/ui_v2/editor_wrapper.py`<br>`src/ui_v2/top_bar.py`<br>`src/tables/reference_documents/editor.py` | 🔍 Onay Bekliyor |
 | **TASK-45** | **Form 3 Antet ve Tüm Editör Başlıklarının Dinamik Çok Dilli Senkronizasyonu (TR/EN/RU)** | `P0 - Blocker` | `src/ui/i18n.py`<br>`src/tables/title_block/editor.py`<br>`src/tables/elements_schedule/editor.py`<br>`src/ui_v2/cad_panel.py` | 🔍 Onay Bekliyor |
+| **TASK-46** | **Tablo İsimlerinin ГОСТ Standartlarına Tam Uyumlu Hale Getirilmesi (Madde 1)** | `P1 - High` | `src/ui/i18n.py`<br>`src/tables/*/module.py`<br>`src/ui_v2/sidebar.py`<br>`src/ui/quick_switcher.py` | 🔍 Onay Bekliyor |
+| **TASK-47** | **Profil Listesinde Profil Şeklinin Profil İsminin Yanında Gösterilmesi (Madde 2)** | `P1 - High` | `src/tables/elements_schedule/editor.py`<br>`src/tables/elements_schedule/sketch_renderer.py` | 🔍 Onay Bekliyor |
+| **TASK-48** | **Profil İsmi Silinip Kiril Kısayolu Eklendiğinde Sona Eklenme Hatasının Düzeltilmesi (Madde 3)** | `P1 - High` | `src/tables/elements_schedule/editor.py`<br>`src/ui_v2/components.py` | 🔍 Onay Bekliyor |
+| **TASK-49** | **Veri Giriş Alanı ile CAD Tuvali Arasında Boyutlandırma Esnekliği (QSplitter) (Madde 4)** | `P1 - High` | `src/ui_v2/window.py`<br>`src/ui_v2/cad_panel.py` | 🔍 Onay Bekliyor |
+| **TASK-50** | **DXF Export Sonrası Dosya Yolunu / Klasörü Açma Onay Diyaloğu (Madde 5)** | `P2 - Medium` | `src/ui_v2/window.py`<br>`src/ui/i18n.py` | 🔍 Onay Bekliyor |
+| **TASK-51** | **Title Block Logo Alanında Şirket Yazısı Olmadığında Logonun Kutu İçinde Ortalanması (Madde 6)** | `P1 - High` | `src/tables/title_block/builder.py`<br>`src/ui/preview_canvas.py`<br>`src/export/dxf_exporter.py` | 🔍 Onay Bekliyor |
+| **TASK-52** | **Title Block Sorumlular Tablosunda Soyisim Sütunu Konumunun Standarttan Kontrolü (Madde 7)** | `P1 - High` | `src/tables/title_block/builder.py`<br>`src/tables/title_block/editor.py`<br>`src/export/dxf_exporter.py` | 🔍 Onay Bekliyor |
+| **TASK-53** | **Title Block Revizyon Sütunları Genişliğinin Standarttan Kontrol Edilip Ayarlanması (Madde 8)** | `P1 - High` | `src/tables/title_block/builder.py`<br>`src/tables/title_block/editor.py` | 🔍 Onay Bekliyor |
+| **TASK-54** | **Güncelleme Kontrol Ayarlarının ve Tercihlerinin Yapılandırılması (Madde 9)** | `P2 - Medium` | `src/services/updater.py`<br>`src/ui_v2/about_dialog.py`<br>`src/config/app_config.py` | 🔍 Onay Bekliyor |
+| **TASK-55** | **Hakkında (About) Butonlarının Hover Olmadığında da Farklı Renklerle Görünmesi (Madde 10)** | `P2 - Medium` | `src/ui_v2/about_dialog.py`<br>`src/ui_v2/theme_linear.py` | 🔍 Onay Bekliyor |
+| **TASK-56** | **Tüm Tabloları Paftalara Otomatik Yerleştiren Dinamik Sistem & Ortak Antet (Madde 11)** | `P0 - Blocker` | `src/models/sheet.py`<br>`src/config/sheet_config.py`<br>`src/export/dxf_exporter.py`<br>`src/ui/preview_canvas.py`<br>`src/ui_v2/window.py` | 🔍 Onay Bekliyor |
+| **TASK-57** | **AutoCAD DXF Katman (Layer) İsimleri, Renkleri ve Ayarlar Paneli** | `P1 - High` | `src/config/dxf_config.py`<br>`src/ui_v2/settings_dialog.py`<br>`src/export/dxf_exporter.py` | 🔍 Onay Bekliyor |
+| **TASK-58** | **Tablo Şablon / Önayar (Preset) Yönetim Sistemi (Bağımsız Kaydetme & Yükleme)** | `P1 - High` | `src/services/preset_manager.py`<br>`src/ui_v2/preset_dialog.py`<br>`src/tables/*/editor.py` | 🔍 Onay Bekliyor |
+| **TASK-59** | **Title Block "Logo Göster" Checkbox Görünürlüğü (Madde 1)** | `P1 - High` | `src/ui_v2/theme_linear.py`<br>`src/ui_v2/assets/checkmark.svg` | 🔍 Onay Bekliyor |
+| **TASK-60** | **Tablo İsimlerinin Standart Üçlü Formata Getirilmesi (GOST / Tablo No / İsim) (Madde 2)** | `P1 - High` | `src/ui/i18n.py` | 🔍 Onay Bekliyor |
+| **TASK-61** | **Ayarlar Menüsü "Uygulama Açıldığında Güncelle" Checkbox Görünürlüğü (Madde 3)** | `P1 - High` | `src/ui_v2/theme_linear.py`<br>`src/ui_v2/settings_dialog.py` | 🔍 Onay Bekliyor |
+| **TASK-62** | **Güncelleme URL Alanının Sabitlenmesi & Resmi Sunucu Kartı (Madde 4)** | `P2 - Medium` | `src/ui_v2/settings_dialog.py` | 🔍 Onay Bekliyor |
+| **TASK-63** | **AutoCAD Katman Adı Alanı İmleç ve Satır Yüksekliği İyileştirmesi (Madde 5)** | `P1 - High` | `src/ui_v2/settings_dialog.py` | 🔍 Onay Bekliyor |
+| **TASK-64** | **AutoCAD Renk Ayarlarında Renk Kutuları (Swatch) ve 255 ACI Renk Paleti (Madde 6)** | `P1 - High` | `src/ui_v2/settings_dialog.py` | 🔍 Onay Bekliyor |
+| **TASK-65** | **AutoCAD Çizgi Kalınlıkları İçin Özel Kalınlık (Custom mm) Desteği (Madde 7)** | `P1 - High` | `src/ui_v2/settings_dialog.py` | 🔍 Onay Bekliyor |
+| **TASK-66** | **Kenar Çubuğu Alt Callout Kartının ve Üst Bar GOST Rozetinin Kaldırılması (Madde 8)** | `P2 - Medium` | `src/ui_v2/sidebar.py`<br>`src/ui_v2/top_bar.py` | 🔍 Onay Bekliyor |
+| **TASK-67** | **Dil Seçeneklerinin Yanına Ülke Bayrak Simgelerinin Eklenmesi (🇹🇷, 🇬🇧, 🇷🇺) (Madde 9)** | `P2 - Medium` | `src/ui_v2/top_bar.py` | 🔍 Onay Bekliyor |
+| **TASK-68** | **Eleman Listesi "Eleman Ekle" Butonundaki Mükerrer '+' İşaretinin Temizlenmesi (Madde 10)** | `P2 - Medium` | `src/ui/i18n.py`<br>`src/tables/elements_schedule/editor.py` | 🔍 Onay Bekliyor |
+| **TASK-69** | **Editör Başlık Metni ile Şablon Butonlarının Ayrılması (Çakışma Önleme) (Madde 11)** | `P1 - High` | `src/ui_v2/editor_wrapper.py`<br>`src/ui/i18n.py` | 🔍 Onay Bekliyor |
+| **TASK-70** | **Üst Barda Yalnızca Logo ve "KM Studio" İsim Alanının Bırakılması (Madde 12)** | `P2 - Medium` | `src/ui_v2/top_bar.py` | 🔍 Onay Bekliyor |
+| **TASK-71** | **Eleman Listesinde Profil İsmi Değişince Anında Algılama & Gecikmesiz Senkronizasyon (Madde 13)** | `P1 - High` | `src/tables/elements_schedule/editor.py` | 🔍 Onay Bekliyor |
 
 ---
 
@@ -671,12 +697,207 @@ Bu belge, Rusya GOST standartlarına tam uyumlu KM Çelik Konstrüksiyon çizim 
   4. **Testler (`test_task_45_multilingual_sync`):**
      - TR, EN ve RU dillerinde Form 3 Antet etiketleri, revizyon ve imza tabloları, çalışma çizimleri butonları ve CAD rozetlerinin anlık değiştiği test edilerek 142 testin tamamı (%100) başarıyla doğrulandı.
 
+##### 🔹 [TASK-46] Tablo İsimlerinin ГОСТ Standartlarına Tam Uyumlu Hale Getirilmesi (Madde 1) — 🔍 Onay Bekliyor
+- **İstek:** "1-tablo isimleri gost'a tam uyumlu olacak."
+- **Yapılan İş:**
+  1. `src/ui/i18n.py` ve tablo modüllerindeki (`elements_schedule`, `title_block`, `reference_documents`, `main_drawings`, `working_drawings`) başlıklar resmi Rus standartlarındaki terminolojiye tam uyumlu hale getirildi.
+  2. Kenar çubuğu (`LinearSidebar`), hızlı geçiş (`QuickTableSwitcherDialog`), üst bar breadcrumb ve editör başlıklarında ГОСТ adları ve iki satırlı iki dilli (Rusça standart + parantez içi Türkçe/İngilizce) isimler senkronize edildi.
+
+##### 🔹 [TASK-47] Profil Listesinde (Ведомость элементов) Profil Kesit Şeklinin Profil İsminin Yanında Gösterilmesi (Madde 2) — 🔍 Onay Bekliyor
+- **İstek:** "2- profil listesinde profil tipinin şekli tabloda profil isminin yanında görünecek."
+- **Yapılan İş:**
+  1. `src/tables/elements_schedule/sketch_renderer.py` modülü geliştirilerek `get_sketch_icon()` ile tüm kesit tipleri için (I-kiriş, Kutu, Boru, Şveller, Köşebent, Levha vb.) 24px yüksek çözünürlüklü vektörel CAD kesit ikonları üretildi.
+  2. `src/tables/elements_schedule/editor.py` tablosunda "Сечение / Состав" hücresine profil tipine karşılık gelen kesit ikonu doğrudan entegre edildi.
+
+##### 🔹 [TASK-48] Profil Listesi Hücre Temizleme Sonrası Kiril Kısayolu Ekleme Hatasının Düzeltilmesi (Madde 3) — 🔍 Onay Bekliyor
+- **İstek:** "3-profil listesi tablosunda veri girişi olan kısımda profil isminde içerik silinip kiril alfabesinin kısayollarından eklenince silinmiş durumuna değilde önceki metnin sonunda ekliyor. düzeltilmeli."
+- **Yapılan İş:**
+  1. `src/tables/elements_schedule/editor.py` içerisindeki `_insert_char_to_active_cell` metodu güncellendi:
+     - `QApplication.focusWidget()` ile aktif düzenleme yapılan `QLineEdit` tespit edilip karakter doğrudan odaklı editörün imleç konumuna eklendi.
+     - Metin silinmişse silinmiş güncel boş metin üzerine ekleme yapılması sağlandı; eski metin dizgisine ekleme bug'ı tamamen giderildi.
+
+##### 🔹 [TASK-49] Veri Giriş Alanı ile CAD Tuvali Arasında Boyutlandırma Esnekliği (QSplitter) (Madde 4) — 🔍 Onay Bekliyor
+- **İstek:** "4- orta alan veri girişi yapılcan kısım sağ taraftan boyutu değiştirilemiyor. cad alanı sabit genişlikte kalıyor."
+- **Yapılan İş:**
+  1. `src/ui_v2/window.py` içerisindeki yatay `QSplitter` ayırıcısına minimum genişlik kısıtlamaları (`editor_wrapper` 320px, `cad_panel` 250px) ve `setHandleWidth(6)` atandı.
+  2. `src/ui_v2/theme_linear.py` CSS temasında `QSplitter::handle:horizontal` modern 6px genişliğinde, yüksek kontrastlı hover efektli olarak stillendirildi; kullanıcının fareyle rahatça tutup boyutu değiştirebilmesi sağlandı.
+
+##### 🔹 [TASK-50] DXF Export Sonrası Dosya Yolunu / Klasörü Açma Onay Diyaloğu (Madde 5) — 🔍 Onay Bekliyor
+- **İstek:** "5-dxf export aldığında dosya yolunu açmak için kullanıcıya sorsun"
+- **Yapılan İş:**
+  1. `src/ui_v2/window.py` içerisindeki `_export_dxf` metodu güncellendi.
+  2. Dışa aktarma tamamlandığında kullanıcıya `open_folder_prompt` onay kutusu gösterilir; kullanıcı "Klasörü Aç" butonuna tıkladığında Windows Explorer (`explorer /select, <path>`) açılarak üretilen DXF dosyası vurgulanır.
+  3. `src/ui/i18n.py` sözlüğüne TR, EN ve RU dillerinde çeviri anahtarları eklendi.
+
+##### 🔹 [TASK-51] Title Block Logo Alanında Şirket Yazısı Olmadığında Logonun Kutu İçinde Ortalanması (Madde 6) — 🔍 Onay Bekliyor
+- **İstek:** "6-title blockta alogo kısmında eğer şiket yazısı eklenmeyecekse resim kutu içinde ortalanmalı"
+- **Yapılan İş:**
+  1. `src/tables/title_block/builder.py`, `src/ui/preview_canvas.py` ve `src/export/dxf_exporter.py` güncellendi.
+  2. Şirket adı (`company_name`) boş olduğunda logo amblemi 50x15 mm kutunun tam ortasına ($X$ ve $Y$ merkezli) yerleştirildi; hem tuvalde hem DXF çıktısında WYSIWYG ortalama sağlandı.
+
+##### 🔹 [TASK-52] Title Block Sorumlular Tablosunda Soyisim Sütunu Konumunun Standarttan Kontrolü (Madde 7) — 🔍 Onay Bekliyor
+- **İstek:** "7-title blockta soyismin olduğu sutun bir soldan başlamalı. (standarttan kontrol edilerek)"
+- **Yapılan İş:**
+  1. ГОСТ Р 21.101-2020 Form 3 standardı (Çizim 1) incelendi:
+     - Графа 10 (Görev / Должность): 20 mm (`colspan=2`, cols 0..1)
+     - Графа 11 (Soyadı / Фамилия): 25 mm (`colspan=2`, cols 2..3 - bir soldan başlar!)
+     - Графа 12 (İmza / Подпись): 10 mm (col 4)
+     - Графа 13 (Tarih / Дата): 15 mm (col 5)
+  2. `src/tables/title_block/builder.py` ve `src/tables/title_block/editor.py` güncellenerek soyisim sütunu standart gereği bir soldan başlatıldı.
+
+##### 🔹 [TASK-53] Title Block Revizyon Sütunları Genişliğinin Standarttan Kontrol Edilip Ayarlanması (Madde 8) — 🔍 Onay Bekliyor
+- **İstek:** "8-titleblockta revision sutunları genişliği kontrol edilmeli (standarttan kontrol edilerek)"
+- **Yapılan İş:**
+  1. ГОСТ Р 21.101-2020 Form 3 standardı revizyon tablosu kontrol edildi:
+     - `Изм.` (10 mm), `Кол.уч.` (10 mm), `Лист` (10 mm), `№док.` (15 mm), `Подпись` (10 mm), `Дата` (15 mm). Toplam 70 mm.
+  2. `TitleBlockTableBuilder` COL_WIDTHS ve `TitleBlockEditorWidget` revizyon tablosu sütun genişlikleri resmi GOST milimetrik değerlerine tam hizalandı.
+
+##### 🔹 [TASK-54] Güncelleme Kontrol Ayarlarının ve Tercihlerinin Yapılandırılması (Madde 9) — 🔍 Onay Bekliyor
+- **İstek:** "9-güncelleme kontrol ayarları yaplacak."
+- **Yapılan İş:**
+  1. `src/services/settings.py` içinde `UpdaterSetting` modeli kuruldu (başlangıçta kontrol etme, kontrol URL'si `https://zadax.net/...`).
+  2. `src/ui_v2/settings_dialog.py` Ayarlar penceresine canlı test butonu ("Bağlantıyı Sına") ve otomatik kontrol tercihleri eklendi.
+  3. `src/services/updater.py` modülüne HTML fallback regex ayrıştırıcısı eklenerek Zadax.net ürün sayfası HTML içeriğinden sürüm ve indirme linki yakalama yeteneği kazandırıldı.
+
+##### 🔹 [TASK-55] Hakkında (About) Butonlarının Hover Olmadığında da Farklı Renklerle Görünmesi (Madde 10) — 🔍 Onay Bekliyor
+- **İstek:** "10-about kısmında butonlar mause olmayınca da renklenecek. farklı renkler ile."
+- **Yapılan İş:**
+  1. `src/ui_v2/about_dialog.py` içindeki tüm aksiyon butonları varsayılan durumlarında da farklı ve yüksek kontrastlı renklere kavuşturuldu:
+     - `btn_web_link`: Deep Sky (`#0369a1` zemin, `#38bdf8` kenarlık)
+     - `btn_check_update`: Indigo (`#4338ca` zemin, `#6366f1` kenarlık)
+     - `btn_open_product_page`: Emerald Green (`#047857` zemin, `#10b981` kenarlık)
+     - `btn_close`: Slate Steel (`#334155` zemin, kırmızı hover)
+
+##### 🔹 [TASK-56] Tüm Tabloları Paftalara Otomatik Yerleştiren Dinamik Sistem & Ortak Antet (Madde 11) — 🔍 Onay Bekliyor
+- **İstek:** "11-tüm tabloları paftalara otomatik yerleştiren sistem yapılacak. tablo eklenmesine uyumlu şekilde. seçilen sayfa boyuyu yeterli değilse başka bir pafta daha açacak. titleblock tüm paftalarda ortak kullanılacak."
+- **Yapılan İş:**
+  1. `src/models/multi_sheet.py` altında `MultiSheetLayoutManager` motoru geliştirildi:
+     - Tabloların toplam yüksekliklerini hesaplayarak seçilen paftaya (A4, A3, A2, A1) sığmadığında otomatik olarak yeni paftalar (Pafta 1, Pafta 2...) açar.
+     - Form 3 ana anteti (185x55 mm) her paftanın sağ alt köşesinde ortak proje bilgileriyle oluşturur; pafta numarasını (`Лист 1`, `Лист 2`...) ve toplam pafta sayısını (`Листов N`) otomatik dinamik üretir.
+  2. `src/export/dxf_exporter.py` sınıfına `export_multi_sheet()` metodu eklendi; tüm paftalar AutoCAD Modelspace'te 50 mm aralıkla yan yana 1:1 ölçekli dışa aktarılır.
+  3. `src/ui/preview_canvas.py` ve `src/ui_v2/cad_panel.py` üzerine `render_multi_sheet()` ve HUD çoklu pafta butonu entegre edildi.
+
+##### 🔹 [TASK-57] AutoCAD DXF Katman (Layer) İsimleri, Renkleri ve Ayarlar Paneli — 🔍 Onay Bekliyor
+- **İstek:** "1- ayarlar alanı eklenmeli. burada aucad layer isimleri ve renkleri falan tutulsun. kullanıcı isterse değiştirsin."
+- **Yapılan İş:**
+  1. `src/services/settings.py` altında `SettingsManager` geliştirildi; `~/.km_tables_studio/settings.json` dosyasında katman adları, ACI renkleri (1..255), çizgi kalınlıkları ve tipleri kalıcı olarak saklanır.
+  2. `src/ui_v2/settings_dialog.py` (`LinearSettingsDialog`) modern ayarlar penceresi oluşturuldu; ACI renk paleti, çizgi kalınlıkları seçimi ve "Varsayılanlara Sıfırla" desteği sunuldu.
+  3. `LinearTopBar` üzerine "⚙️ Ayarlar" butonu eklendi.
+  4. `DxfExporter` motoru katman adlarını doğrudan `SettingsManager` üzerinden dinamik çözecek şekilde entegre edildi.
+
+##### 🔹 [TASK-58] Tablo Şablon / Önayar (Preset) Yönetim Sistemi (Bağımsız Kaydetme & Yükleme) — 🔍 Onay Bekliyor
+- **İstek:** "2-tablolar için kullanıcı yaptığı tabloları ayrı ayrı preset olarak kaydetsin. her tabloyu baştan yapmasına gerek kalmaz. aynı projede çalışıyorsa önceki yaptığı tabloyu çağırıp üzerinde oynama yapabilir."
+- **Yapılan İş:**
+  1. `src/services/preset_manager.py` altında `PresetManager` geliştirildi; her tablo modülü için `~/.km_tables_studio/presets/<module_id>/` altında JSON şablonları saklanır, listelenir, yüklenir ve silinir.
+  2. `src/ui_v2/preset_dialog.py` (`SavePresetDialog`, `LoadPresetDialog`) önayar pencereleri kodlandı.
+  3. `src/ui_v2/editor_wrapper.py` başlık satırına "💾 Şablon Kaydet" ve "📂 Şablon Yükle" butonları yerleştirildi; yüklenen şablonun aktif editöre ve canlı CAD tuvaline anında yansıtılması sağlandı.
+
+##### 🔹 [TASK-59] Title Block "Logo Göster" Checkbox Görünürlüğü (Madde 1) — 🔍 Onay Bekliyor
+- **İstek:** "1-titleblockta logo göster seçneği tıklayınca görünmez oluyor."
+- **Yapılan İş:**
+  1. `src/ui_v2/assets/checkmark.svg` temiz beyaz vektörel onay simgesi oluşturuldu.
+  2. `src/ui_v2/theme_linear.py` içerisinde `QCheckBox`, `QCheckBox::indicator`, `QCheckBox::indicator:checked` QSS stilleri tanımlandı; tıklandığında arka plan mor/vurgulu renge dönüp beyaz onay işareti görünür kılındı.
+
+##### 🔹 [TASK-60] Tablo İsimlerinin Standart Üçlü Formata Getirilmesi (GOST / Tablo No / İsim) (Madde 2) — 🔍 Onay Bekliyor
+- **İstek:** "2- tablo isimleri GOST no/ tablo no (yoksa appendix no) / isim olsun. çevirileride buna göre olsun."
+- **Yapılan İş:**
+  1. `src/ui/i18n.py` içerisindeki tüm modül başlıkları TR, RU ve EN için standart formata dönüştürüldü:
+     - TR: `ГОСТ 21.502 / Tablo 1 / Eleman Listesi`, `ГОСТ Р 21.101 / Form 3 / Başlık Bloğu (Antet)`, `ГОСТ Р 21.101 / Form 2 / Referans ve Ek Dokümanlar`, `ГОСТ Р 21.101 / Form 2 / Ana Çizim Takımları`, `ГОСТ Р 21.101 / Form 1 / Çalışma Çizimleri Listesi`.
+     - RU: `ГОСТ 21.502 / Таблица 1 / Ведомость элементов`, `ГОСТ Р 21.101 / Форма 3 / Основная надпись`, `ГОСТ Р 21.101 / Форма 2 / Ведомость ссылочных и прилагаемых документов` vb.
+     - EN: `GOST 21.502 / Table 1 / Elements Schedule`, `GOST R 21.101 / Form 3 / Title Block` vb.
+
+##### 🔹 [TASK-61] Ayarlar Menüsü "Uygulama Açıldığında Güncelle" Checkbox Görünürlüğü (Madde 3) — 🔍 Onay Bekliyor
+- **İstek:** "3- uygulama her açıldığında güncelleme chek listi seçilince görünmez oluyor."
+- **Yapılan İş:**
+  1. `src/ui_v2/theme_linear.py` QCheckBox kuralı ile onaylandığında kutucuğun kaybolma problemi çözüldü.
+  2. `src/ui_v2/settings_dialog.py` içindeki `chk_startup_update` bileşeni tam görünür ve stabil hale getirildi.
+
+##### 🔹 [TASK-62] Güncelleme URL Alanının Sabitlenmesi & Resmi Sunucu Kartı (Madde 4) — 🔍 Onay Bekliyor
+- **İstek:** "4-güncelleme adresini kullanıcıya bırakma"
+- **Yapılan İş:**
+  1. `src/ui_v2/settings_dialog.py` içerisindeki kullanıcı tarafından düzenlenebilen `QLineEdit` giriş kutusu kaldırıldı.
+  2. Resmi doğrulanmış adres (`DEFAULT_UPDATE_CHECK_URL`) sabit, kopyalanabilir bilgi kartı olarak gösterildi.
+  3. Bağlantı testi ve ayar kaydetme daima resmi adrese bağlandı.
+
+##### 🔹 [TASK-63] AutoCAD Katman Adı Alanı İmleç ve Satır Yüksekliği İyileştirmesi (Madde 5) — 🔍 Onay Bekliyor
+- **İstek:** "5-autocad katman ayarları katman adı alanı imleçten küçük."
+- **Yapılan İş:**
+  1. `src/ui_v2/settings_dialog.py` katman tablosu satır yüksekliği `36px`'e çıkartıldı.
+  2. Katman adı `QLineEdit` yüksekliği `28px`, font boyutu `12px` ve iç boşluğu `padding: 4px 8px` olarak güncellendi. İmleç artık basık kalmıyor ve rahat hareket ediyor.
+
+##### 🔹 [TASK-64] AutoCAD Renk Ayarlarında Renk Kutuları (Swatch) ve 255 ACI Renk Paleti (Madde 6) — 🔍 Onay Bekliyor
+- **İstek:** "6-autocad renk ayarlarında renkleri de göstersin ayrıca autocaddeki kadar renk paleti olsun"
+- **Yapılan İş:**
+  1. `make_color_icon` fonksiyonu ile renk açılır kutusundaki her rengin yanına gerçek renk önizleme kutusu (swatch) eklendi.
+  2. `AciColorPickerDialog` iletişim kutusu geliştirildi; AutoCAD'deki gibi 1-9 Standart renkler, 10-249 renk matrisi (24 sütun x 10 satır) ve 250-255 gri tonları içeren tam 255'lik AutoCAD Color Index paleti entegre edildi.
+
+##### 🔹 [TASK-65] AutoCAD Çizgi Kalınlıkları İçin Özel Kalınlık (Custom mm) Desteği (Madde 7) — 🔍 Onay Bekliyor
+- **İstek:** "7-autocad ayarları kalınlık için custon da olsun. kullanıcı isterse kalınlık girsin"
+- **Yapılan İş:**
+  1. Çizgi kalınlığı açılır menüsüne `📐 Özel Kalınlık...` seçeneği eklendi.
+  2. Kullanıcı bu seçeneği seçtiğinde açılan sayısal girdi kutusuyla dilediği milimetrik kalınlığı (örn: 0.40 mm) girebilmesi ve menüye dinamik eklenmesi sağlandı.
+
+##### 🔹 [TASK-66] Kenar Çubuğu Alt Callout Kartının ve Üst Bar GOST Rozetinin Kaldırılması (Madde 8) — 🔍 Onay Bekliyor
+- **İstek:** "8-resimde verdiğim şeyleri kaldır." (Resim 1: Sol kenar çubuğu altındaki yeşil ГОСТ kartı, Resim 2: Üst bardaki yeşil GOST uyum rozeti).
+- **Yapılan İş:**
+  1. `src/ui_v2/sidebar.py` içerisinden `status_callout` yeşil kartı arayüzden kaldırıldı.
+  2. `src/ui_v2/top_bar.py` içerisinden `badge_gost` yeşil rozeti arayüzden kaldırıldı.
+
+##### 🔹 [TASK-67] Dil Seçeneklerinin Yanına Ülke Bayrak Simgelerinin Eklenmesi (🇹🇷, 🇬🇧, 🇷🇺) (Madde 9) — 🔍 Onay Bekliyor
+- **İstek:** "9-dil seçeneklerin yanına bayrak ekle."
+- **Yapılan İş:**
+  1. `src/ui_v2/top_bar.py` dil seçici butonları `🇹🇷 TR`, `🇬🇧 EN`, `🇷🇺 RU` olarak güncellendi.
+  2. Buton boyutları (48x24px) ve stilleri bayrakların net görünmesi için optimize edildi.
+
+##### 🔹 [TASK-68] Eleman Listesi "Eleman Ekle" Butonundaki Mükerrer '+' İşaretinin Temizlenmesi (Madde 10) — 🔍 Onay Bekliyor
+- **İstek:** "10-eleman listesinde eleman ekle butonunda 2 tane + var."
+- **Yapılan İş:**
+  1. `src/ui/i18n.py` dosyasındaki `add_element` çevirilerindeki metin içi '+' işaretleri kaldırıldı (`Eleman Ekle`, `Add Element`, `Добавить элемент`).
+  2. Buton ikonu olan `+` simgesi ile metin temiz biçimde hizalandı.
+
+##### 🔹 [TASK-69] Editör Başlık Metni ile Şablon Butonlarının Ayrılması (Çakışma Önleme) (Madde 11) — 🔍 Onay Bekliyor
+- **İstek:** "11-3. resimde metin ile buton çakışması var. bu alanı tüm tablolarda kontrol et. butonlar için uygun bir yer bul."
+- **Yapılan İş:**
+  1. `src/ui_v2/editor_wrapper.py` başlık alanı iki ayrı satıra bölündü:
+     - 1. Satır: Yalnızca tablo ikonu ve tam sayfa genişliğindeki tablo başlığı (metin asla kırpılmaz veya butonlarla çakışmaz).
+     - 2. Satır: Alt başlık, Excel yapıştırma ipucu ve sağ tarafta "💾 Şablon Kaydet" / "📂 Şablon Yükle" butonları.
+
+##### 🔹 [TASK-70] Üst Barda Yalnızca Logo ve "KM Studio" İsim Alanının Bırakılması (Madde 12) — 🔍 Onay Bekliyor
+- **İstek:** "12-en üst barda sadece logo ve KM Studio yazsa yeterli. yanındaki gost adını ve tablo adını sil."
+- **Yapılan İş:**
+  1. `src/ui_v2/top_bar.py` sol gezinme bölümündeki ayrıştırıcılar, standart adı (`ГОСТ 21.502`) ve aktif tablo adı etiketleri üst bardan kaldırıldı.
+  2. Yalnızca menü butonu ve `📐 KM Studio` logosu bırakıldı.
+
+##### 🔹 [TASK-71] Eleman Listesinde Profil İsmi Değişince Anında Algılama & Gecikmesiz Senkronizasyon (Madde 13) — 🔍 Onay Bekliyor
+- **İstek:** "13-eleman listesinde veri girişi kısmında profil ismi değişince hemen değiştirmiyor. biraz bekleme yapıyor."
+- **Yapılan İş:**
+  1. `src/tables/elements_schedule/editor.py` içerisine `ProfileCellDelegate` eklendi; kullanıcı hücrede profil ismini yazarken `textChanged` sinyaliyle kesit türü anında algılanır.
+  2. `_detect_sketch_type` fonksiyonu ile Rusça standart haddelenmiş profiller (`20К1`, `25Ш1`, `30Б2`, `16П`, `100х100х4`, `L 75х6` vb.) anında tanınarak eskiz türü ve ikonu eşzamanlı güncellenir.
+##### 🔹 [TASK-72] Çoklu Çıktıda Paftalarda Tablo Çakışmasının Kesin Önlenmesi & Dinamik Sütun Paketleme — 🔍 Onay Bekliyor
+- **İstek:** "çoklu çıktıda paftalarda böyle çakışma olmasın" (Ekran görüntüsü: `media_1791809000094_f549e299.png`)
+- **Kök Neden:**
+  - `MultiSheetLayoutManager` içerisinde sol sütun (2. sütun) yerleşimi hesaplanırken sağdaki 1. sütun tablosunun genişliği Form 3 antet genişliği olan `tb_w = 185.0 mm` varsayılıyordu (`tbl_cad_x = inner_w - tb_w - TABLE_GAP - t_w`).
+  - Ancak GOST 21.502 uyumlu "Ведомость элементов" tablosunun genişliği **197.0 mm**'dir.
+  - Bu nedenle 1. sütun sola doğru $X = inner\_w - 197.0$ noktasına kadar uzanırken, 2. sütunun sağ kenarı $X = inner\_w - 193.0$ noktasına yerleştiriliyor ve aralarında tam **4.0 mm fiziksel çakışma** (overlap) meydana geliyordu.
+- **Yapılan İş:**
+  1. `src/models/multi_sheet.py` dosyasındaki `MultiSheetLayoutManager.calculate_layout` algoritması dinamik sağdan-sola sütun paketleme (`PageState`, `open_new_column`) mimarisine geçirildi:
+     - 1. Sütun (Sağ kenar, Antet üstü): `x_right = inner_w`, alt sınır antetin üstü (`min_y = tb_h + TABLE_GAP`), taban genişliği `max(tb_w, max_width_tables)`.
+     - 2. ve Sonraki Sütunlar (Sola doğru): Sağ kenarı önceki sütunun gerçek maksimum genişliğine göre belirlenir (`x_right = prev_col.x_right - prev_col.max_width - TABLE_GAP`). Böylece tablolar kaç mm olursa olsun sütunlar arası mesafe daima en az `TABLE_GAP` (8.0 mm) kalır.
+     - Antetin solunda kalan sütunlar tüm dikey yüksekliği (`min_y = TABLE_GAP`) kullanır.
+     - Bir sütuna veya paftaya sığmayan tablolar için yatayda iç çerçeve payı kontrol edilir (`tbl_cad_x >= 0.0`); yatayda sığmayan tablolar için otomatik olarak yeni pafta (Pafta 2, 3...) açılır.
+  2. `src/ui_v2/cad_panel.py` içindeki Floating HUD Araç Çubuğu modernize edildi; çift kutu QFrame çizgileri düzeltildi, 1px dikey ayırıcılar eklendi ve koordinat genişliği dinamik kılındı.
+  3. `src/ui_v2/window.py` içerisinde çoklu paftaya dahil edilecek tablolar filtrelendi (pasif çelik sarfiyat ve antet hariç tutuldu).
+  4. `tests/test_tasks_46_to_58.py` altına `test_task_56_no_table_overlaps_multi_sheet` geometrik sınırlayıcı kutu (Bounding Box) ayrıklık testi eklendi; tüm paftalarda sıfır çakışma doğrulandı.
+
 ---
 
 ## 🧪 BÖLÜM 2: Test ve Kalite Güvencesi (QA)
-- **Toplam Test Sayısı:** 142 adet test (`python -m pytest` ile %100 başarılı).
-- **Yeni Doğrulama Testleri:** `tests/test_ui_v2_tasks_verification.py::test_task_45_multilingual_sync` ile Form 3 Antet ve tüm editör bileşenlerinin 3 dilde (TR, EN, RU) dinamik çeviri uyumu doğrulandı.
+- **Toplam Test Sayısı:** 168 adet test (`python -m pytest` ile %100 başarılı).
+- **Yeni Doğrulama Testleri:**
+  - `tests/test_tasks_46_to_58.py`: TASK-46'dan TASK-58'e ve TASK-72'ye kadar olan görevlerin doğrulaması (çakışmasızlık Bounding Box testi dahil).
+  - `tests/test_revisions_batch_13.py`: TASK-59'dan TASK-71'e kadar olan 13 maddelik revizyon listesinin tüm testleri.
 - DXF çıktısının **1:1 ölçekli** (`$INSUNITS = 4`) ve Form 3 antetinin **sağ altta sabit** olduğu doğrulandı.
+- Git commit işlemi kullanıcı talimatına istinaden **yapılmamış**, tüm değişiklikler test edilmek üzere çalışma dizininde temiz bırakılmıştır.
 
 ---
 

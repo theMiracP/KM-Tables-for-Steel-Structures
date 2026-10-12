@@ -22,7 +22,7 @@ class ElementsScheduleModule(TableModule):
 
     @property
     def name(self) -> str:
-        return "Ведомость элементов (ГОСТ 21.502 / КМ)"
+        return "Ведомость элементов"
 
     @property
     def category(self) -> str:

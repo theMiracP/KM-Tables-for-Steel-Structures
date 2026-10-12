@@ -3,8 +3,10 @@ KM Tablo Oluşturucu - Linear / Notion SaaS Ana Penceresi (KmLinearMainWindow).
 SaaS tarzı temiz düzen, Notion doküman gezintisi, canlı CAD tuvali ve floating HUD kontrolleri.
 """
 import os
+import sys
+import subprocess
 from typing import Optional, Any
-from PySide6.QtCore import Qt
+from PySide6.QtCore import Qt, QTimer
 from PySide6.QtGui import QKeySequence, QShortcut
 from PySide6.QtWidgets import (
     QMainWindow, QWidget, QVBoxLayout, QHBoxLayout, QSplitter,
@@ -58,6 +60,12 @@ class KmLinearMainWindow(QMainWindow):
         self.current_document: Any = self.active_module.create_default_document()
         self.current_table: Optional[Table] = None
 
+        # CAD Tuvali Yenileme Debounce Zamanlayıcısı (Kasmayı/takılmayı önler)
+        self._cad_debounce_timer = QTimer(self)
+        self._cad_debounce_timer.setSingleShot(True)
+        self._cad_debounce_timer.setInterval(60)
+        self._cad_debounce_timer.timeout.connect(self._do_refresh_table_and_cad)
+
         # UI Kurulumu
         self._build_ui()
         self._setup_shortcuts()
@@ -80,6 +88,7 @@ class KmLinearMainWindow(QMainWindow):
         self.top_bar.toggle_sidebar_requested.connect(self._toggle_sidebar)
         self.top_bar.toggle_cad_requested.connect(self._toggle_cad_panel)
         self.top_bar.about_requested.connect(self._open_about_dialog)
+        self.top_bar.settings_requested.connect(self._open_settings_dialog)
         self.top_bar.language_changed.connect(self._on_language_changed)
         root_layout.addWidget(self.top_bar)
 
@@ -98,16 +107,25 @@ class KmLinearMainWindow(QMainWindow):
         # B) Modern Splitter (Notion Data Grid + CAD Tuvali)
         self.splitter = QSplitter(Qt.Orientation.Horizontal, body_container)
         self.splitter.setChildrenCollapsible(False)
+        self.splitter.setHandleWidth(6)
 
         # Sol Panel: Veri Tablosu Editörü
         self.editor_wrapper = TableEditorWrapper(self.splitter)
+        self.editor_wrapper.setMinimumWidth(320)
         self.editor_wrapper.document_changed.connect(self._on_document_edited)
+        self.editor_wrapper.save_preset_requested.connect(self._on_save_preset)
+        self.editor_wrapper.load_preset_requested.connect(self._on_load_preset)
         self.splitter.addWidget(self.editor_wrapper)
 
         # Sağ Panel: CAD Görünüm Tuvali ve Floating HUD (Varsayılan Açık)
         self.cad_panel = CadViewportPanel(self.splitter)
+        self.cad_panel.setMinimumWidth(250)
         self.cad_panel.toggle_requested.connect(self._toggle_cad_panel)
+        self.cad_panel.multi_sheet_requested.connect(self._show_multi_sheet_layout)
         self.splitter.addWidget(self.cad_panel)
+
+        self.splitter.setStretchFactor(0, 1)
+        self.splitter.setStretchFactor(1, 1)
 
         # Başlangıç bölme oranları (%42 Editör, %58 CAD)
         self._saved_splitter_sizes = [550, 890]
@@ -163,7 +181,7 @@ class KmLinearMainWindow(QMainWindow):
         self.sidebar.set_active_module(module_id)
         self.editor_wrapper.show_module(module_id, self.current_document)
 
-        self._refresh_table_and_cad()
+        self._refresh_table_and_cad(immediate=True)
 
     def _on_language_changed(self, lang: str):
         if self.active_module:
@@ -181,18 +199,23 @@ class KmLinearMainWindow(QMainWindow):
         self.layout_config = new_config
         if self.active_module:
             self.module_layout_configs[self.active_module.id] = new_config
-        self._refresh_table_and_cad()
+        self._refresh_table_and_cad(immediate=True)
 
-    def _open_about_dialog(self):
-        """Hakkında (About) modal penceresini açar (TASK-14)."""
-        dialog = LinearAboutDialog(self)
-        dialog.exec()
+    def _refresh_table_and_cad(self, immediate: bool = False):
+        """CAD tuvali ve tablo yenilemesini yönetir. Sık güncellemelerde debounce uygular."""
+        if immediate:
+            self._cad_debounce_timer.stop()
+            self._do_refresh_table_and_cad()
+        else:
+            self._cad_debounce_timer.start()
 
-    def _refresh_table_and_cad(self):
+    def _do_refresh_table_and_cad(self):
+        """CAD tuvali ve tablo yenilemesini asıl gerçekleştiren metot."""
         if not self.active_module or not self.current_document:
             return
 
         # 1. Modülün generic Table nesnesini inşa et
+        self._current_multi_sheet_layout = None
         try:
             self.current_table = self.active_module.build_table(self.current_document)
         except Exception as e:
@@ -228,6 +251,31 @@ class KmLinearMainWindow(QMainWindow):
         dialog = QuickTableSwitcherDialog(current_module_id=self.active_module.id, parent=self)
         dialog.module_selected.connect(self._switch_to_module)
         dialog.exec()
+
+    def _open_about_dialog(self):
+        from src.ui_v2.about_dialog import LinearAboutDialog
+        dlg = LinearAboutDialog(self)
+        dlg.exec()
+
+    def _open_settings_dialog(self):
+        from src.ui_v2.settings_dialog import LinearSettingsDialog
+        dlg = LinearSettingsDialog(self)
+        dlg.exec()
+
+    def _on_save_preset(self):
+        from src.ui_v2.preset_dialog import SavePresetDialog
+        dlg = SavePresetDialog(module_id=self.active_module.id, document=self.current_document, parent=self)
+        if dlg.exec():
+            self.status_bar.set_status("Tablo Şablon Olarak Kaydedildi", is_success=True)
+
+    def _on_load_preset(self):
+        from src.ui_v2.preset_dialog import LoadPresetDialog
+        dlg = LoadPresetDialog(module_id=self.active_module.id, parent=self)
+        if dlg.exec() and dlg.loaded_document is not None:
+            self.current_document = dlg.loaded_document
+            self.editor_wrapper.show_module(self.active_module.id, self.current_document)
+            self._refresh_table_and_cad()
+            self.status_bar.set_status("Şablon Başarıyla Tabloya Uygulandı", is_success=True)
 
     def _toggle_sidebar(self):
         self.sidebar.setHidden(not self.sidebar.isHidden())
@@ -270,18 +318,86 @@ class KmLinearMainWindow(QMainWindow):
             return
 
         try:
-            self.dxf_exporter.export(
-                table=self.current_table,
-                output_path=out_path,
-                table_config=self.table_config,
-                layout_config=self.layout_config
-            )
+            if getattr(self, "_current_multi_sheet_layout", None):
+                self.dxf_exporter.export_multi_sheet(
+                    multi_sheet_layout=self._current_multi_sheet_layout,
+                    output_path=out_path,
+                    table_config=self.table_config,
+                    layout_config=self.layout_config
+                )
+            else:
+                self.dxf_exporter.export(
+                    table=self.current_table,
+                    output_path=out_path,
+                    table_config=self.table_config,
+                    layout_config=self.layout_config
+                )
             self.status_bar.set_status(f"DXF Başarıyla Dışa Aktarıldı: {os.path.basename(out_path)}", is_success=True)
-            QMessageBox.information(
-                self,
-                "Dışa Aktarma Başarılı",
-                f"Tablo başarıyla DXF olarak kaydedildi:\n\n{out_path}"
-            )
+
+            msg_box = QMessageBox(self)
+            msg_box.setIcon(QMessageBox.Icon.Information)
+            msg_box.setWindowTitle(i18n.t("export_success_title"))
+            msg_box.setText(f"{i18n.t('export_success_msg', path=out_path)}\n\n{i18n.t('open_folder_prompt')}")
+            btn_open = msg_box.addButton(i18n.t("btn_open_folder"), QMessageBox.ButtonRole.AcceptRole)
+            btn_close = msg_box.addButton(i18n.t("btn_close"), QMessageBox.ButtonRole.RejectRole)
+            msg_box.setDefaultButton(btn_open)
+            msg_box.exec()
+
+            if msg_box.clickedButton() == btn_open:
+                self._open_file_in_explorer(out_path)
         except Exception as e:
             self.status_bar.set_status(f"DXF Dışa Aktarma Başarısız: {e}", is_success=False)
             QMessageBox.critical(self, "Hata", f"DXF dışa aktarılırken hata oluştu:\n{e}")
+
+    def _show_multi_sheet_layout(self):
+        """Tüm proje tablolarını sayfa boyutuna göre otomatik olarak paftalara yerleştirir."""
+        from src.models.multi_sheet import MultiSheetLayoutManager
+        tables = self._get_all_project_tables()
+        ms_layout = MultiSheetLayoutManager.calculate_layout(
+            tables=tables,
+            layout_config=self.layout_config,
+            shared_title_block=self.layout_config.title_block_doc
+        )
+        self._current_multi_sheet_layout = ms_layout
+        self.cad_panel.canvas.render_multi_sheet(ms_layout, auto_fit=True)
+        self.status_bar.set_status(
+            f"Otomatik Çoklu Pafta: {ms_layout.total_sheets} Pafta Oluşturuldu (Antet Ortak)",
+            is_success=True
+        )
+
+    def _get_all_project_tables(self) -> list:
+        """Kayıtlı aktif çizim tablosu modüllerinin tablolarını toplar."""
+        tables = []
+        for mod in TableRegistry.all():
+            # Yalnızca aktif tablolar dahil edilir (pasif / iptal edilen tablolar hariç)
+            if not getattr(mod, "is_active", True):
+                continue
+            # Antet (Form 3) her paftada ortak antet olarak çizilir, içerik tablosu değildir
+            if mod.id in ("title_block", "antet"):
+                continue
+            # Çelik sarfiyat tablosu henüz standart onaylanmadığı için hariç tutulur
+            if "raskhod" in mod.id or "steel_consumption" in mod.id or "sarfiyat" in mod.id:
+                continue
+
+            if mod.id == self.active_module.id:
+                doc = self.current_document
+            else:
+                doc = mod.create_default_document()
+            tbl = mod.build_table(doc)
+            if tbl and len(tbl.rows) > 0:
+                tables.append(tbl)
+        return tables
+
+    def _open_file_in_explorer(self, file_path: str):
+        """Dışa aktarılan dosyanın klasörünü işletim sistemi dosya yöneticisinde seçili olarak açar."""
+        norm_path = os.path.normpath(file_path)
+        try:
+            if sys.platform == "win32":
+                subprocess.Popen(["explorer", f"/select,{norm_path}"])
+            elif sys.platform == "darwin":
+                subprocess.Popen(["open", "-R", norm_path])
+            else:
+                folder = os.path.dirname(norm_path)
+                subprocess.Popen(["xdg-open", folder])
+        except Exception as err:
+            self.status_bar.set_status(f"Klasör açılamadı: {err}", is_success=False)

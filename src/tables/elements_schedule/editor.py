@@ -8,13 +8,14 @@ from PySide6.QtGui import QKeySequence, QShortcut, QGuiApplication, QKeyEvent
 from PySide6.QtWidgets import (
     QWidget, QVBoxLayout, QHBoxLayout, QTableWidget, QTableWidgetItem,
     QPushButton, QHeaderView, QComboBox, QLabel, QAbstractItemView,
-    QFrame, QMenu, QMessageBox
+    QFrame, QMenu, QMessageBox, QLineEdit, QApplication
 )
 
 from src.models.sketch import SectionSketch, SketchType
 from src.tables.elements_schedule.model import (
     ScheduleItem, ElementPart, ElementsScheduleDocument, build_sample_items
 )
+from src.tables.elements_schedule.sketch_renderer import get_sketch_icon
 from src.ui_v2 import theme_linear as theme
 from src.ui_v2.components import LinearComboBox, SolidItemDelegate
 from src.ui_v2 import icons
@@ -77,10 +78,29 @@ class EngineeringTableWidget(QTableWidget):
                 self.editItem(item)
             event.accept()
             return
-        elif key == Qt.Key.Key_Escape:
+        elif key in (Qt.Key.Key_Escape,):
             # Esc: Düzenlemeyi iptal et
             super().keyPressEvent(event)
             return
+        elif key in (Qt.Key.Key_Delete, Qt.Key.Key_Backspace):
+            # Seçili hücrelerin içeriğini temizle (Eskiz combo hariç)
+            if self.state() != QAbstractItemView.State.EditingState:
+                parent_w = self.parent()
+                if parent_w and hasattr(parent_w, "_block_signals"):
+                    parent_w._block_signals = True
+                try:
+                    for item in self.selectedItems():
+                        if item.column() != 1:
+                            item.setText("")
+                            if item.column() == 2:
+                                item.setIcon(QIcon())
+                finally:
+                    if parent_w and hasattr(parent_w, "_block_signals"):
+                        parent_w._block_signals = False
+                if parent_w and hasattr(parent_w, "_sync_and_emit"):
+                    parent_w._sync_and_emit()
+                event.accept()
+                return
 
         super().keyPressEvent(event)
 
@@ -109,6 +129,20 @@ class EngineeringTableWidget(QTableWidget):
             parent_widget._move_row(-1)
         elif action == act_down and hasattr(parent_widget, "_move_row"):
             parent_widget._move_row(1)
+
+
+class ProfileCellDelegate(SolidItemDelegate):
+    """Profil/kesit sütunu için yazarken anında eskiz algılayan ve senkronize eden delege."""
+    def __init__(self, owner_widget, parent=None, font_size: int = 13):
+        super().__init__(parent, font_size)
+        self.owner = owner_widget
+
+    def createEditor(self, parent, option, index):
+        editor = super().createEditor(parent, option, index)
+        if isinstance(editor, QLineEdit) and index.column() == 2:
+            row = index.row()
+            editor.textChanged.connect(lambda text, r=row: self.owner._on_profile_text_changed(r, text))
+        return editor
 
 
 class ElementsScheduleWidget(QWidget):
@@ -346,7 +380,7 @@ class ElementsScheduleWidget(QWidget):
 
         # 5. KOMPAKT MÜHENDİSLİK VERİ TABLOSU (EngineeringTableWidget)
         self.table_widget = EngineeringTableWidget(self)
-        self.table_widget.setItemDelegate(SolidItemDelegate(self.table_widget, font_size=13))
+        self.table_widget.setItemDelegate(ProfileCellDelegate(self, self.table_widget, font_size=13))
         self.table_widget.setColumnCount(8)
         self._apply_table_headers()
 
@@ -361,8 +395,8 @@ class ElementsScheduleWidget(QWidget):
         self.table_widget.setColumnWidth(0, 80)   # Марка (Marka)
         self.table_widget.setColumnWidth(1, 135)  # Эскиз (Eskiz)
         self.table_widget.setColumnWidth(2, 160)  # Сечение / Состав (Kesit / Profil)
-        self.table_widget.setColumnWidth(3, 75)   # A, кН (Eksenel)
-        self.table_widget.setColumnWidth(4, 75)   # N, кН (Normal)
+        self.table_widget.setColumnWidth(3, 75)   # A, кН (Kesme)
+        self.table_widget.setColumnWidth(4, 75)   # N, кН (Eksenel)
         self.table_widget.setColumnWidth(5, 75)   # M, кН·м (Moment)
         self.table_widget.setColumnWidth(6, 95)   # Сталь (Çelik)
         self.table_widget.setColumnWidth(7, 110)  # Примечание (Not)
@@ -454,7 +488,7 @@ class ElementsScheduleWidget(QWidget):
             cb_sketch = LinearComboBox(self.table_widget)
             cb_sketch.setFixedHeight(26)
             for label, stype, sym in SKETCH_OPTIONS:
-                cb_sketch.addItem(label, (stype, sym))
+                cb_sketch.addItem(get_sketch_icon(stype), label, (stype, sym))
             selected_idx = 0
             for opt_idx, (label, stype, sym) in enumerate(SKETCH_OPTIONS):
                 if item.sketch.sketch_type == stype:
@@ -468,14 +502,15 @@ class ElementsScheduleWidget(QWidget):
             comp_str = ", ".join(p.composition for p in item.parts) if item.parts else ""
             it_comp = QTableWidgetItem(comp_str)
             it_comp.setTextAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter)
+            it_comp.setIcon(get_sketch_icon(item.sketch.sketch_type))
             self.table_widget.setItem(row_idx, 2, it_comp)
 
-            # 3: A, кН (Eksenel)
+            # 3: A, кН (Kesme)
             it_fa = QTableWidgetItem(item.force_a)
             it_fa.setTextAlignment(Qt.AlignmentFlag.AlignCenter)
             self.table_widget.setItem(row_idx, 3, it_fa)
 
-            # 4: N, кН (Normal)
+            # 4: N, кН (Eksenel)
             it_fn = QTableWidgetItem(item.force_n)
             it_fn.setTextAlignment(Qt.AlignmentFlag.AlignCenter)
             self.table_widget.setItem(row_idx, 4, it_fn)
@@ -507,6 +542,25 @@ class ElementsScheduleWidget(QWidget):
         self.cyrillic_bar.btn_kb_toggle.setChecked(not is_vis)
 
     def _insert_char_to_active_cell(self, char: str):
+        # 1. Hücre düzenleyicisi (QLineEdit) açıksa doğrudan imleç konumuna ekle
+        focus_w = QApplication.focusWidget()
+        if isinstance(focus_w, QLineEdit) and self.table_widget.isAncestorOf(focus_w):
+            focus_w.insert(char)
+            r = self.table_widget.currentRow()
+            c = self.table_widget.currentColumn()
+            if c == 2 and r >= 0:
+                self._on_profile_text_changed(r, focus_w.text())
+            return
+
+        for edit in self.table_widget.findChildren(QLineEdit):
+            if edit.isVisible():
+                edit.insert(char)
+                r = self.table_widget.currentRow()
+                c = self.table_widget.currentColumn()
+                if c == 2 and r >= 0:
+                    self._on_profile_text_changed(r, edit.text())
+                return
+
         r = self.table_widget.currentRow()
         c = self.table_widget.currentColumn()
         if r < 0 or c < 0:
@@ -523,7 +577,48 @@ class ElementsScheduleWidget(QWidget):
 
         item.setText(item.text() + char)
         self.table_widget.setCurrentCell(r, c)
-        self._sync_and_emit()
+        self._on_cell_changed(r, c)
+
+    def _detect_sketch_type(self, raw_text: str) -> Optional[SketchType]:
+        txt = raw_text.strip()
+        if not txt:
+            return None
+
+        # 1. Açık GOST sembolleri ve anahtar kelimeler
+        if txt.startswith("Гн. □") or txt.startswith("□") or txt.startswith("Гн."):
+            return SketchType.RECT_TUBE
+        if txt.startswith("L ") or txt.startswith("∟") or txt.startswith("уг."):
+            return SketchType.ANGLE
+        if txt.startswith("[ ") or txt.startswith("Швеллер"):
+            return SketchType.CHANNEL
+        if txt.startswith("Рифл."):
+            return SketchType.CHECKERED_PLATE
+        if txt.startswith("I ") or txt.startswith("Двутавр"):
+            return SketchType.I_BEAM
+        if txt.startswith("○") or txt.startswith("ø") or txt.startswith("Ø") or txt.startswith("Труба"):
+            return SketchType.ROUND_TUBE
+        if txt.startswith("-") or txt.startswith("—") or txt.startswith("–") or txt.startswith("Полоса") or txt.startswith("Лист"):
+            return SketchType.PLATE
+
+        # 2. Tipik Rusça Profil Kodları (Haddelenmiş I-kirişler: 20К1, 25Ш1, 30Б2, 40К1 vb.)
+        import re
+        if re.search(r"^\d{2,3}[БШКДbshkd]\d?", txt, re.IGNORECASE):
+            return SketchType.I_BEAM
+        if re.search(r"^\d{1,2}[ПУпу]", txt, re.IGNORECASE):
+            return SketchType.CHANNEL
+        if re.search(r"^\d+[xX\*хХ]\d+[xX\*хХ]\d+", txt):
+            return SketchType.RECT_TUBE
+
+        return None
+
+    def _on_profile_text_changed(self, row: int, text: str):
+        """Kullanıcı hücrede profil ismini yazarken yalnızca eskiz açılır menüsünü anında günceller; tuvali kasmaması için arka plan hücresini tetiklemez."""
+        cb: Optional[QComboBox] = self.table_widget.cellWidget(row, 1)
+        if not cb:
+            return
+        det = self._detect_sketch_type(text)
+        if det is not None:
+            self._set_sketch_combo_type(cb, det)
 
     def _set_sketch_combo_type(self, cb: QComboBox, target_type: SketchType):
         for idx in range(cb.count()):
@@ -540,10 +635,12 @@ class ElementsScheduleWidget(QWidget):
         if not txt:
             return txt
 
+        # Eğer metin başka bir bilinen profile aitse (örn. 20К1 I-kiriş, L 50x5 köşebent) zorla kutu veya levha yapma
         if sketch_type == SketchType.RECT_TUBE:
             if not (txt.startswith("Гн. □") or txt.startswith("Гн.□")):
-                clean = txt.lstrip("□ ").strip()
-                return f"Гн. □ {clean}"
+                if not (txt.startswith("I ") or txt.startswith("L ") or txt.startswith("[ ") or txt.startswith("-")):
+                    clean = txt.lstrip("□ ").strip()
+                    return f"Гн. □ {clean}"
 
         elif sketch_type == SketchType.ANGLE:
             if not (txt.startswith("L ") or txt.startswith("∟") or txt.startswith("уг.")):
@@ -561,8 +658,9 @@ class ElementsScheduleWidget(QWidget):
                 return f"Рифл. -{val}"
 
         elif sketch_type == SketchType.PLATE:
-            if not (txt.startswith("-") or txt.startswith("—") or txt.startswith("Полоса")):
-                return f"-{txt}"
+            if not (txt.startswith("-") or txt.startswith("—") or txt.startswith("Полоса") or txt.startswith("Лист")):
+                if txt and txt[0].isdigit():
+                    return f"-{txt}"
 
         return txt
 
@@ -570,34 +668,27 @@ class ElementsScheduleWidget(QWidget):
         if self._block_signals:
             return
 
-        if col == 2:
-            item = self.table_widget.item(row, col)
-            if item:
-                txt = item.text().strip()
-                cb: Optional[QComboBox] = self.table_widget.cellWidget(row, 1)
-                if cb:
-                    stype, _ = cb.currentData()
-                    if txt.startswith("Гн. □") or txt.startswith("□"):
-                        self._set_sketch_combo_type(cb, SketchType.RECT_TUBE)
-                        stype = SketchType.RECT_TUBE
-                    elif txt.startswith("L ") or txt.startswith("∟"):
-                        self._set_sketch_combo_type(cb, SketchType.ANGLE)
-                        stype = SketchType.ANGLE
-                    elif txt.startswith("[ "):
-                        self._set_sketch_combo_type(cb, SketchType.CHANNEL)
-                        stype = SketchType.CHANNEL
-                    elif txt.startswith("Рифл."):
-                        self._set_sketch_combo_type(cb, SketchType.CHECKERED_PLATE)
-                        stype = SketchType.CHECKERED_PLATE
-                    elif txt.startswith("I "):
-                        self._set_sketch_combo_type(cb, SketchType.I_BEAM)
-                        stype = SketchType.I_BEAM
+        self._block_signals = True
+        try:
+            if col == 2:
+                item = self.table_widget.item(row, col)
+                if item:
+                    txt = item.text().strip()
+                    cb: Optional[QComboBox] = self.table_widget.cellWidget(row, 1)
+                    if cb:
+                        det = self._detect_sketch_type(txt)
+                        if det is not None:
+                            self._set_sketch_combo_type(cb, det)
+                            stype = det
+                        else:
+                            stype, _ = cb.currentData()
 
-                    formatted = self._auto_format_composition(txt, stype)
-                    if formatted != txt:
-                        self._block_signals = True
-                        item.setText(formatted)
-                        self._block_signals = False
+                        formatted = self._auto_format_composition(txt, stype)
+                        if formatted != txt:
+                            item.setText(formatted)
+                        item.setIcon(get_sketch_icon(stype))
+        finally:
+            self._block_signals = False
 
         self._sync_and_emit()
 
@@ -609,12 +700,14 @@ class ElementsScheduleWidget(QWidget):
         if cb:
             stype, _ = cb.currentData()
             item = self.table_widget.item(row, 2)
-            if item and item.text().strip():
-                formatted = self._auto_format_composition(item.text().strip(), stype)
-                if formatted != item.text().strip():
-                    self._block_signals = True
-                    item.setText(formatted)
-                    self._block_signals = False
+            if item:
+                item.setIcon(get_sketch_icon(stype))
+                if item.text().strip():
+                    formatted = self._auto_format_composition(item.text().strip(), stype)
+                    if formatted != item.text().strip():
+                        self._block_signals = True
+                        item.setText(formatted)
+                        self._block_signals = False
 
         self._sync_and_emit()
 
