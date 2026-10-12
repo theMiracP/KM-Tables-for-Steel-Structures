@@ -88,8 +88,8 @@ KM-Layout-Tables/
 │   │   ├── cad_panel.py     # Canlı CAD tuvali ve Floating Glass HUD
 │   │   ├── about_dialog.py  # zadax.net web bağlantılı Hakkında & Güncelleme penceresi
 │   │   └── theme_linear.py  # Obsidian Dark teması ve QSS stilleri
-│   └── version.py           # Merkezi sürüm ve ürün bilgileri (v1.2.0)
-├── tests/                   # Kapsamlı pytest test süiti (132 test, %100 başarılı)
+│   └── version.py           # Merkezi sürüm ve ürün bilgileri (v1.3.0)
+├── tests/                   # Kapsamlı pytest test süiti (168 test, %100 başarılı)
 ├── main.py                  # Uygulama ana başlatıcısı (UI v2)
 ├── requirements.txt         # Python bağımlılıkları (PySide6, ezdxf, Pillow, pytest)
 ├── README.md                # Proje tanıtım ve kullanıcı kılavuzu

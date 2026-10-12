@@ -13,7 +13,13 @@ if hasattr(sys.stdout, "reconfigure"):
     except Exception:
         pass
 
-VERSION = "1.2.0"
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+if BASE_DIR not in sys.path:
+    sys.path.insert(0, BASE_DIR)
+
+from src.version import APP_VERSION
+
+VERSION = APP_VERSION
 DIST_DIR = os.path.abspath("dist")
 BUILD_DIR = os.path.abspath("build")
 BUNDLE_NAME = f"KM-Layout-Tables-v{VERSION}-win64"

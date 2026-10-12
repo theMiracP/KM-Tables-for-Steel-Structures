@@ -28,7 +28,7 @@ def qapp():
 
 def test_version_metadata():
     """Temel sürüm ve zadax.net firma bilgilerinin doğruluğu."""
-    assert APP_VERSION == "1.2.0"
+    assert APP_VERSION == "1.3.0"
     assert "zadax.net" in COMPANY_WEBSITE
     assert COMPANY_DISPLAY_URL == "www.zadax.net"
     assert "zadax.net" in DEFAULT_UPDATE_CHECK_URL
@@ -36,31 +36,31 @@ def test_version_metadata():
 
 def test_parse_version_and_comparison():
     """Sürüm ayrıştırma ve semantik karşılaştırma mantığı."""
-    assert parse_version("1.2.0") == (1, 2, 0)
+    assert parse_version("1.3.0") == (1, 3, 0)
     assert parse_version("v1.3.5") == (1, 3, 5)
     assert parse_version("2.0") == (2, 0)
     assert parse_version("") == (0, 0, 0)
 
     # Karşılaştırmalar
-    assert is_version_newer("1.3.0", "1.2.0") is True
-    assert is_version_newer("1.2.0", "1.2.0") is False
-    assert is_version_newer("1.1.9", "1.2.0") is False
-    # String sıralama tuzağı: 1.10.0 > 1.2.0 olmalıdır
-    assert is_version_newer("1.10.0", "1.2.0") is True
+    assert is_version_newer("1.4.0", "1.3.0") is True
+    assert is_version_newer("1.3.0", "1.3.0") is False
+    assert is_version_newer("1.2.9", "1.3.0") is False
+    # String sıralama tuzağı: 1.10.0 > 1.3.0 olmalıdır
+    assert is_version_newer("1.10.0", "1.3.0") is True
     assert is_version_newer("2.0.0", "1.99.99") is True
 
 
 def test_update_check_worker_success():
     """Zadax.net üzerinden güncelleme kontrolü başarılı yanıt senaryosu."""
     payload = {
-        "version": "1.3.0",
+        "version": "1.4.0",
         "release_date": "2026-10-15",
         "product_url": "https://www.zadax.net/urun/km-layout-tables",
         "changelog": "Yeni çelik profiller eklendi."
     }
     mock_bytes = json.dumps(payload).encode("utf-8")
 
-    worker = UpdateCheckWorker(check_url="https://www.zadax.net/version.json", current_version="1.2.0")
+    worker = UpdateCheckWorker(check_url="https://www.zadax.net/version.json", current_version="1.3.0")
 
     result_info = []
     worker.check_completed.connect(lambda info: result_info.append(info))
@@ -75,7 +75,7 @@ def test_update_check_worker_success():
 
     assert len(result_info) == 1
     info = result_info[0]
-    assert info.version == "1.3.0"
+    assert info.version == "1.4.0"
     assert info.is_newer is True
     assert info.product_url == "https://www.zadax.net/urun/km-layout-tables"
     assert info.changelog == "Yeni çelik profiller eklendi."
@@ -109,7 +109,7 @@ def test_about_dialog_ui(qapp):
 
     # Sahte yeni sürüm sinyali gönderelim (QMessageBox Yes yanıtı ile mock'layalım)
     fake_update = UpdateInfo(
-        version="1.3.0",
+        version="1.4.0",
         release_date="2026-10-15",
         product_url="https://www.zadax.net/urun/km-layout-tables",
         changelog="Hata düzeltmeleri",
@@ -124,7 +124,7 @@ def test_about_dialog_ui(qapp):
     assert not dialog.new_version_frame.isHidden()
     assert not dialog.btn_open_product_page.isHidden()
     assert "zadax.net" in dialog.btn_open_product_page.text()
-    assert "Yeni sürüm mevcut: v1.3.0" in dialog.lbl_update_status.text()
+    assert "Yeni sürüm mevcut: v1.4.0" in dialog.lbl_update_status.text()
 
     # Ürün sayfasına git butonu tıklandığında URL açma çağrısı
     with patch.object(dialog, "_open_external_url") as mock_open:

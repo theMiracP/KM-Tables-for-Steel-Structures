@@ -47,6 +47,7 @@ jobs:
         draft: false
         prerelease: false
         generate_release_notes: true
+        body_path: RELEASE_NOTES_${{ github.ref_name }}.md
         files: |
           dist/*.zip
           dist/*.exe

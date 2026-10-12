@@ -14,18 +14,19 @@ from PySide6.QtWidgets import QApplication
 from PySide6.QtGui import QIcon
 from PySide6.QtCore import Qt
 from src.ui_v2 import KmLinearMainWindow
+from src.version import APP_NAME, APP_VERSION, COMPANY_NAME
 
 def main():
     # Windows Taskbar özel ikon eşlemesi (AppUserModelID)
     try:
-        myappid = "zadax.kmlayouttables.studio.1.2.0"
+        myappid = f"zadax.kmlayouttables.studio.{APP_VERSION}"
         ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID(myappid)
     except Exception:
         pass
 
     app = QApplication(sys.argv)
-    app.setApplicationName("KM Layout Tables Studio")
-    app.setOrganizationName("Zadax")
+    app.setApplicationName(APP_NAME)
+    app.setOrganizationName(COMPANY_NAME)
 
     # İkon tanımlaması
     icon_path = os.path.join(BASE_DIR, "assets", "app_icon.ico")

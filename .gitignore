@@ -15,6 +15,7 @@ venv.bak/
 .pytest_cache/
 .coverage
 htmlcov/
+test-results.xml
 
 # CAD output files
 *.dxf
