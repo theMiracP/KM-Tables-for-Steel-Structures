@@ -17,6 +17,9 @@ from src.config.sheet_config import LayoutConfig, DEFAULT_LAYOUT_CONFIG
 from src.config.table_config import TableConfig, DEFAULT_TABLE_CONFIG
 from src.contracts.table_module import TableModule
 from src.export.dxf_exporter import DxfExporter
+from src.export.pdf_exporter import PdfExporter
+from src.services.project_manager import ProjectManager
+from src.services.undo_manager import UndoManager
 from src.models.registry import TableRegistry
 from src.models.table import Table
 import src.tables  # Modülleri sisteme kaydet
@@ -46,18 +49,31 @@ class KmLinearMainWindow(QMainWindow):
         self.layout_config: LayoutConfig = DEFAULT_LAYOUT_CONFIG
         self.module_layout_configs: dict[str, LayoutConfig] = {}
         self.dxf_exporter = DxfExporter()
+        self.pdf_exporter = PdfExporter()
+        self.project_manager = ProjectManager()
+        self.undo_manager = UndoManager()
+        self.current_project_path: Optional[str] = None
+        self.module_documents: dict[str, Any] = {}
+        self._last_committed_docs: dict[str, Any] = {}
 
-        # Varsayılan Title Block dokümanını pafta antetine bağla
-        tb_mod = TableRegistry.get("title_block")
-        if tb_mod:
-            self.layout_config.title_block_doc = tb_mod.create_default_document()
+        # Tüm modüllerin dokümanlarını hafızada tut (sekme geçişlerinde veri kaybını önler)
+        import copy
+        for mod in TableRegistry.all():
+            default_doc = mod.create_default_document()
+            self.module_documents[mod.id] = default_doc
+            self._last_committed_docs[mod.id] = copy.deepcopy(default_doc)
+
+        # Varsayılan Title Block dokümanını pafta antetine bağla (Item 3.2)
+        tb_doc = self.module_documents.get("title_block")
+        if tb_doc:
+            self.layout_config.title_block_doc = tb_doc
 
         # Aktif Modül ve Doküman
         all_modules = TableRegistry.all()
         if not all_modules:
             raise RuntimeError("Sisteme kayıtlı hiçbir TableModule bulunamadı!")
         self.active_module: TableModule = all_modules[0]
-        self.current_document: Any = self.active_module.create_default_document()
+        self.current_document: Any = self.module_documents[self.active_module.id]
         self.current_table: Optional[Table] = None
 
         # CAD Tuvali Yenileme Debounce Zamanlayıcısı (Kasmayı/takılmayı önler)
@@ -85,6 +101,11 @@ class KmLinearMainWindow(QMainWindow):
         self.top_bar = LinearTopBar(central_widget)
         self.top_bar.command_palette_requested.connect(self._open_quick_switcher)
         self.top_bar.export_dxf_requested.connect(self._export_dxf)
+        self.top_bar.export_pdf_requested.connect(self._export_pdf)
+        self.top_bar.new_project_requested.connect(self._new_project)
+        self.top_bar.open_project_requested.connect(self._open_project)
+        self.top_bar.save_project_requested.connect(self._save_project)
+        self.top_bar.save_project_as_requested.connect(self._save_project_as)
         self.top_bar.toggle_sidebar_requested.connect(self._toggle_sidebar)
         self.top_bar.toggle_cad_requested.connect(self._toggle_cad_panel)
         self.top_bar.about_requested.connect(self._open_about_dialog)
@@ -115,6 +136,10 @@ class KmLinearMainWindow(QMainWindow):
         self.editor_wrapper.document_changed.connect(self._on_document_edited)
         self.editor_wrapper.save_preset_requested.connect(self._on_save_preset)
         self.editor_wrapper.load_preset_requested.connect(self._on_load_preset)
+        self.editor_wrapper.undo_requested.connect(self.undo_manager.undo)
+        self.editor_wrapper.redo_requested.connect(self.undo_manager.redo)
+        self.undo_manager.can_undo_changed.connect(self._on_can_undo_changed)
+        self.undo_manager.can_redo_changed.connect(self._on_can_redo_changed)
         self.splitter.addWidget(self.editor_wrapper)
 
         # Sağ Panel: CAD Görünüm Tuvali ve Floating HUD (Varsayılan Açık)
@@ -149,6 +174,17 @@ class KmLinearMainWindow(QMainWindow):
         QShortcut(QKeySequence("F10"), self, self._toggle_cad_panel)
         # Ctrl+E: Export DXF
         QShortcut(QKeySequence("Ctrl+E"), self, self._export_dxf)
+        # Ctrl+P: Export PDF (Item 2.3)
+        QShortcut(QKeySequence("Ctrl+P"), self, self._export_pdf)
+        # Ctrl+N / Ctrl+O / Ctrl+S / Ctrl+Shift+S: Proje Kısayolları (Item 4.1)
+        QShortcut(QKeySequence("Ctrl+N"), self, self._new_project)
+        QShortcut(QKeySequence("Ctrl+O"), self, self._open_project)
+        QShortcut(QKeySequence("Ctrl+S"), self, self._save_project)
+        QShortcut(QKeySequence("Ctrl+Shift+S"), self, self._save_project_as)
+        # Ctrl+Z / Ctrl+Y / Ctrl+Shift+Z: Undo/Redo (Item 4.2)
+        QShortcut(QKeySequence("Ctrl+Z"), self, self.undo_manager.undo)
+        QShortcut(QKeySequence("Ctrl+Y"), self, self.undo_manager.redo)
+        QShortcut(QKeySequence("Ctrl+Shift+Z"), self, self.undo_manager.redo)
 
     def _init_data(self):
         # Tüm modülleri editöre kaydet
@@ -163,17 +199,25 @@ class KmLinearMainWindow(QMainWindow):
         if not mod:
             return
 
+        # Mevcut aktif tablodaki son durumu sakla
+        if self.active_module and self.current_document:
+            self.module_documents[self.active_module.id] = self.current_document
+
         self.active_module = mod
-        self.current_document = mod.create_default_document()
+        if module_id not in self.module_documents:
+            self.module_documents[module_id] = mod.create_default_document()
+        self.current_document = self.module_documents[module_id]
 
         # Her tablo için bağımsız pafta yapılandırması (TASK-10)
+        tb_doc = self.module_documents.get("title_block", getattr(self.layout_config, "title_block_doc", None))
         if module_id not in self.module_layout_configs:
             import copy
             cfg = copy.deepcopy(DEFAULT_LAYOUT_CONFIG)
-            if self.layout_config.title_block_doc:
-                cfg.title_block_doc = self.layout_config.title_block_doc
+            cfg.title_block_doc = tb_doc
             self.module_layout_configs[module_id] = cfg
         self.layout_config = self.module_layout_configs[module_id]
+        if tb_doc:
+            self.layout_config.title_block_doc = tb_doc
         self.sidebar.set_layout_config(self.layout_config)
 
         # UI bileşenlerini güncelle
@@ -188,12 +232,53 @@ class KmLinearMainWindow(QMainWindow):
             self.top_bar.set_active_module_id(self.active_module.id)
 
     def _on_document_edited(self, new_doc: Any):
+        import copy
+        old_doc = self._last_committed_docs.get(self.active_module.id, self.current_document)
+        if not self.undo_manager.is_applying:
+            self.undo_manager.push_snapshot(
+                description=f"Edit {self.active_module.id}",
+                module_id=self.active_module.id,
+                old_state=old_doc,
+                new_state=copy.deepcopy(new_doc),
+                apply_fn=self._apply_undone_state
+            )
+
+        self._last_committed_docs[self.active_module.id] = copy.deepcopy(new_doc)
         self.current_document = new_doc
+        self.module_documents[self.active_module.id] = new_doc
+
+        # Title block metadata synchronization across all tables and multi-sheet layouts (Item 3.2)
         if self.active_module and self.active_module.id == "title_block":
             self.layout_config.title_block_doc = new_doc
             for cfg in self.module_layout_configs.values():
                 cfg.title_block_doc = new_doc
         self._refresh_table_and_cad()
+
+    def _apply_undone_state(self, module_id: str, state: Any):
+        """Undo / Redo işlemi sonucunda ilgili modülün durumunu geri yükler."""
+        import copy
+        self._last_committed_docs[module_id] = copy.deepcopy(state)
+        self.module_documents[module_id] = copy.deepcopy(state)
+        if module_id == "title_block":
+            self.layout_config.title_block_doc = state
+            for cfg in self.module_layout_configs.values():
+                cfg.title_block_doc = state
+        if self.active_module and self.active_module.id == module_id:
+            self.current_document = state
+            self.editor_wrapper.show_module(module_id, state)
+            self._refresh_table_and_cad(immediate=True)
+        else:
+            self._refresh_table_and_cad()
+
+    def _on_can_undo_changed(self, can_undo: bool):
+        self.editor_wrapper.set_undo_redo_enabled(can_undo, self.undo_manager.can_redo())
+
+    def _on_can_redo_changed(self, can_redo: bool):
+        self.editor_wrapper.set_undo_redo_enabled(self.undo_manager.can_undo(), can_redo)
+
+    def closeEvent(self, event):
+        self.undo_manager.clear()
+        super().closeEvent(event)
 
     def _on_layout_config_changed(self, new_config: LayoutConfig):
         self.layout_config = new_config
@@ -353,10 +438,11 @@ class KmLinearMainWindow(QMainWindow):
         """Tüm proje tablolarını sayfa boyutuna göre otomatik olarak paftalara yerleştirir."""
         from src.models.multi_sheet import MultiSheetLayoutManager
         tables = self._get_all_project_tables()
+        tb_doc = self.module_documents.get("title_block", getattr(self.layout_config, "title_block_doc", None))
         ms_layout = MultiSheetLayoutManager.calculate_layout(
             tables=tables,
             layout_config=self.layout_config,
-            shared_title_block=self.layout_config.title_block_doc
+            shared_title_block=tb_doc
         )
         self._current_multi_sheet_layout = ms_layout
         self.cad_panel.canvas.render_multi_sheet(ms_layout, auto_fit=True)
@@ -379,14 +465,159 @@ class KmLinearMainWindow(QMainWindow):
             if "raskhod" in mod.id or "steel_consumption" in mod.id or "sarfiyat" in mod.id:
                 continue
 
-            if mod.id == self.active_module.id:
-                doc = self.current_document
-            else:
-                doc = mod.create_default_document()
+            doc = self.module_documents.get(mod.id) or mod.create_default_document()
             tbl = mod.build_table(doc)
             if tbl and len(tbl.rows) > 0:
                 tables.append(tbl)
         return tables
+
+    def _export_pdf(self):
+        """Aktif tabloyu veya çoklu paftayı 1:1 vektörel PDF olarak dışa aktarır (Item 2.3)."""
+        default_name = (
+            f"KM_Coklu_Pafta_{self.layout_config.size.value}.pdf"
+            if getattr(self, "_current_multi_sheet_layout", None)
+            else f"{self.active_module.default_export_filename(self.current_document).replace('.dxf', '')}.pdf"
+        )
+        out_path, _ = QFileDialog.getSaveFileName(
+            self,
+            "1:1 Vektör PDF Olarak Dışa Aktar",
+            os.path.join(os.getcwd(), default_name),
+            "Adobe PDF Belgesi (*.pdf)"
+        )
+        if not out_path:
+            return
+
+        try:
+            if getattr(self, "_current_multi_sheet_layout", None):
+                self.pdf_exporter.export_multi_sheet(
+                    multi_sheet_layout=self._current_multi_sheet_layout,
+                    output_path=out_path,
+                    table_config=self.table_config,
+                    layout_config=self.layout_config
+                )
+            else:
+                if not self.current_table:
+                    QMessageBox.warning(self, "Hata", "Dışa aktarılacak aktif bir tablo bulunamadı.")
+                    return
+                self.pdf_exporter.export_sheet(
+                    table=self.current_table,
+                    output_path=out_path,
+                    table_config=self.table_config,
+                    layout_config=self.layout_config
+                )
+            self.status_bar.set_status(f"PDF Başarıyla Dışa Aktarıldı: {os.path.basename(out_path)}", is_success=True)
+
+            msg_box = QMessageBox(self)
+            msg_box.setIcon(QMessageBox.Icon.Information)
+            msg_box.setWindowTitle("PDF Dışa Aktarma Başarılı")
+            msg_box.setText(f"Vektör PDF başarıyla oluşturuldu:\n{out_path}\n\nKlasörü açmak ister misiniz?")
+            btn_open = msg_box.addButton(i18n.t("btn_open_folder"), QMessageBox.ButtonRole.AcceptRole)
+            btn_close = msg_box.addButton(i18n.t("btn_close"), QMessageBox.ButtonRole.RejectRole)
+            msg_box.setDefaultButton(btn_open)
+            msg_box.exec()
+
+            if msg_box.clickedButton() == btn_open:
+                self._open_file_in_explorer(out_path)
+        except Exception as e:
+            self.status_bar.set_status(f"PDF Dışa Aktarma Başarısız: {e}", is_success=False)
+            QMessageBox.critical(self, "Hata", f"PDF dışa aktarılırken hata oluştu:\n{e}")
+
+    def _update_window_title(self):
+        base = "KM Studio · GOST 21.502 / Linear CAD Dashboard"
+        if self.current_project_path:
+            name = os.path.basename(self.current_project_path)
+            self.setWindowTitle(f"{name} — {base}")
+        else:
+            self.setWindowTitle(f"İsimsiz Proje — {base}")
+
+    def _new_project(self):
+        """Yeni bir boş proje başlatır (Item 4.1)."""
+        self.module_documents = {}
+        for mod in TableRegistry.all():
+            self.module_documents[mod.id] = mod.create_default_document()
+        self.module_layout_configs = {}
+        self._last_committed_docs = {}
+        self.active_module = None
+        self.current_document = None
+        self.current_project_path = None
+        self.undo_manager.clear()
+        self._update_window_title()
+
+        first_mod = TableRegistry.all()[0]
+        self._switch_to_module(first_mod.id)
+        self.status_bar.set_status("Yeni Proje Başlatıldı", is_success=True)
+
+    def _open_project(self):
+        """Kaydedilmiş bir .kmproj dosyasını açar ve tüm modülleri geri yükler (Item 4.1)."""
+        file_path, _ = QFileDialog.getOpenFileName(
+            self,
+            "KM Proje Dosyasını Aç",
+            os.getcwd(),
+            "KM Studio Projesi (*.kmproj);;Tüm Dosyalar (*.*)"
+        )
+        if not file_path:
+            return
+
+        try:
+            proj_data = self.project_manager.load_from_file(file_path)
+            self.module_documents = proj_data.get("module_documents", {})
+            self.module_layout_configs = proj_data.get("module_layout_configs", {})
+            self._last_committed_docs = {}
+            self.active_module = None
+            self.current_document = None
+            self.current_project_path = file_path
+            self.undo_manager.clear()
+            self._update_window_title()
+
+            active_id = proj_data.get("active_module_id", "elements_schedule")
+            target_id = active_id if TableRegistry.get(active_id) else TableRegistry.all()[0].id
+            self._switch_to_module(target_id)
+            self.status_bar.set_status(f"Proje Yüklendi: {os.path.basename(file_path)}", is_success=True)
+        except Exception as e:
+            self.status_bar.set_status(f"Proje açılamadı: {e}", is_success=False)
+            QMessageBox.critical(self, "Hata", f"Proje dosyası yüklenirken hata oluştu:\n{e}")
+
+    def _save_project(self):
+        """Aktif projeyi mevcut dosya yoluna kaydeder (Item 4.1)."""
+        if not self.current_project_path:
+            self._save_project_as()
+            return
+
+        try:
+            if self.active_module and self.current_document:
+                self.module_documents[self.active_module.id] = self.current_document
+
+            tb_doc = self.module_documents.get("title_block", getattr(self.layout_config, "title_block_doc", None))
+            self.project_manager.save_to_file(
+                filepath=self.current_project_path,
+                documents=self.module_documents,
+                layout_configs=self.module_layout_configs,
+                active_module_id=self.active_module.id if self.active_module else "elements_schedule",
+                title_block_doc=tb_doc
+            )
+            self._update_window_title()
+            self.status_bar.set_status(f"Proje Kaydedildi: {os.path.basename(self.current_project_path)}", is_success=True)
+        except Exception as e:
+            self.status_bar.set_status(f"Proje kaydedilemedi: {e}", is_success=False)
+            QMessageBox.critical(self, "Hata", f"Proje kaydedilirken hata oluştu:\n{e}")
+
+    def _save_project_as(self):
+        """Projeyi yeni bir dosya yoluna .kmproj olarak kaydeder (Item 4.1)."""
+        default_name = "KM_Projesi.kmproj"
+        file_path, _ = QFileDialog.getSaveFileName(
+            self,
+            "KM Projesini Farklı Kaydet",
+            os.path.join(os.getcwd(), default_name),
+            "KM Studio Projesi (*.kmproj)"
+        )
+        if not file_path:
+            return
+
+        if not file_path.endswith(".kmproj"):
+            file_path += ".kmproj"
+
+        self.current_project_path = file_path
+        self._save_project()
 
     def _open_file_in_explorer(self, file_path: str):
         """Dışa aktarılan dosyanın klasörünü işletim sistemi dosya yöneticisinde seçili olarak açar."""

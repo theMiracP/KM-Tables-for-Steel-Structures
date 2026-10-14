@@ -3,7 +3,7 @@
 **Proje:** KM Tablo Oluşturucu (CAD Layout Tables Studio)  
 **Hedef Standartlar:** ГОСТ 21.502-2007 (КМ Çelik Tabloları), ГОСТ Р 21.101-2020 / ГОСТ 2.301 (Pafta & Antet), ГОСТ 2.302-68 (Ölçek)  
 **Geçerli Mimari:** Linear / Notion SaaS Dashboard (UI v2)  
-**Doküman Sürümü:** 1.6.0 · **Tarih:** 2026-10-12  
+**Doküman Sürümü:** 1.7.0 · **Tarih:** 2026-10-14  
 
 ---
 
@@ -12,7 +12,7 @@ Bu belge, Rusya GOST standartlarına tam uyumlu KM Çelik Konstrüksiyon çizim 
 
 ---
 
-### 🎯 BÖLÜM 1: Yapılacaklar Listesi (0 Bekleyen / 71 Onay Bekliyor)
+### 🎯 BÖLÜM 1: Yapılacaklar Listesi (0 Bekleyen / 79 Onay Bekliyor)
 
 > **Kural:** Tüm görevlerin geliştirmesi ve birim/entegrasyon testleri başarıyla tamamlanmıştır. Kullanıcı bizzat inceleyip onay verene kadar görevler Bölüm 1'de `🔍 Onay Bekliyor` durumunda tutulur; Bölüm 3'e taşınmaz.
 
@@ -91,6 +91,14 @@ Bu belge, Rusya GOST standartlarına tam uyumlu KM Çelik Konstrüksiyon çizim 
 | **TASK-69** | **Editör Başlık Metni ile Şablon Butonlarının Ayrılması (Çakışma Önleme) (Madde 11)** | `P1 - High` | `src/ui_v2/editor_wrapper.py`<br>`src/ui/i18n.py` | 🔍 Onay Bekliyor |
 | **TASK-70** | **Üst Barda Yalnızca Logo ve "KM Studio" İsim Alanının Bırakılması (Madde 12)** | `P2 - Medium` | `src/ui_v2/top_bar.py` | 🔍 Onay Bekliyor |
 | **TASK-71** | **Eleman Listesinde Profil İsmi Değişince Anında Algılama & Gecikmesiz Senkronizasyon (Madde 13)** | `P1 - High` | `src/tables/elements_schedule/editor.py` | 🔍 Onay Bekliyor |
+| **TASK-72** | **Çoklu Çıktıda Paftalarda Tablo Çakışmasının Kesin Önlenmesi & Dinamik Sütun Paketleme** | `P0 - Blocker` | `src/models/multi_sheet.py`<br>`src/ui_v2/cad_panel.py` | 🔍 Onay Bekliyor |
+| **TASK-73** | **Güncelleme Ayarının Kullanıcıdan Gizlenmesi & Resmi Zadax Ürün Sayfası Entegrasyonu** | `P1 - High` | `src/version.py`<br>`src/services/updater.py`<br>`src/services/settings.py`<br>`src/ui_v2/settings_dialog.py` | 🔍 Onay Bekliyor |
+| **TASK-74** | **AutoCAD Katman Tablosu Sütun Sıkışmasının Giderilmesi & Dinamik Genişlik** | `P0 - Blocker` | `src/ui_v2/settings_dialog.py`<br>`tests/test_revisions_batch_13.py` | 🔍 Onay Bekliyor |
+| **TASK-75** | **GOST Rus Çelik Sortament / Profil Seçici Kütüphanesi (Item 2.1)** | `P0 - Blocker` | `src/config/gost_profiles.json`<br>`src/services/profile_database.py`<br>`src/ui_v2/profile_picker_dialog.py`<br>`src/tables/elements_schedule/editor.py` | 🔍 Onay Bekliyor |
+| **TASK-76** | **1:1 Vektörel PDF Dışa Aktarma Motoru (Tekli ve Çoklu Paftalar) (Item 2.3)** | `P0 - Blocker` | `src/export/pdf_exporter.py`<br>`src/ui/preview_canvas.py`<br>`src/ui_v2/window.py`<br>`src/ui_v2/top_bar.py` | 🔍 Onay Bekliyor |
+| **TASK-77** | **Ortak Antet (Title Block) Verilerinin Tüm Tablolar ve Paftalarla Eşzamanlanması (Item 3.2)** | `P1 - High` | `src/ui_v2/window.py`<br>`src/models/sheet.py`<br>`src/models/multi_sheet.py` | 🔍 Onay Bekliyor |
+| **TASK-78** | **Yerel Proje Formatı (.kmproj) Kaydetme, Yükleme ve Proje Yönetimi (Item 4.1)** | `P0 - Blocker` | `src/services/project_manager.py`<br>`src/ui_v2/window.py`<br>`src/ui_v2/top_bar.py` | 🔍 Onay Bekliyor |
+| **TASK-79** | **Geri Al / İleri Al (Undo / Redo) Geri Alma Altyapısı (Item 4.2)** | `P1 - High` | `src/services/undo_manager.py`<br>`src/ui_v2/editor_wrapper.py`<br>`src/ui_v2/window.py` | 🔍 Onay Bekliyor |
 
 ---
 
@@ -889,14 +897,99 @@ Bu belge, Rusya GOST standartlarına tam uyumlu KM Çelik Konstrüksiyon çizim 
   3. `src/ui_v2/window.py` içerisinde çoklu paftaya dahil edilecek tablolar filtrelendi (pasif çelik sarfiyat ve antet hariç tutuldu).
   4. `tests/test_tasks_46_to_58.py` altına `test_task_56_no_table_overlaps_multi_sheet` geometrik sınırlayıcı kutu (Bounding Box) ayrıklık testi eklendi; tüm paftalarda sıfır çakışma doğrulandı.
 
+##### 🔹 [TASK-73] Güncelleme Ayarının Kullanıcıdan Gizlenmesi & Resmi Zadax Ürün Sayfası Entegrasyonu — 🔍 Onay Bekliyor
+- **İstek:** "güncelleme ayarını kullanıcıdan gizle. KOntrol edilecek link ise şu: https://zadax.net/tr/products/km-tables-studio-celik-yap-tablolar-ve-dxf-uretici/"
+- **Yapılan İş:**
+  1. `src/version.py` dosyasındaki `DEFAULT_UPDATE_CHECK_URL` resmi Zadax ürün sayfası adresine güncellendi (`https://zadax.net/tr/products/km-tables-studio-celik-yap-tablolar-ve-dxf-uretici/`).
+  2. `src/ui_v2/settings_dialog.py` içerisindeki resmi sunucu kartı (`self.card_server`), test butonu (`self.btn_test_url`), sonuç etiketi (`self.lbl_test_result`) ve geriye dönük uyumluluk metin kutusu (`self.txt_update_url`) kullanıcı arayüzünden tamamen gizlendi (`.hide()`).
+  3. `src/services/updater.py` içerisinde `_parse_html_page` fonksiyonu Zadax ürün sayfası JSON-LD `softwareVersion` ("v1.3.0") şemasını ve sayfa içi versiyon etiketlerini ayrıştıracak şekilde optimize edildi; ürün sayfası yönlendirme linki olarak doğrudan bu adres bağlandı.
+  4. `src/services/settings.py` ayar yükleme ve kaydetme mimarisi güncellendi; kullanıcı girdisinden bağımsız olarak kontrol adresi daima resmi ürün sayfasına bağlandı.
+  5. `tests/test_revisions_batch_13.py` ve `tests/test_updater_and_about.py` testleri güncellendi; tüm 169 test %100 başarıyla geçti.
+
+##### 🔹 [TASK-74] AutoCAD Katman Tablosu Sütun Sıkışmasının Giderilmesi & Dinamik Genişlik — 🔍 Onay Bekliyor
+- **İstek:** "bu alanda sığmamış" ve "hücreye sığmamış" (Ekran görüntüleri: `media_1791983906448_29d3c32a.png`, `media_1791988568294_696a3eca.png`)
+- **Kök Neden:**
+  - Sütun 2 (`Renk (ACI)`) içerisindeki `cb_color` ("7 - Beyaz / Siyah (White)") ve palet butonu `btn_palette` 240px genişliğe sıkıştığında, ComboBox sağ parantezi `)` kesiliyor; buton içindeki "🎨" emojisi ise Windows DirectWrite metin motorunda tek piksellik dikey çizgi (`|`) şeklinde bozuk kırpılıyordu.
+  - Sütun 0'daki uzun açıklamalarda `...` (üç nokta) oluşuyor; Sütun 3'teki "0.70 mm (Ana dış çerçeve - GOST 2.303)" metni ise açılır oka temas ediyordu.
+- **Yapılan İş:**
+  1. `src/ui_v2/settings_dialog.py` pencere boyutları ferah `setMinimumSize(960, 520)` ve `resize(1020, 570)` değerlerine optimize edildi.
+  2. Tablo sütun yerleşimi ve genişlikleri tam metin sığacak şekilde yeniden kalibre edildi:
+     - Sütun 0 (`İşlev (Açıklama)`): `Interactive` (265px — hiçbir açıklamada üç nokta kalmaz).
+     - Sütun 1 (`Katman Adı (AutoCAD)`): `Interactive` (155px — katman isimleri tam sığar).
+     - Sütun 2 (`Renk (ACI)`): `Interactive` (260px — `cb_color` metni ve parantezleri tam görünür).
+     - Sütun 3 (`Kalınlık`): `Stretch` (250px+ — kalan tüm alanı doldurur).
+  3. Palet butonundaki bozuk emoji `"🎨"` yerine QtAwesome vektörel SVG ikonu (`fa5s.palette`) entegre edildi; buton 28x28 pikselde net ve profesyonel bir görünüme kavuşturuldu.
+  4. Çizgi kalınlığı 0.70 mm metni gereksiz uzantıdan arındırılarak `"0.70 mm (Ana dış çerçeve)"` formatına getirildi.
+  5. `tests/test_revisions_batch_13.py` ve tüm test süiti (184 test) %100 başarıyla doğrulandı.
+
+##### 🔹 [TASK-75] GOST Rus Çelik Sortament / Profil Seçici Kütüphanesi (Item 2.1) — 🔍 Onay Bekliyor
+- **İstek:** "2.1'i yapmak istiyorum. kütüphane için veriye ihtiyacın olacak mı?"
+- **Yapılan İş:**
+  1. Kullanıcıdan ek veri ihtiyacı olmadan, Rus GOST standartlarına uygun kapsamlı yerleşik profil kütüphanesi oluşturuldu (`src/config/gost_profiles.json`):
+     - Двутавры (I-Kirişler): GOST R 57837-2017 / GOST 26020-83 (Б, Ш, К serileri: 20Б1, 30Б1, 40Б1, 20Ш1, 30К1 vb.)
+     - Швеллеры (U-Kanallar): GOST 8240-97 (У ve П serileri: 10П, 16П, 20П, 14У, 20У vb.)
+     - Трубы профильные (Kare & Dikdörtgen Kutu Profiller): GOST 30245-2003 / GOST 8639 (80x80x4, 100x100x5, 120x80x4, 140x140x6 vb.)
+     - Трубы круглые (Yuvarlak Çelik Borular): GOST 10704-91 / GOST 8732 (89x4, 108x4, 159x5, 219x6 vb.)
+     - Уголки (Eşkenar ve Çeşitkenar Köşebentler): GOST 8509-93 (50x5, 75x6, 100x8, 125x8 vb.)
+  2. `src/services/profile_database.py` servisi geliştirildi: kategoriye göre filtreleme, anlık metin arama ve seçilen profilden eskiz tipini (`sketch_type`) otomatik çıkarma mimarisi kuruldu.
+  3. `src/ui_v2/profile_picker_dialog.py` Linear Dark modal diyaloğu kodlandı: anlık arama kutusu, kategori hapları (Pills), profil tablosu (profil adı, standart, h/b/s/t boyutları, birim ağırlık kg/m) ve çift tıklama/seçme ile doğrudan tabloya ekleme desteği sağlandı.
+  4. `src/tables/elements_schedule/editor.py` içerisine "📚 GOST Profil..." butonu ve çift tıklama ile profil seçici diyaloğu entegre edildi.
+  5. `tests/test_profile_picker.py` ile veritabanı, filtreleme ve GUI diyaloğu test edildi.
+
+##### 🔹 [TASK-76] 1:1 Vektörel PDF Dışa Aktarma Motoru (Tekli ve Çoklu Paftalar) (Item 2.3) — 🔍 Onay Bekliyor
+- **İstek:** "2.3'ü de ekleyelim. hem tüm tablolar için hemde çoklu tablolar için"
+- **Yapılan İş:**
+  1. `src/ui/preview_canvas.py` üzerine `print_mode` (monokrom GOST teknik çizim modu: beyaz zemin, siyah net çizgiler, siyah metinler, koordinat eksensiz) ve tekil paftayı sayfaya çizen `render_single_sheet_page(page)` fonksiyonları eklendi.
+  2. `src/export/pdf_exporter.py` bağımsız 1:1 vektörel PDF dışa aktarıcısı kodlandı:
+     - `QPdfWriter` ve `QPainter` donanım vektör motoru kullanıldı.
+     - 1 CAD birimi = 1.0 mm kesin metrik ölçek sağlandı (A0, A1, A2, A3, A4 paftalarında yatay ve dikey yönde tam milimetrik GOST çerçeve ve Form 3 antet).
+     - UTF-8 Kiril metinleri ve font boyutlandırmaları kayıpsız vektörel olarak basıldı.
+     - Tekli tablolar için `export_sheet` ve çok sayfalı çizim setleri için çok sayfalı (`newPage()`) `export_multi_sheet` metotları uygulandı.
+  3. `src/ui_v2/top_bar.py` üzerine "📄 PDF Aktar" butonu ve `Ctrl+P` kısayolu entegre edildi.
+  4. `src/ui_v2/window.py` içerisinde aktif tablo veya çoklu pafta moduna göre dinamik PDF export akışı ve dışa aktarım sonrası klasörü açma diyaloğu bağlandı.
+  5. `tests/test_pdf_exporter.py` ile tekli ve çoklu pafta PDF üretimi doğrulandı.
+
+##### 🔹 [TASK-77] Ortak Antet (Title Block) Verilerinin Tüm Tablolar ve Paftalarla Eşzamanlanması (Item 3.2) — 🔍 Onay Bekliyor
+- **İstek:** "3.2 zaten titleblock ta veri varsa oradan çekecek diye anlaşmıştık."
+- **Yapılan İş:**
+  1. Title block (Form 3 ana antet) modülünde yapılan tüm veri değişikliklerinin (`doc_code`, `project_name`, `building_name`, `company_name`, mühendis imzaları vb.) anında tüm modüllerin `module_layout_configs` yapılandırmalarına ve ana `self.layout_config.title_block_doc` nesnesine aktarılması sağlandı (`src/ui_v2/window.py`).
+  2. Eleman Listesi veya diğer tablolara geçildiğinde antetin güncel şirket, proje ve imza verileriyle çizilmeye devam ettiği doğrulandı.
+  3. Çoklu pafta hesaplamasında (`MultiSheetLayoutManager`) ortak antet (`shared_title_block`) kullanıcının en son girdiği gerçek antet belgesinden beslendi.
+  4. `tests/test_ui_v2_new_features.py` altında `test_title_block_synchronization` testi ile tam entegrasyon kanıtlandı.
+
+##### 🔹 [TASK-78] Yerel Proje Formatı (.kmproj) Kaydetme, Yükleme ve Proje Yönetimi (Item 4.1) — 🔍 Onay Bekliyor
+- **İstek:** "4.1'i yapalım"
+- **Yapılan İş:**
+  1. `src/services/project_manager.py` servisi geliştirildi (`.kmproj` JSON tabanlı yerel proje dosya formatı):
+     - Tüm modüllerin dokümanları (`module_documents`), her tabloya özel bağımsız pafta konfigürasyonları (`module_layout_configs`), ortak antet ve katman ayarları eksiksiz serileştirildi ve geri yüklendi.
+  2. `src/ui_v2/top_bar.py` sol üst alanına modern açılır "📁 Proje ▾" menüsü eklendi:
+     - 📄 Yeni Proje (`Ctrl+N`)
+     - 📂 Proje Aç... (`Ctrl+O`)
+     - 💾 Projeyi Kaydet (`Ctrl+S`)
+     - 💾 Farklı Kaydet... (`Ctrl+Shift+S`)
+  3. `src/ui_v2/window.py` içerisinde proje açma/kaydetme/yeni proje döngüsü, pencere başlığı senkronizasyonu (`ProjeAdı.kmproj — KM Studio`), durum çubuğu bildirimleri kuruldu.
+  4. `tests/test_project_manager.py` ve `tests/test_ui_v2_new_features.py` testleriyle kaydetme/yükleme roundtrip döngüsü doğrulandı.
+
+##### 🔹 [TASK-79] Geri Al / İleri Al (Undo / Redo) Geri Alma Altyapısı (Item 4.2) — 🔍 Onay Bekliyor
+- **İstek:** "4.2'yi ekleyelm"
+- **Yapılan İş:**
+  1. `src/services/undo_manager.py` servisi `QUndoStack` tabanlı anlık durum (snapshot) komut yapısıyla kodlandı (`UndoManager`, `SnapshotUndoCommand`).
+  2. Python/Qt nesne ömrü (C++ deleted object) koruması ve derin kopya (`copy.deepcopy`) koruması eklenerek referans mutasyonu engellendi.
+  3. `src/ui_v2/editor_wrapper.py` editör araç çubuğuna "↩ Geri Al" ve "↪ İleri Al" butonları yerleştirildi; durumlarına göre dinamik olarak enable/disable edilmeleri sağlandı.
+  4. Global klavye kısayolları bağlandı: `Ctrl+Z` (Geri Al), `Ctrl+Y` ve `Ctrl+Shift+Z` (İleri Al).
+  5. `tests/test_undo_manager.py` ve `tests/test_ui_v2_new_features.py` testleriyle tam işlevsellik doğrulandı.
+
 ---
 
 ## 🧪 BÖLÜM 2: Test ve Kalite Güvencesi (QA)
-- **Toplam Test Sayısı:** 168 adet test (`python -m pytest` ile %100 başarılı).
+- **Toplam Test Sayısı:** 184 adet test (`python -m pytest` ile %100 başarılı).
 - **Yeni Doğrulama Testleri:**
-  - `tests/test_tasks_46_to_58.py`: TASK-46'dan TASK-58'e ve TASK-72'ye kadar olan görevlerin doğrulaması (çakışmasızlık Bounding Box testi dahil).
-  - `tests/test_revisions_batch_13.py`: TASK-59'dan TASK-71'e kadar olan 13 maddelik revizyon listesinin tüm testleri.
-- DXF çıktısının **1:1 ölçekli** (`$INSUNITS = 4`) ve Form 3 antetinin **sağ altta sabit** olduğu doğrulandı.
+  - `tests/test_profile_picker.py`: GOST Profil veritabanı, filtreleme ve seçim modalı testleri.
+  - `tests/test_pdf_exporter.py`: 1:1 vektörel PDF tekli ve çok sayfalı dışa aktarma testleri.
+  - `tests/test_project_manager.py`: Yerel `.kmproj` projesi serileştirme ve yükleme testleri.
+  - `tests/test_undo_manager.py`: QUndoStack snapshot komutları, undo/redo geçmişi ve temizleme testleri.
+  - `tests/test_ui_v2_new_features.py`: Window entegrasyonu, başlık bloğu senkronizasyonu, undo/redo ve proje kaydetme yaşam döngüsü testleri.
+- DXF ve PDF çıktılarının **1:1 ölçekli** (`$INSUNITS = 4`) ve Form 3 antetinin **sağ altta sabit** olduğu doğrulandı.
 - Git commit işlemi kullanıcı talimatına istinaden **yapılmamış**, tüm değişiklikler test edilmek üzere çalışma dizininde temiz bırakılmıştır.
 
 ---

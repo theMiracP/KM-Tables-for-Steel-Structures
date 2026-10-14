@@ -81,6 +81,44 @@ def test_update_check_worker_success():
     assert info.changelog == "Yeni çelik profiller eklendi."
 
 
+def test_update_check_worker_html_product_page():
+    """Zadax.net HTML ürün sayfasından softwareVersion ve link ayrıştırma testi."""
+    html_mock = """
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <script type="application/ld+json">
+      {
+        "@type": "SoftwareApplication",
+        "softwareVersion": "v1.4.0",
+        "offers": { "url": "https://zadax.net/tr/products/km-tables-studio-celik-yap-tablolar-ve-dxf-uretici/" }
+      }
+      </script>
+    </head>
+    <body>
+       <h1>KM Tables Studio</h1>
+    </body>
+    </html>
+    """
+    worker = UpdateCheckWorker(check_url=DEFAULT_UPDATE_CHECK_URL, current_version="1.3.0")
+    mock_resp = MagicMock()
+    mock_resp.read.return_value = html_mock.encode("utf-8")
+    mock_resp.__enter__.return_value = mock_resp
+    mock_resp.__exit__.return_value = None
+
+    result_info = []
+    worker.check_completed.connect(lambda info: result_info.append(info))
+
+    with patch("urllib.request.urlopen", return_value=mock_resp):
+        worker.run()
+
+    assert len(result_info) == 1
+    info = result_info[0]
+    assert info.version == "1.4.0"
+    assert info.is_newer is True
+    assert info.product_url == DEFAULT_UPDATE_CHECK_URL
+
+
 def test_update_check_worker_failure():
     """Zadax.net sunucusuna ulaşılamadığında hata sinyali üretimi."""
     import urllib.error

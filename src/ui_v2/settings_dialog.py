@@ -24,7 +24,7 @@ LINEWEIGHT_OPTIONS = [
     (25, "0.25 mm (Standart metin/çizgi)"),
     (35, "0.35 mm (Eskiz / belirgin)"),
     (50, "0.50 mm (Kalın çerçeve)"),
-    (70, "0.70 mm (Ana dış çerçeve - GOST 2.303)"),
+    (70, "0.70 mm (Ana dış çerçeve)"),
 ]
 
 
@@ -220,11 +220,13 @@ class LinearSettingsDialog(QDialog):
     def __init__(self, parent=None):
         super().__init__(parent)
         self.setWindowTitle("KM Layout Tables Studio · Ayarlar")
-        self.setFixedSize(760, 540)
+        self.setMinimumSize(960, 520)
+        self.resize(1020, 570)
         self.setWindowFlags(
             Qt.WindowType.Dialog |
             Qt.WindowType.WindowTitleHint |
-            Qt.WindowType.WindowCloseButtonHint
+            Qt.WindowType.WindowCloseButtonHint |
+            Qt.WindowType.WindowMinMaxButtonsHint
         )
         self.setStyleSheet(f"""
             QDialog {{
@@ -301,12 +303,14 @@ class LinearSettingsDialog(QDialog):
             }}
         """)
         h = self.tbl_layers.horizontalHeader()
-        h.setSectionResizeMode(0, QHeaderView.ResizeMode.ResizeToContents)
-        h.setSectionResizeMode(1, QHeaderView.ResizeMode.Stretch)
-        h.setSectionResizeMode(2, QHeaderView.ResizeMode.Fixed)
-        h.setSectionResizeMode(3, QHeaderView.ResizeMode.Fixed)
-        self.tbl_layers.setColumnWidth(2, 180)
-        self.tbl_layers.setColumnWidth(3, 170)
+        h.setSectionResizeMode(0, QHeaderView.ResizeMode.Interactive)
+        h.setSectionResizeMode(1, QHeaderView.ResizeMode.Interactive)
+        h.setSectionResizeMode(2, QHeaderView.ResizeMode.Interactive)
+        h.setSectionResizeMode(3, QHeaderView.ResizeMode.Stretch)
+        self.tbl_layers.setColumnWidth(0, 265)
+        self.tbl_layers.setColumnWidth(1, 155)
+        self.tbl_layers.setColumnWidth(2, 260)
+        self.tbl_layers.setColumnWidth(3, 250)
 
         self._populate_layers_table()
         l_layout.addWidget(self.tbl_layers)
@@ -343,7 +347,7 @@ class LinearSettingsDialog(QDialog):
         u_layout.setSpacing(14)
 
         lbl_upd_info = QLabel(
-            "Yazılımın yeni sürümlerini zadax.net resmi sunucusu üzerinden denetleme tercihleri:"
+            "Yazılımın yeni sürümlerini resmi Zadax platformu üzerinden otomatik denetleme tercihleri:"
         )
         lbl_upd_info.setStyleSheet(f"color: {theme.TEXT_SECONDARY}; font-size: 12px;")
         u_layout.addWidget(lbl_upd_info)
@@ -352,9 +356,9 @@ class LinearSettingsDialog(QDialog):
         self.chk_startup_update.setChecked(self.mgr.get_updater_settings().check_on_startup)
         u_layout.addWidget(self.chk_startup_update)
 
-        # Sabit Resmi Güncelleme Adresi Kartı
-        card_server = QFrame()
-        card_server.setStyleSheet(f"""
+        # Sabit Resmi Güncelleme Adresi Kartı (Kullanıcı arayüzünden gizlendi)
+        self.card_server = QFrame()
+        self.card_server.setStyleSheet(f"""
             QFrame {{
                 background-color: {theme.BG_SURFACE};
                 border: 1px solid {theme.BORDER_SUBTLE};
@@ -362,7 +366,7 @@ class LinearSettingsDialog(QDialog):
                 padding: 10px;
             }}
         """)
-        cs_layout = QVBoxLayout(card_server)
+        cs_layout = QVBoxLayout(self.card_server)
         cs_layout.setContentsMargins(12, 10, 12, 10)
         cs_layout.setSpacing(4)
 
@@ -375,13 +379,14 @@ class LinearSettingsDialog(QDialog):
         lbl_srv_url.setTextInteractionFlags(Qt.TextInteractionFlag.TextSelectableByMouse)
         cs_layout.addWidget(lbl_srv_url)
 
-        u_layout.addWidget(card_server)
+        u_layout.addWidget(self.card_server)
+        self.card_server.hide()
 
         # Geriye dönük uyumluluk ve testler için gizli QLineEdit
         self.txt_update_url = QLineEdit(DEFAULT_UPDATE_CHECK_URL)
         self.txt_update_url.hide()
 
-        # Test Butonu ve Sonuç Rozeti
+        # Test Butonu ve Sonuç Rozeti (Kullanıcı arayüzünden gizlendi)
         test_row = QHBoxLayout()
         test_row.setSpacing(10)
         self.btn_test_url = QPushButton("🔗 Bağlantıyı Test Et")
@@ -407,6 +412,9 @@ class LinearSettingsDialog(QDialog):
         self.lbl_test_result.setStyleSheet(f"font-size: 11px; color: {theme.TEXT_MUTED};")
         test_row.addWidget(self.lbl_test_result, 1)
         u_layout.addLayout(test_row)
+
+        self.btn_test_url.hide()
+        self.lbl_test_result.hide()
 
         u_layout.addStretch(1)
         tabs.addTab(tab_update, "Güncelleme Ayarları")
@@ -501,7 +509,7 @@ class LinearSettingsDialog(QDialog):
             w_color = QWidget()
             wc_layout = QHBoxLayout(w_color)
             wc_layout.setContentsMargins(0, 4, 0, 4)
-            wc_layout.setSpacing(4)
+            wc_layout.setSpacing(6)
 
             cb_color = QComboBox()
             cb_color.setFixedHeight(28)
@@ -511,7 +519,7 @@ class LinearSettingsDialog(QDialog):
                     color: {theme.TEXT_PRIMARY};
                     border: 1px solid {theme.BORDER_SUBTLE};
                     border-radius: 4px;
-                    padding: 2px 22px 2px 6px;
+                    padding: 2px 20px 2px 6px;
                     font-size: 11px;
                 }}
             """)
@@ -532,16 +540,18 @@ class LinearSettingsDialog(QDialog):
 
             wc_layout.addWidget(cb_color, 1)
 
-            btn_palette = QPushButton("🎨")
+            btn_palette = QPushButton()
             btn_palette.setFixedSize(28, 28)
             btn_palette.setCursor(Qt.CursorShape.PointingHandCursor)
             btn_palette.setToolTip("AutoCAD 255 Renk Paletinden Seç...")
+            btn_palette.setIcon(icons.get_icon("fa5s.palette", color="#ffffff"))
+            btn_palette.setIconSize(icons.icon_size(14))
             btn_palette.setStyleSheet(f"""
                 QPushButton {{
                     background-color: {theme.BG_SURFACE};
                     border: 1px solid {theme.BORDER_SUBTLE};
                     border-radius: 4px;
-                    font-size: 12px;
+                    padding: 0;
                 }}
                 QPushButton:hover {{
                     background-color: {theme.BG_SURFACE_HOVER};
@@ -549,7 +559,7 @@ class LinearSettingsDialog(QDialog):
                 }}
             """)
             btn_palette.clicked.connect(lambda checked=False, cb=cb_color: self._open_palette(cb))
-            wc_layout.addWidget(btn_palette)
+            wc_layout.addWidget(btn_palette, 0)
 
             self.tbl_layers.setCellWidget(row, 2, w_color)
 
@@ -562,7 +572,7 @@ class LinearSettingsDialog(QDialog):
                     color: {theme.TEXT_PRIMARY};
                     border: 1px solid {theme.BORDER_SUBTLE};
                     border-radius: 4px;
-                    padding: 2px 22px 2px 6px;
+                    padding: 2px 20px 2px 6px;
                     font-size: 11px;
                 }}
             """)

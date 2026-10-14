@@ -7,6 +7,6 @@ COMPANY_NAME = "Zadax"
 COMPANY_WEBSITE = "https://www.zadax.net"
 COMPANY_DISPLAY_URL = "www.zadax.net"
 
-# Zadax.net üzerindeki versiyon kontrol endpoint'i
-# Ürün linki ve endpoint hazır olduğunda bu URL doğrudan güncellenebilir.
-DEFAULT_UPDATE_CHECK_URL = "https://www.zadax.net/updates/km-layout-tables/version.json"
+# Zadax.net üzerindeki resmi ürün ve versiyon kontrol sayfası
+DEFAULT_UPDATE_CHECK_URL = "https://zadax.net/tr/products/km-tables-studio-celik-yap-tablolar-ve-dxf-uretici/"
+

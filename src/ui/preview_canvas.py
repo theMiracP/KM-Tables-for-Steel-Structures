@@ -57,6 +57,31 @@ class CadGraphicsView(QGraphicsView):
         self._table: Optional[Table] = None
         self._table_config: TableConfig = DEFAULT_TABLE_CONFIG
         self._layout_config: LayoutConfig = DEFAULT_LAYOUT_CONFIG
+        self.print_mode: bool = False
+
+    def _get_pen_thick(self) -> QPen:
+        pen = QPen(QColor(0, 0, 0) if self.print_mode else QColor(theme.COLOR_ACCENT), 0.7)
+        pen.setJoinStyle(Qt.PenJoinStyle.MiterJoin)
+        return pen
+
+    def _get_pen_thin(self) -> QPen:
+        width = 0.25 if self.print_mode else 0.35
+        return QPen(QColor(0, 0, 0) if self.print_mode else QColor(theme.COLOR_ACCENT), width)
+
+    def _get_text_color(self) -> QColor:
+        return QColor(0, 0, 0) if self.print_mode else QColor(theme.COLOR_TEXT_PRIMARY)
+
+    def _get_paper_brush(self) -> QBrush:
+        return QBrush(Qt.BrushStyle.NoBrush) if self.print_mode else QBrush(QColor("#080808"))
+
+    def _get_paper_pen(self) -> QPen:
+        return QPen(QColor(0, 0, 0) if self.print_mode else QColor(theme.COLOR_ACCENT), 0.35 if self.print_mode else 0.6)
+
+    def _get_frame_pen(self) -> QPen:
+        return QPen(QColor(0, 0, 0) if self.print_mode else QColor(theme.COLOR_ACCENT), 0.7 if self.print_mode else 0.8)
+
+    def _get_sketch_color(self) -> QColor:
+        return QColor(0, 0, 0) if self.print_mode else QColor(theme.COLOR_CAD_SKETCH)
 
     def set_data(
         self,
@@ -166,15 +191,15 @@ class CadGraphicsView(QGraphicsView):
         sw = s.width
         sh = s.height
 
-        # Koyu Teknik Pafta Çerçevesi
-        paper_brush = QBrush(QColor("#080808"))
-        paper_pen = QPen(QColor(theme.COLOR_ACCENT), 0.6)
+        # Koyu Teknik Pafta Çerçevesi / Baskı Kağıdı
+        paper_brush = self._get_paper_brush()
+        paper_pen = self._get_paper_pen()
         self._scene.addRect(sx, sy, sw, sh, paper_pen, paper_brush)
 
         # ГОСТ 21.101 İç Çizim Çerçevesi (sol 20mm, diğerleri 5mm kalın çizgi)
         f = calc.inner_frame_rect
         fx, fy = self._cad_to_scene(f.x_min, f.y_max)
-        frame_pen = QPen(QColor(theme.COLOR_ACCENT), 0.8)
+        frame_pen = self._get_frame_pen()
         self._scene.addRect(fx, fy, f.width, f.height, frame_pen, QBrush(Qt.BrushStyle.NoBrush))
 
         # ГОСТ 2.301-68 / СПДС Pafta Format Etiketi (Sağ alt köşe, alt 5 mm marjininde Form 3 altında ortalı)
@@ -193,7 +218,7 @@ class CadGraphicsView(QGraphicsView):
             font_h = 2.5
             scale_f = font_h / (cap_h if cap_h > 0 else 36.0)
             t_fmt.setFont(f_fmt)
-            t_fmt.setBrush(QBrush(QColor(theme.COLOR_TEXT_PRIMARY)))
+            t_fmt.setBrush(QBrush(self._get_text_color()))
             t_fmt.setScale(scale_f)
             lw = t_fmt.boundingRect().width() * scale_f
             lh = t_fmt.boundingRect().height() * scale_f
@@ -212,41 +237,42 @@ class CadGraphicsView(QGraphicsView):
             self._draw_table_content(Point2D(tb.x_min, tb.y_min), is_sheet=True, table=tb_table)
 
         # ----------------------------------------------------------------------
-        # CAD KOORDİNAT EKSENLERİ (X ve Y Okları)
+        # CAD KOORDİNAT EKSENLERİ (Yalnızca ekran CAD görünümünde, baskıda çizilmez)
         # ----------------------------------------------------------------------
-        ax_x = f.x_min + 12.0
-        ax_y = f.y_min + 12.0
-        orig_px, orig_py = self._cad_to_scene(ax_x, ax_y)
-        axis_pen = QPen(QColor(theme.COLOR_TEXT_PRIMARY), 0.6)
+        if not self.print_mode:
+            ax_x = f.x_min + 12.0
+            ax_y = f.y_min + 12.0
+            orig_px, orig_py = self._cad_to_scene(ax_x, ax_y)
+            axis_pen = QPen(QColor(theme.COLOR_TEXT_PRIMARY), 0.6)
 
-        # X Ekseni (Sağa ok)
-        x_end_px, x_end_py = self._cad_to_scene(ax_x + 18.0, ax_y)
-        self._scene.addLine(orig_px, orig_py, x_end_px, x_end_py, axis_pen)
-        self._scene.addLine(x_end_px, x_end_py, x_end_px - 3, x_end_py - 2, axis_pen)
-        self._scene.addLine(x_end_px, x_end_py, x_end_px - 3, x_end_py + 2, axis_pen)
-        lbl_x = self._scene.addSimpleText("X")
-        lbl_x.setFont(QFont("ISOCPEUR", 4, QFont.Weight.Bold))
-        lbl_x.setBrush(QBrush(QColor(theme.COLOR_TEXT_PRIMARY)))
-        lbl_x.setPos(x_end_px + 3, x_end_py - 4)
+            # X Ekseni (Sağa ok)
+            x_end_px, x_end_py = self._cad_to_scene(ax_x + 18.0, ax_y)
+            self._scene.addLine(orig_px, orig_py, x_end_px, x_end_py, axis_pen)
+            self._scene.addLine(x_end_px, x_end_py, x_end_px - 3, x_end_py - 2, axis_pen)
+            self._scene.addLine(x_end_px, x_end_py, x_end_px - 3, x_end_py + 2, axis_pen)
+            lbl_x = self._scene.addSimpleText("X")
+            lbl_x.setFont(QFont("ISOCPEUR", 4, QFont.Weight.Bold))
+            lbl_x.setBrush(QBrush(QColor(theme.COLOR_TEXT_PRIMARY)))
+            lbl_x.setPos(x_end_px + 3, x_end_py - 4)
 
-        # Y Ekseni (Yukarı ok)
-        y_end_px, y_end_py = self._cad_to_scene(ax_x, ax_y + 18.0)
-        self._scene.addLine(orig_px, orig_py, y_end_px, y_end_py, axis_pen)
-        self._scene.addLine(y_end_px, y_end_py, y_end_px - 2, y_end_py + 3, axis_pen)
-        self._scene.addLine(y_end_px, y_end_py, y_end_px + 2, y_end_py + 3, axis_pen)
-        lbl_y = self._scene.addSimpleText("Y")
-        lbl_y.setFont(QFont("ISOCPEUR", 4, QFont.Weight.Bold))
-        lbl_y.setBrush(QBrush(QColor(theme.COLOR_TEXT_PRIMARY)))
-        lbl_y.setPos(y_end_px - 2, y_end_py - 8)
+            # Y Ekseni (Yukarı ok)
+            y_end_px, y_end_py = self._cad_to_scene(ax_x, ax_y + 18.0)
+            self._scene.addLine(orig_px, orig_py, y_end_px, y_end_py, axis_pen)
+            self._scene.addLine(y_end_px, y_end_py, y_end_px - 2, y_end_py + 3, axis_pen)
+            self._scene.addLine(y_end_px, y_end_py, y_end_px + 2, y_end_py + 3, axis_pen)
+            lbl_y = self._scene.addSimpleText("Y")
+            lbl_y.setFont(QFont("ISOCPEUR", 4, QFont.Weight.Bold))
+            lbl_y.setBrush(QBrush(QColor(theme.COLOR_TEXT_PRIMARY)))
+            lbl_y.setPos(y_end_px - 2, y_end_py - 8)
 
     def _draw_side_stamps(self, f: Rect2D) -> None:
         """ГОСТ 2.104 ve ГОСТ Р 21.101 standart sol kenar boşluğu (20 mm) ek tabloları (İnventar & Согласовано)."""
         x0 = f.x_min
         y0 = f.y_min
 
-        thick_pen = QPen(QColor(theme.COLOR_ACCENT), 0.8)
-        thin_pen = QPen(QColor(theme.COLOR_ACCENT), 0.4)
-        text_color = QColor(theme.COLOR_TEXT_PRIMARY)
+        thick_pen = self._get_pen_thick()
+        thin_pen = self._get_pen_thin()
+        text_color = self._get_text_color()
 
         # 1. Tablo 1: İnventar Bilgileri (85 x 12 mm)
         # Dış Kalın Çerçeve
@@ -347,13 +373,12 @@ class CadGraphicsView(QGraphicsView):
         t_h = layout_info.total_height
         table_top = origin.y + t_h
 
-        border_color = QColor(theme.COLOR_ACCENT)
-        grid_color = QColor(theme.COLOR_ACCENT)
-        text_color = QColor(theme.COLOR_TEXT_PRIMARY)
+        border_color = self._get_text_color()
+        grid_color = self._get_text_color()
+        text_color = self._get_text_color()
 
-        thick_pen = QPen(border_color, 0.7)
-        thick_pen.setJoinStyle(Qt.PenJoinStyle.MiterJoin)
-        thin_pen = QPen(grid_color, 0.35)
+        thick_pen = self._get_pen_thick()
+        thin_pen = self._get_pen_thin()
 
         # A. Tablo Başlığı ("Ведомость элементов")
         if tbl.title:
@@ -371,7 +396,7 @@ class CadGraphicsView(QGraphicsView):
             t_scale = (config.typography.title_height * 0.95) / ref_th
             title_item.setFont(font_title)
             title_item.setScale(t_scale)
-            title_item.setBrush(QBrush(QColor(theme.COLOR_TEXT_PRIMARY)))
+            title_item.setBrush(QBrush(self._get_text_color()))
 
             # Merkeze hizala
             br = title_item.boundingRect()
@@ -380,7 +405,7 @@ class CadGraphicsView(QGraphicsView):
         # B. Dış Çerçeve
         top_left_x, top_left_y = self._cad_to_scene(origin.x, table_top)
         if not is_sheet:
-            bg_brush = QBrush(QColor("#080808"))
+            bg_brush = self._get_paper_brush()
             self._scene.addRect(top_left_x, top_left_y, t_w, t_h, thick_pen, bg_brush)
         else:
             self._scene.addRect(top_left_x, top_left_y, t_w, t_h, thick_pen)
@@ -524,7 +549,8 @@ class CadGraphicsView(QGraphicsView):
                 img_item.setPos(px, py)
                 return
 
-        pen = QPen(color, 0.4)
+        sketch_pen_color = self._get_sketch_color() if self.print_mode else color
+        pen = QPen(sketch_pen_color, 0.4)
         prims = sketch.generate_primitives(rect.x, rect.y, rect.width, rect.height)
 
         for prim in prims:
@@ -548,7 +574,7 @@ class CadGraphicsView(QGraphicsView):
                 t_scale = 1.8 / 24.0
                 t_item.setFont(t_font)
                 t_item.setScale(t_scale)
-                t_item.setBrush(QBrush(color))
+                t_item.setBrush(QBrush(sketch_pen_color))
                 t_item.setPos(px, py)
 
     def render_multi_sheet(self, multi_sheet_layout, auto_fit: bool = True) -> None:
@@ -561,13 +587,13 @@ class CadGraphicsView(QGraphicsView):
             # 1. Kağıt ve İç Çizim Çerçevesi
             s = page.sheet_rect
             sx, sy = self._cad_to_scene(s.x_min, s.y_max)
-            paper_brush = QBrush(QColor("#080808"))
-            paper_pen = QPen(QColor(theme.COLOR_ACCENT), 0.6)
+            paper_brush = self._get_paper_brush()
+            paper_pen = self._get_paper_pen()
             self._scene.addRect(sx, sy, s.width, s.height, paper_pen, paper_brush)
 
             f = page.inner_frame_rect
             fx, fy = self._cad_to_scene(f.x_min, f.y_max)
-            frame_pen = QPen(QColor(theme.COLOR_ACCENT), 0.8)
+            frame_pen = self._get_frame_pen()
             self._scene.addRect(fx, fy, f.width, f.height, frame_pen, QBrush(Qt.BrushStyle.NoBrush))
 
             # 2. Format Etiketi
@@ -586,7 +612,7 @@ class CadGraphicsView(QGraphicsView):
                 font_h = 2.5
                 scale_f = font_h / (cap_h if cap_h > 0 else 36.0)
                 t_fmt.setFont(f_fmt)
-                t_fmt.setBrush(QBrush(QColor(theme.COLOR_TEXT_PRIMARY)))
+                t_fmt.setBrush(QBrush(self._get_text_color()))
                 t_fmt.setScale(scale_f)
                 lw = t_fmt.boundingRect().width() * scale_f
                 lh = t_fmt.boundingRect().height() * scale_f
@@ -602,6 +628,58 @@ class CadGraphicsView(QGraphicsView):
             # 5. Yerleştirilen Tablolar
             for item in page.placed_tables:
                 self._draw_table_content(item.origin, is_sheet=True, table=item.table)
+
+        if auto_fit:
+            self.fit_to_view()
+
+    def render_single_sheet_page(self, page, auto_fit: bool = False) -> None:
+        """Tek bir çoklu pafta sayfasını (0, 0) merkezli olarak tuvalde çizer."""
+        self._scene.clear()
+        if not page:
+            return
+
+        s = page.sheet_rect
+        offset = page.offset_x
+        # 1. Kağıt ve İç Çizim Çerçevesi (0, 0'a normalize edilmiş)
+        sx, sy = self._cad_to_scene(0.0, s.height)
+        self._scene.addRect(sx, sy, s.width, s.height, self._get_paper_pen(), self._get_paper_brush())
+
+        f = page.inner_frame_rect
+        fx, fy = self._cad_to_scene(f.x_min - offset, f.y_max)
+        self._scene.addRect(fx, fy, f.width, f.height, self._get_frame_pen(), QBrush(Qt.BrushStyle.NoBrush))
+
+        # Format Etiketi
+        if hasattr(self._layout_config, "get_format_designation"):
+            fmt_text = self._layout_config.get_format_designation()
+            fmt_cad_x = (f.x_max - offset) - 25.0
+            fmt_cad_y = (0.0 + (f.y_min)) / 2.0
+            px, py = self._cad_to_scene(fmt_cad_x, fmt_cad_y)
+            t_fmt = self._scene.addSimpleText(fmt_text)
+            f_fmt = QFont("ISOCPEUR")
+            if not f_fmt.exactMatch():
+                f_fmt = QFont("Segoe UI")
+            f_fmt.setPixelSize(36)
+            fm_fmt = QFontMetricsF(f_fmt)
+            cap_h = fm_fmt.capHeight() if fm_fmt.capHeight() > 0 else (fm_fmt.ascent() * 0.8)
+            scale_f = 2.5 / (cap_h if cap_h > 0 else 36.0)
+            t_fmt.setFont(f_fmt)
+            t_fmt.setBrush(QBrush(self._get_text_color()))
+            t_fmt.setScale(scale_f)
+            lw = t_fmt.boundingRect().width() * scale_f
+            lh = t_fmt.boundingRect().height() * scale_f
+            t_fmt.setPos(px - lw / 2.0, py - lh / 2.0)
+
+        # Yan damgalar (normalize edilmiş iç çerçeve ile)
+        f_norm = Rect2D(f.x_min - offset, f.x_max - offset, f.y_min, f.y_max)
+        self._draw_side_stamps(f_norm)
+
+        # Form 3 Başlık Bloğu
+        tb = page.title_block_rect
+        self._draw_table_content(Point2D(tb.x_min - offset, tb.y_min), is_sheet=True, table=page.title_block_table)
+
+        # Yerleştirilen Tablolar
+        for item in page.placed_tables:
+            self._draw_table_content(Point2D(item.origin.x - offset, item.origin.y), is_sheet=True, table=item.table)
 
         if auto_fit:
             self.fit_to_view()

@@ -66,7 +66,11 @@ class UpdateCheckWorker(QThread):
 
     def _parse_html_page(self, html_text: str) -> Optional[UpdateInfo]:
         """zadax.net ürün sayfası HTML içeriğinden sürüm ve indirme bağlantısını ayrıştırır."""
-        match = re.search(r'(?:Sürüm|Surum|v|Version)\s*[:\-]?\s*v?(\d+\.\d+\.\d+)', html_text, re.IGNORECASE)
+        # 1. JSON-LD softwareVersion ("softwareVersion": "v1.3.0")
+        match = re.search(r'"softwareVersion"\s*:\s*"v?(\d+\.\d+\.\d+)"', html_text, re.IGNORECASE)
+        if not match:
+            # 2. Genel Sürüm / Version regex'i
+            match = re.search(r'(?:Sürüm|Surum|v|Version)\s*[:\-]?\s*v?(\d+\.\d+\.\d+)', html_text, re.IGNORECASE)
         if not match:
             match = re.search(r'v(\d+\.\d+\.\d+)', html_text)
         if not match:

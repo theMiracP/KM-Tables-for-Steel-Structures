@@ -313,6 +313,28 @@ class ElementsScheduleWidget(QWidget):
         self.btn_down.clicked.connect(lambda: self._move_row(1))
         action_layout.addWidget(self.btn_down)
 
+        # GOST Profil Kütüphanesi Butonu (Item 2.1)
+        self.btn_profile_picker = QPushButton(" 📚 GOST Profil...", action_bar)
+        self.btn_profile_picker.setFixedHeight(30)
+        self.btn_profile_picker.setToolTip("GOST Rus Çelik Sortament / Profil Kütüphanesinden Seç")
+        self.btn_profile_picker.setStyleSheet("""
+            QPushButton {
+                background-color: #1E232B;
+                color: #38BDF8;
+                border: 1px solid #0369A1;
+                border-radius: 6px;
+                padding: 0 14px;
+                font-size: 12px;
+                font-weight: 600;
+            }
+            QPushButton:hover {
+                background-color: #0369A1;
+                color: #FFFFFF;
+            }
+        """)
+        self.btn_profile_picker.clicked.connect(self._open_profile_picker)
+        action_layout.addWidget(self.btn_profile_picker)
+
         action_layout.addStretch()
 
         # Örnekleri Yükle Butonu
@@ -807,6 +829,52 @@ class ElementsScheduleWidget(QWidget):
             self.table_widget.selectRow(target)
             self._sync_and_emit()
 
+    def _open_profile_picker(self):
+        """GOST Profil Seçici Diyaloğunu açar ve seçilen profili aktif satıra işler."""
+        from src.ui_v2.profile_picker_dialog import GostProfilePickerDialog
+        r = self.table_widget.currentRow()
+        if r < 0:
+            if self.table_widget.rowCount() == 0:
+                self._add_row()
+                r = 0
+            else:
+                r = 0
+                self.table_widget.selectRow(0)
+
+        current_item = self.table_widget.item(r, 2)
+        initial_q = current_item.text().strip() if current_item else ""
+
+        dlg = GostProfilePickerDialog(parent=self, initial_query=initial_q)
+        if dlg.exec() and dlg.selected_profile:
+            p = dlg.selected_profile
+            self._block_signals = True
+            try:
+                # Profil adını ata
+                if current_item:
+                    current_item.setText(p.designation)
+                else:
+                    it = QTableWidgetItem(p.designation)
+                    it.setTextAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter)
+                    self.table_widget.setItem(r, 2, it)
+
+                # Eskiz ComboBox'ını güncelle
+                cb: Optional[QComboBox] = self.table_widget.cellWidget(r, 1)
+                if cb:
+                    stype = p.get_sketch_type_enum()
+                    self._set_sketch_combo_type(cb, stype)
+                    it_c = self.table_widget.item(r, 2)
+                    if it_c:
+                        it_c.setIcon(get_sketch_icon(stype))
+
+                # Çelik kalitesi
+                st_item = self.table_widget.item(r, 6)
+                if st_item and (not st_item.text().strip() or st_item.text() in ("С255-4", "С255")):
+                    st_item.setText(p.default_steel)
+            finally:
+                self._block_signals = False
+
+            self._sync_and_emit()
+
     def _reset_to_samples(self):
         self.items = build_sample_items()
         self._load_items_to_table(self.items)
@@ -903,11 +971,16 @@ class ElementsScheduleWidget(QWidget):
         return ElementsScheduleDocument(items=self.items)
 
     def set_document(self, doc: Union[ElementsScheduleDocument, List[ScheduleItem]]):
+        import copy
         if isinstance(doc, ElementsScheduleDocument):
-            self.items = doc.items
+            self.items = copy.deepcopy(doc.items)
         else:
-            self.items = doc
-        self._load_items_to_table(self.items)
+            self.items = copy.deepcopy(doc)
+        self._block_signals = True
+        try:
+            self._load_items_to_table(self.items)
+        finally:
+            self._block_signals = False
         self._sync_and_emit()
 
     def get_items(self) -> List[ScheduleItem]:

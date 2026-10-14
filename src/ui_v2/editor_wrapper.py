@@ -20,6 +20,8 @@ class TableEditorWrapper(QWidget):
     document_changed = Signal(object)  # new document
     save_preset_requested = Signal()
     load_preset_requested = Signal()
+    undo_requested = Signal()
+    redo_requested = Signal()
 
     def __init__(self, parent=None):
         super().__init__(parent)
@@ -66,6 +68,63 @@ class TableEditorWrapper(QWidget):
         """)
         title_row.addWidget(self.lbl_title)
         title_row.addStretch(1)
+
+        # Undo / Redo Butonları (Item 4.2)
+        self.btn_undo = QPushButton("↩ Geri Al")
+        self.btn_undo.setFixedHeight(26)
+        self.btn_undo.setToolTip("Son işlemi geri al (Ctrl+Z)")
+        self.btn_undo.setCursor(Qt.CursorShape.PointingHandCursor)
+        self.btn_undo.setEnabled(False)
+        self.btn_undo.setStyleSheet(f"""
+            QPushButton {{
+                background-color: {theme.BG_SURFACE_ACTIVE};
+                color: {theme.TEXT_PRIMARY};
+                border: 1px solid {theme.BORDER_LIGHT};
+                border-radius: 5px;
+                padding: 0 8px;
+                font-size: 11px;
+                font-weight: 500;
+            }}
+            QPushButton:hover {{
+                background-color: {theme.BG_SURFACE_HOVER};
+                border-color: {theme.ACCENT_PRIMARY};
+                color: #ffffff;
+            }}
+            QPushButton:disabled {{
+                color: {theme.TEXT_MUTED};
+                border-color: {theme.BORDER_SUBTLE};
+            }}
+        """)
+        self.btn_undo.clicked.connect(self.undo_requested.emit)
+        title_row.addWidget(self.btn_undo)
+
+        self.btn_redo = QPushButton("↪ İleri Al")
+        self.btn_redo.setFixedHeight(26)
+        self.btn_redo.setToolTip("Geri alınan işlemi tekrarla (Ctrl+Y)")
+        self.btn_redo.setCursor(Qt.CursorShape.PointingHandCursor)
+        self.btn_redo.setEnabled(False)
+        self.btn_redo.setStyleSheet(f"""
+            QPushButton {{
+                background-color: {theme.BG_SURFACE_ACTIVE};
+                color: {theme.TEXT_PRIMARY};
+                border: 1px solid {theme.BORDER_LIGHT};
+                border-radius: 5px;
+                padding: 0 8px;
+                font-size: 11px;
+                font-weight: 500;
+            }}
+            QPushButton:hover {{
+                background-color: {theme.BG_SURFACE_HOVER};
+                border-color: {theme.ACCENT_PRIMARY};
+                color: #ffffff;
+            }}
+            QPushButton:disabled {{
+                color: {theme.TEXT_MUTED};
+                border-color: {theme.BORDER_SUBTLE};
+            }}
+        """)
+        self.btn_redo.clicked.connect(self.redo_requested.emit)
+        title_row.addWidget(self.btn_redo)
 
         # Şablon Eylem Butonları (Üst Sağ Köşe)
         self.btn_save_preset = QPushButton(i18n.t("btn_save_preset"))
@@ -221,3 +280,10 @@ class TableEditorWrapper(QWidget):
     def _on_editor_items_changed(self, module_id: str, items: Any):
         if module_id == self._active_module_id:
             self.document_changed.emit(items)
+
+    def set_undo_redo_enabled(self, can_undo: bool, can_redo: bool):
+        """Undo ve Redo butonlarının aktif/pasif durumunu günceller."""
+        if hasattr(self, "btn_undo"):
+            self.btn_undo.setEnabled(can_undo)
+        if hasattr(self, "btn_redo"):
+            self.btn_redo.setEnabled(can_redo)

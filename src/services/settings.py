@@ -55,7 +55,8 @@ class LayerSetting:
 @dataclass
 class UpdaterSetting:
     check_on_startup: bool = False
-    check_url: str = "https://zadax.net/tr/products/km-tables-studio-celik-yap-tablolar-ve-dxf-uretici/"
+    check_url: str = DEFAULT_UPDATE_CHECK_URL
+
 
 
 @dataclass
@@ -167,7 +168,7 @@ class SettingsManager:
             upd_data = data.get("updater", {})
             self.settings.updater = UpdaterSetting(
                 check_on_startup=bool(upd_data.get("check_on_startup", False)),
-                check_url=str(upd_data.get("check_url", "https://zadax.net/tr/products/km-tables-studio-celik-yap-tablolar-ve-dxf-uretici/")),
+                check_url=DEFAULT_UPDATE_CHECK_URL,
             )
         except Exception:
             # Okuma hatasında varsayılanları koru

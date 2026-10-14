@@ -75,11 +75,16 @@ def test_item_2_table_naming_gost_table_name():
 
 
 def test_item_4_update_url_fixed_official(qapp):
-    """Madde 4: Güncelleme kontrol adresinin kullanıcı girdisine bırakılmadığını doğrular."""
+    """Madde 4: Güncelleme kontrol ayarının kullanıcıdan gizlendiğini ve resmi ürün linkine bağlı olduğunu doğrular."""
     dlg = LinearSettingsDialog()
     assert dlg.txt_update_url.isHidden()
+    assert dlg.card_server.isHidden()
+    assert dlg.btn_test_url.isHidden()
+    assert dlg.lbl_test_result.isHidden()
     assert dlg.txt_update_url.text() == DEFAULT_UPDATE_CHECK_URL
+    assert DEFAULT_UPDATE_CHECK_URL == "https://zadax.net/tr/products/km-tables-studio-celik-yap-tablolar-ve-dxf-uretici/"
     dlg.close()
+
 
 
 def test_item_5_layer_name_input_size(qapp):
@@ -188,3 +193,19 @@ def test_item_13_profile_detection_and_realtime_sync(qapp):
     assert stype == SketchType.I_BEAM
 
     widget.close()
+
+
+def test_settings_dialog_layer_table_column_widths(qapp):
+    """Ayarlar penceresinde katman tablosu sütun genişliklerinin sığdığını ve kırpılmadığını doğrular."""
+    dlg = LinearSettingsDialog()
+    dlg.show()
+    # Katman Adı (Column 1) en az 140px olmalı
+    assert dlg.tbl_layers.columnWidth(1) >= 140
+    # Renk (Column 2) en az 220px olmalı
+    assert dlg.tbl_layers.columnWidth(2) >= 220
+    # Kalınlık (Column 3) en az 230px olmalı
+    assert dlg.tbl_layers.columnWidth(3) >= 230
+    # Tablo toplam genişliği en az 880px olmalı
+    assert dlg.tbl_layers.width() >= 880
+    dlg.close()
+

@@ -21,6 +21,11 @@ class LinearTopBar(QFrame):
     """
     command_palette_requested = Signal()
     export_dxf_requested = Signal()
+    export_pdf_requested = Signal()
+    new_project_requested = Signal()
+    open_project_requested = Signal()
+    save_project_requested = Signal()
+    save_project_as_requested = Signal()
     toggle_sidebar_requested = Signal()
     toggle_cad_requested = Signal()
     language_changed = Signal(str)
@@ -57,6 +62,29 @@ class LinearTopBar(QFrame):
         self.lbl_workspace = QLabel("📐 KM Studio")
         self.lbl_workspace.setStyleSheet(f"font-weight: 600; color: {theme.TEXT_PRIMARY}; font-size: 13px;")
         layout.addWidget(self.lbl_workspace)
+
+        # Proje Menüsü Butonu (Item 4.1)
+        self.btn_project = QPushButton("📁 Proje ▾")
+        self.btn_project.setObjectName("ghostButton")
+        self.btn_project.setFixedHeight(28)
+        self.btn_project.setCursor(Qt.CursorShape.PointingHandCursor)
+        self.btn_project.setStyleSheet(f"""
+            QPushButton {{
+                background-color: {theme.BG_SURFACE};
+                color: {theme.TEXT_PRIMARY};
+                border: 1px solid {theme.BORDER_SUBTLE};
+                border-radius: 6px;
+                padding: 0 10px;
+                font-size: 12px;
+                font-weight: 500;
+            }}
+            QPushButton:hover {{
+                background-color: {theme.BG_SURFACE_HOVER};
+                border-color: {theme.BORDER_LIGHT};
+            }}
+        """)
+        self._build_project_menu()
+        layout.addWidget(self.btn_project)
 
         # Geriye dönük uyumluluk ve testler için dummy etiketler
         self.lbl_standard = QLabel("")
@@ -134,6 +162,30 @@ class LinearTopBar(QFrame):
         self.btn_settings.clicked.connect(self.settings_requested.emit)
         layout.addWidget(self.btn_settings)
 
+        # Vektör PDF Dışa Aktar Butonu (Item 2.3)
+        self.btn_export_pdf = QPushButton(" 📄 PDF Aktar")
+        self.btn_export_pdf.setObjectName("ghostButton")
+        self.btn_export_pdf.setFixedHeight(30)
+        self.btn_export_pdf.setCursor(Qt.CursorShape.PointingHandCursor)
+        self.btn_export_pdf.setToolTip("1:1 Ölçekli Vektör PDF Olarak Dışa Aktar (Ctrl+P)")
+        self.btn_export_pdf.setStyleSheet(f"""
+            QPushButton {{
+                background-color: {theme.BG_SURFACE};
+                color: #38BDF8;
+                border: 1px solid #0284C7;
+                border-radius: 6px;
+                padding: 0 12px;
+                font-size: 12px;
+                font-weight: 600;
+            }}
+            QPushButton:hover {{
+                background-color: #0369A1;
+                color: #FFFFFF;
+            }}
+        """)
+        self.btn_export_pdf.clicked.connect(self.export_pdf_requested.emit)
+        layout.addWidget(self.btn_export_pdf)
+
         # Linear Ana Eylem: Export DXF (Sağdan sola jilet parlamalı buton)
         self.btn_export = LinearShimmerButton(" DXF Dışa Aktar")
         self.btn_export.setIcon(icons.get_icon(icons.ICON_BOLT, color=icons.COLOR_WHITE))
@@ -143,6 +195,42 @@ class LinearTopBar(QFrame):
         self.btn_export.setCursor(Qt.CursorShape.PointingHandCursor)
         self.btn_export.clicked.connect(self.export_dxf_requested.emit)
         layout.addWidget(self.btn_export)
+
+    def _build_project_menu(self):
+        from PySide6.QtWidgets import QMenu
+        menu = QMenu(self)
+        menu.setStyleSheet(f"""
+            QMenu {{
+                background-color: {theme.BG_SURFACE};
+                color: {theme.TEXT_PRIMARY};
+                border: 1px solid {theme.BORDER_LIGHT};
+                border-radius: 6px;
+                padding: 4px;
+            }}
+            QMenu::item {{
+                padding: 6px 18px;
+                border-radius: 4px;
+            }}
+            QMenu::item:selected {{
+                background-color: {theme.BG_SURFACE_ACTIVE};
+                color: #FFFFFF;
+            }}
+        """)
+        act_new = menu.addAction("📄 Yeni Proje (Ctrl+N)")
+        act_new.triggered.connect(self.new_project_requested.emit)
+
+        act_open = menu.addAction("📂 Projeyi Aç... (Ctrl+O)")
+        act_open.triggered.connect(self.open_project_requested.emit)
+
+        menu.addSeparator()
+
+        act_save = menu.addAction("💾 Projeyi Kaydet (Ctrl+S)")
+        act_save.triggered.connect(self.save_project_requested.emit)
+
+        act_save_as = menu.addAction("📋 Farklı Kaydet... (Ctrl+Shift+S)")
+        act_save_as.triggered.connect(self.save_project_as_requested.emit)
+
+        self.btn_project.setMenu(menu)
 
     def _build_language_pills(self, parent_layout: QHBoxLayout):
         lang_container = QWidget()
