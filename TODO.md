@@ -3,7 +3,7 @@
 **Proje:** KM Tablo Oluşturucu (CAD Layout Tables Studio)  
 **Hedef Standartlar:** ГОСТ 21.502-2007 (КМ Çelik Tabloları), ГОСТ Р 21.101-2020 / ГОСТ 2.301 (Pafta & Antet), ГОСТ 2.302-68 (Ölçek)  
 **Geçerli Mimari:** Linear / Notion SaaS Dashboard (UI v2)  
-**Doküman Sürümü:** 1.7.0 · **Tarih:** 2026-10-14  
+**Doküman Sürümü:** 1.8.0 · **Tarih:** 2026-10-15  
 
 ---
 

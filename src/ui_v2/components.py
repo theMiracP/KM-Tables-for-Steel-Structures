@@ -99,15 +99,21 @@ class SolidItemDelegate(QStyledItemDelegate):
         super().initStyleOption(option, index)
         view = self.parent()
         # Eğer bu hücre şu anda aktif olarak düzenleniyorsa altındaki metni çizme
-        if view and hasattr(view, "state") and view.state() == QAbstractItemView.State.EditingState and view.currentIndex() == index:
-            option.text = ""
+        if view and hasattr(view, "state"):
+            curr = getattr(view, "currentIndex", lambda: None)()
+            is_current = curr is not None and curr.isValid() and curr.row() == index.row() and curr.column() == index.column()
+            if is_current and (view.state() == QAbstractItemView.State.EditingState or bool(view.findChildren(QLineEdit))):
+                option.text = ""
 
     def paint(self, painter, option, index):
         opt = QStyleOptionViewItem(option)
         view = self.parent()
         # Çift koruma: Düzenleme halindeki hücrenin alt metni asla çizilmez
-        if view and hasattr(view, "state") and view.state() == QAbstractItemView.State.EditingState and view.currentIndex() == index:
-            opt.text = ""
+        if view and hasattr(view, "state"):
+            curr = getattr(view, "currentIndex", lambda: None)()
+            is_current = curr is not None and curr.isValid() and curr.row() == index.row() and curr.column() == index.column()
+            if is_current and (view.state() == QAbstractItemView.State.EditingState or bool(view.findChildren(QLineEdit))):
+                opt.text = ""
         super().paint(painter, opt, index)
 
 

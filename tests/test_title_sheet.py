@@ -522,7 +522,6 @@ def test_title_sheet_signatories_solid_delegate_no_text_overlap(qapp):
     from PySide6.QtWidgets import QLineEdit, QStyleOptionViewItem
 
     editor = TitleSheetEditorWidget()
-    editor.show()
     tbl = editor.table_sigs
 
     # 1. SolidItemDelegate atanmış olduğunu doğrula
@@ -535,7 +534,6 @@ def test_title_sheet_signatories_solid_delegate_no_text_overlap(qapp):
     assert len(item_role.text()) > 0
 
     tbl.editItem(item_role)
-    qapp.processEvents()
 
     # 3. Düzenleyici QLineEdit nesnesinin opak zemin stiline sahip olduğunu doğrula
     le_role = tbl.findChild(QLineEdit)

@@ -16,12 +16,15 @@ from PyInstaller.utils.hooks import collect_data_files, collect_submodules
 
 block_cipher = None
 
-# QtAwesome font ve harita dosyalarını topla
+# QtAwesome ve python-docx veri dosyalarını topla
 qtawesome_datas = collect_data_files('qtawesome')
+docx_datas = collect_data_files('docx')
 
 # Proje kaynak dosyaları ve varlıkları
 datas = [
     ('src/config/standards_library.json', 'src/config'),
+    ('src/config/gost_profiles.json', 'src/config'),
+    ('src/config/custom_profiles.json', 'src/config'),
     ('src/ui_v2/assets/checkmark.svg', 'src/ui_v2/assets'),
     ('src/ui_v2/assets/chevron_down.svg', 'src/ui_v2/assets'),
     ('src/ui_v2/assets/chevron_down_hover.svg', 'src/ui_v2/assets'),
@@ -32,20 +35,23 @@ datas = [
     ('assets/app_icon.ico', 'assets'),
     ('assets/app_icon.png', 'assets'),
     ('assets/zadax_logo.png', 'assets'),
-] + qtawesome_datas
+] + qtawesome_datas + docx_datas
 
 # Dinamik yüklenen tüm alt modülleri dahil et
 hiddenimports = [
     'PySide6.QtCore',
     'PySide6.QtGui',
     'PySide6.QtWidgets',
+    'PySide6.QtSvg',
+    'PySide6.QtPrintSupport',
     'ezdxf',
     'pyparsing',
     'unittest',
     'qtawesome',
     'PIL',
     'PIL.Image',
-] + collect_submodules('src')
+    'docx',
+] + collect_submodules('docx') + collect_submodules('src')
 
 a = Analysis(
     ['main.py'],
