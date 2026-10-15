@@ -28,7 +28,7 @@ def qapp():
 
 def test_version_metadata():
     """Temel sürüm ve zadax.net firma bilgilerinin doğruluğu."""
-    assert APP_VERSION == "1.3.0"
+    assert APP_VERSION == "1.4.0"
     assert "zadax.net" in COMPANY_WEBSITE
     assert COMPANY_DISPLAY_URL == "www.zadax.net"
     assert "zadax.net" in DEFAULT_UPDATE_CHECK_URL
