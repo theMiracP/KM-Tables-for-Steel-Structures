@@ -3,8 +3,8 @@ KM Tablo Oluşturucu - 'Ведомость элементов' Editörü (Elemen
 Excel benzeri veri girişi, 26px kompakt mühendislik satırları, klavye gezintisi ve Kiril klavye entegrasyonu.
 """
 from typing import List, Optional, Union
-from PySide6.QtCore import Qt, Signal, QEvent
-from PySide6.QtGui import QKeySequence, QShortcut, QGuiApplication, QKeyEvent
+from PySide6.QtCore import Qt, Signal, QEvent, QTimer
+from PySide6.QtGui import QKeySequence, QShortcut, QGuiApplication, QKeyEvent, QAction, QIcon
 from PySide6.QtWidgets import (
     QWidget, QVBoxLayout, QHBoxLayout, QTableWidget, QTableWidgetItem,
     QPushButton, QHeaderView, QComboBox, QLabel, QAbstractItemView,
@@ -37,6 +37,103 @@ SKETCH_OPTIONS = [
     ("- (Levha / Lama)", SketchType.PLATE, "-"),
     ("Yok", SketchType.NONE, ""),
 ]
+
+WELDED_SKETCH_TYPES = {
+    SketchType.WELDED_I_BEAM,
+    SketchType.COMPOUND_BOX_WELDED,
+    SketchType.WELDED_T,
+    SketchType.WELDED_I_PACKAGE,
+    SketchType.WELDED_CRUCIFORM,
+}
+
+def sketch_type_to_profile_category(stype: SketchType) -> Optional[str]:
+    """Eskiz tipine göre GOST Sortament kütüphanesindeki ilgili kategori adını döndürür."""
+    mapping = {
+        SketchType.I_BEAM: "Двутавры",
+        SketchType.CHANNEL: "Швеллеры",
+        SketchType.RECT_TUBE: "Трубы профильные",
+        SketchType.ROUND_TUBE: "Трубы круглые",
+        SketchType.ANGLE: "Уголки",
+    }
+    return mapping.get(stype)
+
+def clean_profile_prefix(txt: str) -> str:
+    """
+    Metinden eski eskiz ön eklerini (örn. 'I ', '[ ', 'L ', 'Гн. □ ', 'Рифл. -', '-') temizler.
+    Böylece eskiz tipi değiştirildiğinde eski tipin sembolü kalıntı yapmaz.
+    """
+    s = txt.strip()
+    prefixes = ["Гн. □", "Гн.□", "Рифл. -", "Рифл.-", "Рифл.", "L ", "∟ ", "уг. ", "[ ", "I ", "- ", "— ", "– ", "-"]
+    changed = True
+    while changed:
+        changed = False
+        for p in prefixes:
+            if s.startswith(p):
+                s = s[len(p):].strip()
+                changed = True
+                break
+    return s
+
+def get_profile_full_name(designation: str, sketch_type: SketchType) -> str:
+    """
+    Profil adını eskiz tipine uygun GOST sembolü / ön ekiyle formatlar.
+    Örn:
+    - 20Б1 -> I 20Б1
+    - 140x100x6.0 -> Гн. □ 140x100x6.0
+    - 16П -> [ 16П
+    - 75х5 -> L 75х5
+    - 70x4.0 -> ○ ⌀ 70x4.0
+    """
+    clean = clean_profile_prefix(designation)
+    if not clean:
+        return ""
+    if sketch_type == SketchType.I_BEAM:
+        return f"I {clean}"
+    elif sketch_type == SketchType.RECT_TUBE:
+        return f"Гн. □ {clean}"
+    elif sketch_type == SketchType.CHANNEL:
+        return f"[ {clean}"
+    elif sketch_type == SketchType.ANGLE:
+        return f"L {clean}"
+    elif sketch_type == SketchType.ROUND_TUBE:
+        if clean.startswith("⌀") or clean.startswith("ø") or clean.startswith("Ø"):
+            return f"○ {clean}"
+        return f"○ ⌀ {clean}"
+    elif sketch_type == SketchType.CHECKERED_PLATE:
+        return f"Рифл. -{clean}"
+    elif sketch_type == SketchType.PLATE:
+        return f"-{clean}"
+    return clean
+
+def get_profiles_for_sketch(stype: SketchType) -> List[str]:
+    """Aktif eskiz tipine uygun tüm profil isimlerini ön ekleriyle birlikte liste olarak döndürür."""
+    from src.services.profile_database import GostProfileDatabase
+    db = GostProfileDatabase.instance()
+    cat = sketch_type_to_profile_category(stype)
+    if not cat:
+        if stype in WELDED_SKETCH_TYPES:
+            if stype in (SketchType.WELDED_I_PACKAGE, SketchType.WELDED_CRUCIFORM):
+                return [
+                    "-300 x 14, -260 x 12, -500 x 10",
+                    "-250 x 12, -200 x 10, -400 x 8",
+                    "-350 x 16, -300 x 14, -600 x 12",
+                ]
+            else:
+                return [
+                    "-130 x 12, -106 x 12",
+                    "-160 x 14, -120 x 10",
+                    "-200 x 16, -150 x 12",
+                    "-250 x 16, -200 x 14",
+                    "-300 x 18, -250 x 14",
+                ]
+        elif stype == SketchType.CHECKERED_PLATE:
+            return ["Рифл. -4x1000", "Рифл. -5x1000", "Рифл. -6x1000", "Рифл. -8x1000"]
+        elif stype == SketchType.PLATE:
+            return ["-10x200", "-12x250", "-14x300", "-16x350", "-20x400"]
+        return []
+
+    recs = db.filter_profiles(category=cat)
+    return [get_profile_full_name(r.designation, stype) for r in recs]
 
 
 class EngineeringTableWidget(QTableWidget):
@@ -78,6 +175,14 @@ class EngineeringTableWidget(QTableWidget):
                 self.editItem(item)
             event.accept()
             return
+        elif key == Qt.Key.Key_F4:
+            # F4: 2. sütundaysa profil/kesit düzenleyiciyi aç
+            if c == 2:
+                parent_w = self.parent()
+                if parent_w and hasattr(parent_w, "_open_section_editor_for_row"):
+                    parent_w._open_section_editor_for_row(r)
+                    event.accept()
+                    return
         elif key in (Qt.Key.Key_Escape,):
             # Esc: Düzenlemeyi iptal et
             super().keyPressEvent(event)
@@ -132,17 +237,115 @@ class EngineeringTableWidget(QTableWidget):
 
 
 class ProfileCellDelegate(SolidItemDelegate):
-    """Profil/kesit sütunu için yazarken anında eskiz algılayan ve senkronize eden delege."""
+    """
+    Profil/kesit sütunu için açılır dropdown menüden (ComboBox) kolay profil seçimi,
+    anında arama/tamamlama ve GOST kütüphane erişimi sunan delege.
+    """
     def __init__(self, owner_widget, parent=None, font_size: int = 13):
         super().__init__(parent, font_size)
         self.owner = owner_widget
 
     def createEditor(self, parent, option, index):
-        editor = super().createEditor(parent, option, index)
-        if isinstance(editor, QLineEdit) and index.column() == 2:
+        if index.column() == 2:
             row = index.row()
-            editor.textChanged.connect(lambda text, r=row: self.owner._on_profile_text_changed(r, text))
-        return editor
+            cb = LinearComboBox(parent)
+            cb.setEditable(True)
+            cb.setMaxVisibleItems(15)
+
+            line_edit = cb.lineEdit()
+            if line_edit:
+                line_edit.setStyleSheet(f"""
+                    QLineEdit {{
+                        background-color: {theme.BG_SURFACE_ACTIVE};
+                        color: #ffffff;
+                        border: none;
+                        padding: 2px 28px 2px 8px;
+                        font-size: {self.font_size}px;
+                        font-weight: 500;
+                    }}
+                """)
+                # Hücre içi sağ aksiyon butonu (GOST Profil / Kesit Kütüphanesi - F4)
+                browse_act = line_edit.addAction(
+                    icons.get_icon(icons.ICON_SEARCH, color=icons.COLOR_PRIMARY),
+                    QLineEdit.ActionPosition.TrailingPosition
+                )
+                browse_act.setToolTip("GOST Profil / Kesit Kütüphanesi (F4)")
+                browse_act.triggered.connect(lambda: self.owner._open_section_editor_for_row(row))
+                line_edit.textChanged.connect(lambda text, r=row: self.owner._on_profile_text_changed(r, text))
+
+            cb.setStyleSheet(f"""
+                QComboBox {{
+                    background-color: {theme.BG_SURFACE_ACTIVE};
+                    color: #ffffff;
+                    border: 1.5px solid {theme.ACCENT_PRIMARY};
+                    border-radius: 4px;
+                    padding-left: 2px;
+                    font-size: {self.font_size}px;
+                }}
+            """)
+            return cb
+        return super().createEditor(parent, option, index)
+
+    def setEditorData(self, editor, index):
+        if index.column() == 2 and isinstance(editor, QComboBox):
+            row = index.row()
+            current_txt = index.data(Qt.ItemDataRole.DisplayRole) or ""
+
+            # Aktif satırın eskiz tipini al
+            cb_sk = self.owner.table_widget.cellWidget(row, 1)
+            stype = SketchType.I_BEAM
+            if cb_sk:
+                stype, _ = cb_sk.currentData()
+
+            # Eskiz tipine uygun profilleri al
+            profiles = get_profiles_for_sketch(stype)
+
+            editor.blockSignals(True)
+            editor.clear()
+
+            # Eğer mevcut metin listede yoksa en başa ekle
+            if current_txt and current_txt not in profiles:
+                editor.addItem(current_txt)
+
+            for p in profiles:
+                editor.addItem(p)
+
+            editor.insertSeparator(editor.count())
+            editor.addItem("📚 GOST Profil Kütüphanesi (F4)...")
+            editor.addItem("➕ Yeni Özel Profil Ekle...")
+
+            editor.setEditText(current_txt)
+            editor.blockSignals(False)
+
+            # Kullanıcı hücreye tıklar tıklamaz dropdown'ı anında aç (1 tıkla seçim kolaylığı)
+            QTimer.singleShot(0, editor.showPopup)
+            return
+
+        super().setEditorData(editor, index)
+
+    def setModelData(self, editor, model, index):
+        if index.column() == 2 and isinstance(editor, QComboBox):
+            row = index.row()
+            val = editor.currentText().strip()
+
+            if val == "📚 GOST Profil Kütüphanesi (F4)...":
+                QTimer.singleShot(0, lambda: self.owner._open_section_editor_for_row(row))
+                return
+            elif val == "➕ Yeni Özel Profil Ekle...":
+                QTimer.singleShot(0, lambda: self.owner._open_add_custom_profile_dialog(row))
+                return
+
+            cb_sk = self.owner.table_widget.cellWidget(row, 1)
+            stype = SketchType.I_BEAM
+            if cb_sk:
+                stype, _ = cb_sk.currentData()
+
+            formatted = self.owner._auto_format_composition(val, stype)
+            model.setData(index, formatted, Qt.ItemDataRole.EditRole)
+            self.owner._on_cell_changed(row, index.column())
+            return
+
+        super().setModelData(editor, model, index)
 
 
 class ElementsScheduleWidget(QWidget):
@@ -332,7 +535,7 @@ class ElementsScheduleWidget(QWidget):
                 color: #FFFFFF;
             }
         """)
-        self.btn_profile_picker.clicked.connect(self._open_profile_picker)
+        self.btn_profile_picker.clicked.connect(lambda: self._open_section_editor_for_row())
         action_layout.addWidget(self.btn_profile_picker)
 
         action_layout.addStretch()
@@ -431,6 +634,7 @@ class ElementsScheduleWidget(QWidget):
         self.table_widget.setAlternatingRowColors(True)
 
         self.table_widget.cellChanged.connect(self._on_cell_changed)
+        self.table_widget.cellDoubleClicked.connect(self._on_cell_double_clicked)
         main_layout.addWidget(self.table_widget)
 
         # 6. TABLO ALTI KULLANIM VE GOST BİLGİLENDİRME KARTI (UsageInfoCard)
@@ -522,6 +726,8 @@ class ElementsScheduleWidget(QWidget):
 
             # 2: Kesit (Состав)
             comp_str = ", ".join(p.composition for p in item.parts) if item.parts else ""
+            if len(item.parts) == 1 and item.sketch.sketch_type != SketchType.NONE and item.sketch.sketch_type not in WELDED_SKETCH_TYPES:
+                comp_str = get_profile_full_name(comp_str, item.sketch.sketch_type)
             it_comp = QTableWidgetItem(comp_str)
             it_comp.setTextAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter)
             it_comp.setIcon(get_sketch_icon(item.sketch.sketch_type))
@@ -657,34 +863,11 @@ class ElementsScheduleWidget(QWidget):
         if not txt:
             return txt
 
-        # Eğer metin başka bir bilinen profile aitse (örn. 20К1 I-kiriş, L 50x5 köşebent) zorla kutu veya levha yapma
-        if sketch_type == SketchType.RECT_TUBE:
-            if not (txt.startswith("Гн. □") or txt.startswith("Гн.□")):
-                if not (txt.startswith("I ") or txt.startswith("L ") or txt.startswith("[ ") or txt.startswith("-")):
-                    clean = txt.lstrip("□ ").strip()
-                    return f"Гн. □ {clean}"
+        # Kaynaklı tiplerde elle ön ek formatlaması yapma (WeldedSectionDialog yönetir)
+        if sketch_type in WELDED_SKETCH_TYPES:
+            return txt
 
-        elif sketch_type == SketchType.ANGLE:
-            if not (txt.startswith("L ") or txt.startswith("∟") or txt.startswith("уг.")):
-                clean = txt.lstrip("L∟ ").strip()
-                return f"L {clean}"
-
-        elif sketch_type == SketchType.CHANNEL:
-            if not (txt.startswith("[ ") or txt.startswith("Швеллер")):
-                clean = txt.lstrip("[ ").strip()
-                return f"[ {clean}"
-
-        elif sketch_type == SketchType.CHECKERED_PLATE:
-            if not txt.startswith("Рифл."):
-                val = txt.lstrip("- ").strip()
-                return f"Рифл. -{val}"
-
-        elif sketch_type == SketchType.PLATE:
-            if not (txt.startswith("-") or txt.startswith("—") or txt.startswith("Полоса") or txt.startswith("Лист")):
-                if txt and txt[0].isdigit():
-                    return f"-{txt}"
-
-        return txt
+        return get_profile_full_name(txt, sketch_type)
 
     def _on_cell_changed(self, row: int, col: int):
         if self._block_signals:
@@ -714,22 +897,37 @@ class ElementsScheduleWidget(QWidget):
 
         self._sync_and_emit()
 
+    def _on_cell_double_clicked(self, row: int, col: int):
+        """Hücreye çift tıklandığında kesit/profil kolonundaysa düzenleyici diyaloğunu açar."""
+        if col == 2:
+            self._open_section_editor_for_row(row)
+
     def _on_sketch_changed(self, row: int, opt_idx: int):
         if self._block_signals:
             return
 
         cb: Optional[QComboBox] = self.table_widget.cellWidget(row, 1)
-        if cb:
-            stype, _ = cb.currentData()
-            item = self.table_widget.item(row, 2)
-            if item:
-                item.setIcon(get_sketch_icon(stype))
-                if item.text().strip():
-                    formatted = self._auto_format_composition(item.text().strip(), stype)
-                    if formatted != item.text().strip():
-                        self._block_signals = True
-                        item.setText(formatted)
-                        self._block_signals = False
+        if not cb:
+            return
+
+        stype, _ = cb.currentData()
+        item = self.table_widget.item(row, 2)
+        if not item:
+            return
+
+        # TÜM DEĞİŞİKLİKLERİ block_signals İÇİNDE YAP!
+        # item.setIcon veya item.setText çağrısı cellChanged'i tetikler,
+        # o da eski metne bakıp combobox'ı tekrar geriye çevirir!
+        self._block_signals = True
+        try:
+            item.setIcon(get_sketch_icon(stype))
+            cur_txt = item.text().strip()
+            if cur_txt:
+                formatted = self._auto_format_composition(cur_txt, stype)
+                if formatted != cur_txt:
+                    item.setText(formatted)
+        finally:
+            self._block_signals = False
 
         self._sync_and_emit()
 
@@ -829,45 +1027,124 @@ class ElementsScheduleWidget(QWidget):
             self.table_widget.selectRow(target)
             self._sync_and_emit()
 
-    def _open_profile_picker(self):
-        """GOST Profil Seçici Diyaloğunu açar ve seçilen profili aktif satıra işler."""
+    def _open_section_editor_for_row(self, row: Optional[int] = None):
+        """
+        Eskiz tipine göre dinamik profil / kesit düzenleyiciyi açar:
+        - Kaynaklı kesitler (1-2, 1-2-3 vb.): WeldedSectionDialog açılarak levha bileşenleri girilir.
+        - Haddelenmiş / standart profiller (I, [, L, □, ○ vb.): GostProfilePickerDialog ilgili kategori ön-seçili olarak açılır.
+        """
         from src.ui_v2.profile_picker_dialog import GostProfilePickerDialog
-        r = self.table_widget.currentRow()
-        if r < 0:
+        from src.tables.elements_schedule.welded_dialog import WeldedSectionDialog
+
+        if row is None or row < 0:
+            row = self.table_widget.currentRow()
+        if row < 0:
             if self.table_widget.rowCount() == 0:
                 self._add_row()
-                r = 0
+                row = 0
             else:
-                r = 0
+                row = 0
                 self.table_widget.selectRow(0)
 
-        current_item = self.table_widget.item(r, 2)
-        initial_q = current_item.text().strip() if current_item else ""
+        cb: Optional[QComboBox] = self.table_widget.cellWidget(row, 1)
+        stype = SketchType.I_BEAM
+        if cb:
+            stype, _ = cb.currentData()
 
-        dlg = GostProfilePickerDialog(parent=self, initial_query=initial_q)
-        if dlg.exec() and dlg.selected_profile:
-            p = dlg.selected_profile
+        current_item = self.table_widget.item(row, 2)
+        current_comp = current_item.text().strip() if current_item else ""
+
+        if stype in WELDED_SKETCH_TYPES:
+            dlg = WeldedSectionDialog(sketch_type=stype, current_composition=current_comp, parent=self)
+            if dlg.exec() and dlg.result_composition:
+                res_comp = dlg.result_composition
+                self._block_signals = True
+                try:
+                    if current_item:
+                        current_item.setText(res_comp)
+                        current_item.setIcon(get_sketch_icon(stype))
+                    else:
+                        it = QTableWidgetItem(res_comp)
+                        it.setTextAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter)
+                        it.setIcon(get_sketch_icon(stype))
+                        self.table_widget.setItem(row, 2, it)
+                finally:
+                    self._block_signals = False
+                self._sync_and_emit()
+        else:
+            # Standart GOST sortament kütüphanesi
+            initial_cat = sketch_type_to_profile_category(stype)
+            clean_q = clean_profile_prefix(current_comp)
+            dlg = GostProfilePickerDialog(parent=self, initial_query=clean_q, category=initial_cat)
+            if dlg.exec() and dlg.selected_profile:
+                p = dlg.selected_profile
+                self._block_signals = True
+                try:
+                    # Profil adını ata
+                    new_stype = p.get_sketch_type_enum()
+                    full_name = get_profile_full_name(p.designation, new_stype)
+                    if current_item:
+                        current_item.setText(full_name)
+                    else:
+                        it = QTableWidgetItem(full_name)
+                        it.setTextAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter)
+                        self.table_widget.setItem(row, 2, it)
+
+                    # Eskiz ComboBox'ını güncelle
+                    if cb:
+                        self._set_sketch_combo_type(cb, new_stype)
+                    it_c = self.table_widget.item(row, 2)
+                    if it_c:
+                        it_c.setIcon(get_sketch_icon(new_stype))
+
+                    # Çelik kalitesi
+                    st_item = self.table_widget.item(row, 6)
+                    if st_item and (not st_item.text().strip() or st_item.text() in ("С255-4", "С255")):
+                        st_item.setText(p.default_steel)
+                finally:
+                    self._block_signals = False
+
+                self._sync_and_emit()
+
+    def _open_profile_picker(self):
+        """Geriye dönük uyumluluk: aktif satır için kesit düzenleyiciyi açar."""
+        self._open_section_editor_for_row()
+
+    def _open_add_custom_profile_dialog(self, row: Optional[int] = None):
+        """Kullanıcının kütüphaneye yeni özel profil eklemesi için diyaloğu açar."""
+        from src.ui_v2.profile_picker_dialog import AddCustomProfileDialog
+        if row is None or row < 0:
+            row = self.table_widget.currentRow()
+        if row < 0:
+            row = 0
+
+        cb_sk = self.table_widget.cellWidget(row, 1)
+        init_cat = "Двутавры"
+        if cb_sk:
+            stype, _ = cb_sk.currentData()
+            init_cat = sketch_type_to_profile_category(stype) or "Двутавры"
+
+        dlg = AddCustomProfileDialog(parent=self, initial_category=init_cat)
+        if dlg.exec() and dlg.created_profile:
+            p = dlg.created_profile
             self._block_signals = True
             try:
-                # Profil adını ata
-                if current_item:
-                    current_item.setText(p.designation)
+                new_stype = p.get_sketch_type_enum()
+                full_name = get_profile_full_name(p.designation, new_stype)
+                it = self.table_widget.item(row, 2)
+                if it:
+                    it.setText(full_name)
+                    it.setIcon(get_sketch_icon(new_stype))
                 else:
-                    it = QTableWidgetItem(p.designation)
+                    it = QTableWidgetItem(full_name)
                     it.setTextAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter)
-                    self.table_widget.setItem(r, 2, it)
+                    it.setIcon(get_sketch_icon(new_stype))
+                    self.table_widget.setItem(row, 2, it)
 
-                # Eskiz ComboBox'ını güncelle
-                cb: Optional[QComboBox] = self.table_widget.cellWidget(r, 1)
-                if cb:
-                    stype = p.get_sketch_type_enum()
-                    self._set_sketch_combo_type(cb, stype)
-                    it_c = self.table_widget.item(r, 2)
-                    if it_c:
-                        it_c.setIcon(get_sketch_icon(stype))
+                if cb_sk:
+                    self._set_sketch_combo_type(cb_sk, new_stype)
 
-                # Çelik kalitesi
-                st_item = self.table_widget.item(r, 6)
+                st_item = self.table_widget.item(row, 6)
                 if st_item and (not st_item.text().strip() or st_item.text() in ("С255-4", "С255")):
                     st_item.setText(p.default_steel)
             finally:

@@ -58,6 +58,18 @@ class SolidItemDelegate(QStyledItemDelegate):
     def createEditor(self, parent, option, index):
         editor = super().createEditor(parent, option, index)
         if isinstance(editor, QLineEdit):
+            align_data = index.data(Qt.ItemDataRole.TextAlignmentRole)
+            if align_data is not None:
+                align = Qt.Alignment(align_data)
+                if align & Qt.AlignmentFlag.AlignHCenter:
+                    editor.setAlignment(Qt.AlignmentFlag.AlignCenter)
+                elif align & Qt.AlignmentFlag.AlignRight:
+                    editor.setAlignment(Qt.AlignmentFlag.AlignRight)
+            elif hasattr(option, "displayAlignment"):
+                if option.displayAlignment & Qt.AlignmentFlag.AlignHCenter:
+                    editor.setAlignment(Qt.AlignmentFlag.AlignCenter)
+                elif option.displayAlignment & Qt.AlignmentFlag.AlignRight:
+                    editor.setAlignment(Qt.AlignmentFlag.AlignRight)
             editor.setStyleSheet(f"""
                 QLineEdit {{
                     background-color: {theme.BG_SURFACE_ACTIVE};
@@ -267,3 +279,99 @@ class LinearShimmerButton(QPushButton):
             painter.restore()
         finally:
             painter.end()
+
+
+class LinearButton(QPushButton):
+    """
+    Linear / Notion tarzı şık buton bileşeni.
+    variant: 'primary', 'secondary', 'danger', 'ghost'
+    """
+    def __init__(self, text: str = "", parent=None, variant: str = "secondary", icon=None):
+        super().__init__(text, parent)
+        self.variant = variant
+        if icon:
+            self.setIcon(icon)
+        self.setCursor(Qt.CursorShape.PointingHandCursor)
+        self._apply_style()
+
+    def _apply_style(self):
+        if self.variant == "primary":
+            self.setStyleSheet(f"""
+                QPushButton {{
+                    background-color: {theme.ACCENT_PRIMARY};
+                    color: #FFFFFF;
+                    font-weight: 600;
+                    font-size: 12px;
+                    border: 1px solid {theme.ACCENT_PRIMARY};
+                    border-radius: 6px;
+                    padding: 4px 12px;
+                }}
+                QPushButton:hover {{
+                    background-color: {theme.ACCENT_HOVER};
+                    border-color: {theme.ACCENT_HOVER};
+                }}
+                QPushButton:pressed {{
+                    background-color: {theme.ACCENT_ACTIVE};
+                }}
+                QPushButton:disabled {{
+                    background-color: {theme.BG_SURFACE};
+                    color: {theme.TEXT_MUTED};
+                    border-color: {theme.BORDER_SUBTLE};
+                }}
+            """)
+        elif self.variant == "danger":
+            self.setStyleSheet("""
+                QPushButton {
+                    background-color: rgba(239, 68, 68, 0.12);
+                    color: #EF4444;
+                    font-weight: 600;
+                    font-size: 12px;
+                    border: 1px solid rgba(239, 68, 68, 0.3);
+                    border-radius: 6px;
+                    padding: 4px 12px;
+                }
+                QPushButton:hover {
+                    background-color: rgba(239, 68, 68, 0.22);
+                    border-color: rgba(239, 68, 68, 0.5);
+                    color: #F87171;
+                }
+                QPushButton:pressed {
+                    background-color: rgba(239, 68, 68, 0.35);
+                }
+            """)
+        elif self.variant == "ghost":
+            self.setStyleSheet(f"""
+                QPushButton {{
+                    background-color: transparent;
+                    color: {theme.TEXT_SECONDARY};
+                    font-size: 12px;
+                    border: 1px solid transparent;
+                    border-radius: 6px;
+                    padding: 4px 10px;
+                }}
+                QPushButton:hover {{
+                    background-color: {theme.BG_SURFACE_HOVER};
+                    color: {theme.TEXT_PRIMARY};
+                    border-color: {theme.BORDER_SUBTLE};
+                }}
+            """)
+        else:  # secondary
+            self.setStyleSheet(f"""
+                QPushButton {{
+                    background-color: {theme.BG_SURFACE};
+                    color: {theme.TEXT_PRIMARY};
+                    font-size: 12px;
+                    font-weight: 500;
+                    border: 1px solid {theme.BORDER_LIGHT};
+                    border-radius: 6px;
+                    padding: 4px 12px;
+                }}
+                QPushButton:hover {{
+                    background-color: {theme.BG_SURFACE_HOVER};
+                    border-color: {theme.BORDER_FOCUS};
+                }}
+                QPushButton:pressed {{
+                    background-color: {theme.BG_SURFACE_ACTIVE};
+                }}
+            """)
+

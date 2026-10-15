@@ -17,6 +17,7 @@ CHECKMARK_SVG = f"{ASSETS_DIR}/checkmark.svg"
 BG_APP = "#0e0f12"              # En alt katman zemin rengi
 BG_SIDEBAR = "#121318"          # Notion / Linear sol navigasyon paneli
 BG_SURFACE = "#17181f"          # Kartlar, paneller, veri kutuları
+BG_CARD = BG_SURFACE            # Kart zemin rengi (alias)
 BG_SURFACE_HOVER = "#20222b"    # Fare üzerine gelme zemin rengi
 BG_SURFACE_ACTIVE = "#282a36"   # Seçili öğe zemini
 
@@ -29,6 +30,7 @@ ACCENT_PRIMARY = "#5e6ad2"      # Linear ana buton ve eylem moru
 ACCENT_PRIMARY_HOVER = "#6e79d6"
 ACCENT_HOVER = ACCENT_PRIMARY_HOVER
 ACCENT_PRIMARY_PRESSED = "#4f5bb8"
+ACCENT_ACTIVE = ACCENT_PRIMARY_PRESSED
 ACCENT_TEXT = "#ffffff"
 COLOR_ACCENT = "#5e6ad2"        # Geriye dönük uyumluluk vurgusu
 

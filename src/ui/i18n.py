@@ -125,6 +125,14 @@ TRANSLATIONS: Dict[str, Dict[str, str]] = {
         "module_reference_docs": "ГОСТ Р 21.101 / Form 2 / Referans ve Ek Dokümanlar",
         "module_main_drawings": "ГОСТ Р 21.101 / Form 2 / Ana Çizim Takımları",
         "module_working_drawings": "ГОСТ Р 21.101 / Form 1 / Çalışma Çizimleri Listesi",
+        "module_change_permission": "ГОСТ Р 21.101 / Form 9 / Değişiklik İzni (Разрешение на внесение изменений)",
+        "change_permission_title": "DEĞİŞİKLİK İZNİ",
+        "change_permission_name": "Разрешение на внесение изменений (Форма 9)",
+        "change_permission_desc": "ГОСТ Р 21.101-2020 Form 9 Değişiklik İzni / Разрешение на внесение изменений (185 x 287 mm)",
+        "module_title_sheet": "ГОСТ Р 21.101 / Form 12 / Başlık Sayfası (Титульный лист / Приложение С)",
+        "title_sheet_title": "BAŞLIK SAYFASI",
+        "title_sheet_name": "Титульный лист (Форма 12, Приложение С)",
+        "title_sheet_desc": "ГОСТ Р 21.101-2020 Form 12 / Приложение С Başlık Sayfası / Титульный лист (185 x 287 mm, Word & CAD)",
         "col_sub_sheet_num": "Pafta No",
         "col_sub_drawing_name": "Çizim Adı",
         "col_sub_code": "Kod / Standart No",
@@ -162,7 +170,11 @@ TRANSLATIONS: Dict[str, Dict[str, str]] = {
         "btn_cad_panel": "CAD Ekranı",
         "tooltip_toggle_cad": "CAD Ekranını Gizle / Göster (Ctrl+J)",
         "btn_multi_sheet": "Çoklu Pafta",
+        "btn_single_sheet": "Tekli Pafta",
         "tooltip_multi_sheet": "Tüm Proje Tablolarını Paftalara Otomatik Yerleştir (ГОСТ)",
+        "tooltip_single_sheet": "Aktif Tablo Tekil Pafta Görünümüne Geri Dön",
+        "badge_multi_sheet": "ÇOKLU PAFTA DÜZENİ",
+        "sheets_count": "Pafta",
 
         # Editör Konteyneri (TableEditorWrapper) Başlık & Alt Başlıkları
         "wrapper_title_elements_schedule": "ГОСТ 21.502 / Tablo 1 / Eleman Listesi",
@@ -175,6 +187,11 @@ TRANSLATIONS: Dict[str, Dict[str, str]] = {
         "wrapper_subtitle_working_drawings": "ГОСТ Р 21.101-2020 • Form 1 Çalışma Çizimleri Pafta Listesi",
         "wrapper_title_main_drawings": "ГОСТ Р 21.101 / Form 2 / Ana Çizim Takımları",
         "wrapper_subtitle_main_drawings": "ГОСТ Р 21.101-2020 • Form 2 Çizim Takımları Listesi",
+        "wrapper_title_change_permission": "ГОСТ Р 21.101 / Form 9 / Değişiklik İzni",
+        "wrapper_subtitle_change_permission": "ГОСТ Р 21.101-2020 • Form 9 Değişiklik İzni (185 × 287 mm)",
+        "wrapper_title_title_sheet": "ГОСТ Р 21.101 / Form 12 / Başlık Sayfası (Приложение С)",
+        "wrapper_subtitle_title_sheet": "ГОСТ Р 21.101-2020 • Form 12 / Приложение С Başlık Sayfası (185 × 287 mm)",
+        "btn_export_word": "📄 Word'e Aktar (.docx)",
         "wrapper_title_generic": "Standart Çizim Tablosu",
         "wrapper_subtitle_generic": "ГОСТ Standart Mühendislik Tablosu",
         "hint_excel_paste": "Excel'den yapıştırmak için Ctrl+V kullanabilirsiniz",
@@ -227,6 +244,8 @@ TRANSLATIONS: Dict[str, Dict[str, str]] = {
         "info_main_drawings_desc": "• Tüm alanlar kullanıcı tarafından manuel olarak düzenlenebilir. Excel veya Google Sheets'ten kopyalanan satırlar doğrudan yapıştırılabilir (Ctrl+V).\n• Standart Form 2 genişliği 185 mm'dir (60 + 95 + 30 mm). Tablo başlığı standart gereği tablonun üstünde yer alır ve DXF çıktısında otomatik üretilir.",
         "info_working_drawings_title": "💡 ГОСТ Р 21.101-2020 Form 1 — Çalışma Çizimleri / Pafta Listesi (Ведомость рабочих чертежей основного комплекта)",
         "info_working_drawings_desc": "• Pafta numaraları (1, 2.1, 2.2 vb.) ve çizim adları manuel olarak girilebilir. Excel'den doğrudan kopyala-yapıştır yapılabilir (Ctrl+V).\n• Standart Form 1 toplam genişliği 185 mm'dir (15 + 140 + 30 mm). Tablo başlığı standart gereği tablonun üstünde yer alır ve DXF çıktısında otomatik üretilir.\n• Gelecek Sürüm: Proje PDF dosyalarından pafta listesi otomatik olarak okunup bu tabloya doldurulacaktır.",
+        "info_change_permission_title": "💡 ГОСТ Р 21.101-2020 Приложение Л — Разрешение на внесение изменений (Форма 9)",
+        "info_change_permission_desc": "• Form 9, teknik çizimlerdeki revizyon izinlerini ve değişiklik kayıtlarını standartlaştıran A4 dikey (210 × 297 mm) resmi belgedir.\n• Toplam genişlik 185 mm olup pafta iç çerçevesiyle (20 mm sol подшивка, 5 mm diğerleri) birebir örtüşür.\n• 'Код' sütunundan Tablo Л.1'e uygun değişiklik nedeni açılır menüden seçilebilir veya Excel'den yapıştırılabilir (Ctrl+V).\n• Klavye Kısayolları: Enter sonraki satıra geçer, Tab yan hücreye atlar, Delete seçili hücreleri temizler.",
         "info_elements_schedule": "<b>ГОСТ 21.502-2007:</b> A (Kesme kuvveti), N (Eksenel yük) ve M (Eğilme momenti) değerleri sırasıyla кН ve кН·м cinsindedir. Kısayollar: <b>Tab</b>: Yan Hücre · <b>Enter</b>: Alt Hücre · <b>F2</b>: Düzenle · <b>Ctrl+V</b>: Excel'den Yapıştır",
 
         # UI Genel & Arayüz Kontrolleri
@@ -240,6 +259,25 @@ TRANSLATIONS: Dict[str, Dict[str, str]] = {
         "sidebar_status_warning_desc": "Eksik veya standart dışı veri bulundu.",
         "btn_cad_panel_close_tooltip": "CAD Ekranını Kapat (Ctrl+J)",
         "btn_settings": "Ayarlar",
+
+        # Title Sheet (Form 12 / Приложение С) Butonlar ve Seçenekler
+        "preset_btn_sample": "📋 Örnek Şablon",
+        "btn_sample_template": "📋 Örnek Şablon",
+        "approval_soglasovano": "СОГЛАСОВАНО — (Uygunluk / İnceleme Onayı)",
+        "approval_utverzhdayu": "УТВЕРЖДАЮ — (Tasdik / Yürürlük Onayı)",
+        "doc_type_project": "ПРОЕКТНАЯ ДОКУМЕНТАЦИЯ — (Proje Dokümantasyonu / Tasarım & Ruhsat Aşaması)",
+        "doc_type_working": "РАБОЧАЯ ДОКУМЕНТАЦИЯ — (Çalışma Çizimleri / Uygulama & İmalat Aşaması)",
+
+        # Form 9 Değişiklik İzni (Разрешение на внесение изменений)
+        "perm_role_chg": "Изм. внес (Rev. Yapan)",
+        "perm_role_prep": "Составил (Hazırlayan)",
+        "perm_role_gip": "ГИП (Proje Baş Müh.)",
+        "perm_role_appr": "Утв. (Onaylayan)",
+        "btn_add_change": "＋ Değişiklik Ekle",
+        "ph_surname": "Soyadı",
+        "ph_date": "GG.AA.YY",
+        "tooltip_sample_form9": "Standart örnek mühendislik verilerini yükler",
+        "tooltip_clear_form9": "Tüm alanları temizler ve boş şablon açar",
     },
     "EN": {
         "menu_file": "File",
@@ -353,6 +391,14 @@ TRANSLATIONS: Dict[str, Dict[str, str]] = {
         "module_reference_docs": "GOST R 21.101 / Form 2 / Reference & Attached Documents",
         "module_main_drawings": "GOST R 21.101 / Form 2 / Main Drawing Sets",
         "module_working_drawings": "GOST R 21.101 / Form 1 / Working Drawings Schedule",
+        "module_change_permission": "GOST R 21.101 / Form 9 / Change Permission (Разрешение на внесение изменений)",
+        "change_permission_title": "CHANGE PERMISSION",
+        "change_permission_name": "Permission for Changes (GOST Form 9)",
+        "change_permission_desc": "GOST R 21.101-2020 Form 9 Permission for Making Changes (185 x 287 mm)",
+        "module_title_sheet": "GOST R 21.101 / Form 12 / Title Sheet (Appendix C)",
+        "title_sheet_title": "TITLE SHEET",
+        "title_sheet_name": "Title Sheet (Form 12, Appendix C)",
+        "title_sheet_desc": "GOST R 21.101-2020 Form 12 / Appendix C Title Sheet (185 x 287 mm, Word & CAD)",
         "col_sub_sheet_num": "Sheet No",
         "col_sub_drawing_name": "Drawing Title",
         "col_sub_code": "Code / Standard No",
@@ -389,7 +435,11 @@ TRANSLATIONS: Dict[str, Dict[str, str]] = {
         "btn_cad_panel": "CAD View",
         "tooltip_toggle_cad": "Toggle CAD Viewport (Ctrl+J)",
         "btn_multi_sheet": "Multi Sheet",
+        "btn_single_sheet": "Single Sheet",
         "tooltip_multi_sheet": "Automatically Distribute Project Tables to Sheets (GOST)",
+        "tooltip_single_sheet": "Return to Single Sheet Active Table View",
+        "badge_multi_sheet": "MULTI-SHEET LAYOUT",
+        "sheets_count": "Sheets",
 
         # Editor Container (TableEditorWrapper) Titles & Subtitles
         "wrapper_title_elements_schedule": "GOST 21.502 / Table 1 / Elements Schedule",
@@ -402,6 +452,11 @@ TRANSLATIONS: Dict[str, Dict[str, str]] = {
         "wrapper_subtitle_working_drawings": "GOST R 21.101-2020 • Form 1 Working Drawings Schedule",
         "wrapper_title_main_drawings": "GOST R 21.101 / Form 2 / Main Drawing Sets",
         "wrapper_subtitle_main_drawings": "GOST R 21.101-2020 • Form 2 Main Drawing Sets",
+        "wrapper_title_change_permission": "GOST R 21.101 / Form 9 / Change Permission",
+        "wrapper_subtitle_change_permission": "GOST R 21.101-2020 • Form 9 Permission for Making Changes (185 x 287 mm)",
+        "wrapper_title_title_sheet": "GOST R 21.101 / Form 12 / Title Sheet (Appendix C)",
+        "wrapper_subtitle_title_sheet": "GOST R 21.101-2020 • Form 12 / Appendix C Title Sheet (185 x 287 mm)",
+        "btn_export_word": "📄 Export to Word (.docx)",
         "wrapper_title_generic": "Standard Engineering Table",
         "wrapper_subtitle_generic": "GOST Standard Engineering Table",
         "hint_excel_paste": "You can use Ctrl+V to paste from Excel",
@@ -454,6 +509,8 @@ TRANSLATIONS: Dict[str, Dict[str, str]] = {
         "info_main_drawings_desc": "• All fields can be edited manually. Rows copied from Excel or Google Sheets can be pasted directly (Ctrl+V).\n• Standard Form 2 width is 185 mm (60 + 95 + 30 mm). Table title is placed above table by standard and exported in DXF automatically.",
         "info_working_drawings_title": "💡 GOST R 21.101-2020 Form 1 — Working Drawings / Sheet List (Ведомость рабочих чертежей основного комплекта)",
         "info_working_drawings_desc": "• Sheet numbers (1, 2.1, 2.2 etc.) and drawing titles can be edited manually. Excel rows can be pasted directly (Ctrl+V).\n• Standard Form 1 width is 185 mm (15 + 140 + 30 mm). Table title is placed above table by standard and exported in DXF automatically.\n• Future Version: Sheet list will be automatically parsed from project PDF drawings.",
+        "info_change_permission_title": "💡 GOST R 21.101-2020 Appendix L — Permission for Making Changes (Form 9)",
+        "info_change_permission_desc": "• Form 9 is an official A4 portrait (210 × 297 mm) engineering document standardizing revision permissions and change descriptions.\n• Total width is 185 mm, matching the inner drawing frame exactly (20 mm left binding margin, 5 mm others).\n• The 'Код' column allows selecting the change reason code (Table L.1) from dropdown or pasting from Excel (Ctrl+V).\n• Shortcuts: Enter moves down, Tab moves to next cell, Delete clears cell.",
         "info_elements_schedule": "<b>GOST 21.502-2007:</b> A (Shear force), N (Axial load) and M (Bending moment) values are in kN and kN·m. Shortcuts: <b>Tab</b>: Next Cell · <b>Enter</b>: Next Row · <b>F2</b>: Edit · <b>Ctrl+V</b>: Paste from Excel",
 
         # UI Chrome & Controls
@@ -467,6 +524,25 @@ TRANSLATIONS: Dict[str, Dict[str, str]] = {
         "sidebar_status_warning_desc": "Incomplete or non-standard data detected.",
         "btn_cad_panel_close_tooltip": "Hide CAD View (Ctrl+J)",
         "btn_settings": "Settings",
+
+        # Title Sheet (Form 12 / Appendix C) Buttons & Options
+        "preset_btn_sample": "📋 Sample Template",
+        "btn_sample_template": "📋 Sample Template",
+        "approval_soglasovano": "СОГЛАСОВАНО — (Agreed / Concurrence)",
+        "approval_utverzhdayu": "УТВЕРЖДАЮ — (Approved / Adoption)",
+        "doc_type_project": "ПРОЕКТНАЯ ДОКУМЕНТАЦИЯ — (Design Documentation / Permitting Stage)",
+        "doc_type_working": "РАБОЧАЯ ДОКУМЕНТАЦИЯ — (Working Documentation / Construction Stage)",
+
+        # Form 9 Change Permission (Разрешение на внесение изменений)
+        "perm_role_chg": "Изм. внес (Revised by)",
+        "perm_role_prep": "Составил (Prepared by)",
+        "perm_role_gip": "ГИП (Chief Project Eng.)",
+        "perm_role_appr": "Утв. (Approved by)",
+        "btn_add_change": "＋ Add Change",
+        "ph_surname": "Surname",
+        "ph_date": "DD.MM.YY",
+        "tooltip_sample_form9": "Loads standard engineering sample data",
+        "tooltip_clear_form9": "Clears all fields and opens an empty template",
     },
     "RU": {
         "menu_file": "Файл",
@@ -580,6 +656,14 @@ TRANSLATIONS: Dict[str, Dict[str, str]] = {
         "module_reference_docs": "ГОСТ Р 21.101 / Форма 2 / Ведомость ссылочных и прилагаемых документов",
         "module_main_drawings": "ГОСТ Р 21.101 / Форма 2 / Ведомость основных комплектов рабочих чертежей",
         "module_working_drawings": "ГОСТ Р 21.101 / Форма 1 / Ведомость рабочих чертежей основного комплекта",
+        "module_change_permission": "ГОСТ Р 21.101 / Форма 9 / Разрешение на внесение изменений",
+        "change_permission_title": "РАЗРЕШЕНИЕ НА ВНЕСЕНИЕ ИЗМЕНЕНИЙ",
+        "change_permission_name": "Разрешение на внесение изменений (Форма 9)",
+        "change_permission_desc": "ГОСТ Р 21.101-2020 Форма 9 Разрешение на внесение изменений (185 x 287 мм)",
+        "module_title_sheet": "ГОСТ Р 21.101 / Форма 12 / Титульный лист (Приложение С)",
+        "title_sheet_title": "ТИТУЛЬНЫЙ ЛИСТ",
+        "title_sheet_name": "Титульный лист (Форма 12, Приложение С)",
+        "title_sheet_desc": "ГОСТ Р 21.101-2020 Форма 12 / Приложение С Титульный лист (185 x 287 мм, Word и CAD)",
         "col_sub_sheet_num": "Лист",
         "col_sub_drawing_name": "Наименование",
         "col_sub_code": "Обозначение",
@@ -616,7 +700,11 @@ TRANSLATIONS: Dict[str, Dict[str, str]] = {
         "btn_cad_panel": "Панель CAD",
         "tooltip_toggle_cad": "Скрыть / Показать экран CAD (Ctrl+J)",
         "btn_multi_sheet": "Многолистовой план",
+        "btn_single_sheet": "Один лист",
         "tooltip_multi_sheet": "Автоматическое размещение всех таблиц проекта по листам (ГОСТ)",
+        "tooltip_single_sheet": "Вернуться к просмотру текущей таблицы на одном листе",
+        "badge_multi_sheet": "МНОГОЛИСТОВОЙ ПЛАН",
+        "sheets_count": "Листов",
 
         # Заголовки и подзаголовки редактора (TableEditorWrapper)
         "wrapper_title_elements_schedule": "ГОСТ 21.502 / Таблица 1 / Ведомость элементов",
@@ -629,6 +717,11 @@ TRANSLATIONS: Dict[str, Dict[str, str]] = {
         "wrapper_subtitle_working_drawings": "ГОСТ Р 21.101-2020 • Форма 1 Рабочие чертежи основного комплекта",
         "wrapper_title_main_drawings": "ГОСТ Р 21.101 / Форма 2 / Ведомость основных комплектов рабочих чертежей",
         "wrapper_subtitle_main_drawings": "ГОСТ Р 21.101-2020 • Форма 2 Основные комплекты рабочих чертежей",
+        "wrapper_title_change_permission": "ГОСТ Р 21.101 / Форма 9 / Разрешение на внесение изменений",
+        "wrapper_subtitle_change_permission": "ГОСТ Р 21.101-2020 • Форма 9 Разрешение на внесение изменений (185 x 287 мм)",
+        "wrapper_title_title_sheet": "ГОСТ Р 21.101 / Форма 12 / Титульный лист (Приложение С)",
+        "wrapper_subtitle_title_sheet": "ГОСТ Р 21.101-2020 • Форма 12 / Приложение С Титульный лист (185 × 287 мм)",
+        "btn_export_word": "📄 Экспорт в Word (.docx)",
         "wrapper_title_generic": "Стандартная таблица",
         "wrapper_subtitle_generic": "Инженерная таблица по стандарту ГОСТ",
         "hint_excel_paste": "Для вставки из Excel используйте Ctrl+V",
@@ -681,6 +774,8 @@ TRANSLATIONS: Dict[str, Dict[str, str]] = {
         "info_main_drawings_desc": "• Все поля заполняются вручную. Строки из Excel можно вставлять напрямую (Ctrl+V).\n• Ширина таблицы по Форме 2 составляет 185 мм (60 + 95 + 30 мм). Заголовок формируется автоматически в соответствии с ГОСТ.",
         "info_working_drawings_title": "💡 ГОСТ Р 21.101-2020 Форма 1 — Ведомость рабочих чертежей основного комплекта",
         "info_working_drawings_desc": "• Номера листов (1, 2.1, 2.2 и т.д.) и наименования вводятся вручную. Поддерживается вставка из Excel (Ctrl+V).\n• Ширина таблицы по Форме 1 составляет 185 мм (15 + 140 + 30 мм). Заголовок формируется по ГОСТ автоматически.\n• В будущей версии: Список листов будет считываться из PDF-файлов чертежей проекта.",
+        "info_change_permission_title": "💡 ГОСТ Р 21.101-2020 Приложение Л — Разрешение на внесение изменений (Форма 9)",
+        "info_change_permission_desc": "• Разрешение на внесение изменений (форма 9) оформляют на листах формата А4 (210 × 297 мм) с рамкой по ГОСТ Р 21.101.\n• Размеры граф и форма основной надписи соответствуют приложению Л.\n• В графе 'Код' указывают код причины изменения по таблице Л.1 (1—5) из выпадающего списка.\n• Поддерживается вставка из Excel (Ctrl+V) и навигация клавишами Enter/Tab.",
         "info_elements_schedule": "<b>ГОСТ 21.502-2007:</b> Значения A (Перерезывающая сила / сдвиг), N (Осевая / продольная сила) и M (Изгибающий момент) указываются в кН и кН·м. Горячие клавиши: <b>Tab</b>: След. ячейка · <b>Enter</b>: След. строка · <b>F2</b>: Правка · <b>Ctrl+V</b>: Вставка из Excel",
 
         # Интерфейс и элементы управления
@@ -694,6 +789,25 @@ TRANSLATIONS: Dict[str, Dict[str, str]] = {
         "sidebar_status_warning_desc": "Обнаружены неполные или нестандартные данные.",
         "btn_cad_panel_close_tooltip": "Скрыть CAD вид (Ctrl+J)",
         "btn_settings": "Настройки",
+
+        # Title Sheet (Форма 12 / Приложение С) Кнопки и опции
+        "preset_btn_sample": "📋 Пример шаблона",
+        "btn_sample_template": "📋 Пример шаблона",
+        "approval_soglasovano": "СОГЛАСОВАНО — (Согласующая организация)",
+        "approval_utverzhdayu": "УТВЕРЖДАЮ — (Утверждающая инстанция)",
+        "doc_type_project": "ПРОЕКТНАЯ ДОКУМЕНТАЦИЯ — (Стадия «П» / Экспертиза и утверждение)",
+        "doc_type_working": "РАБОЧАЯ ДОКУМЕНТАЦИЯ — (Стадия «Р» / Строительство и монтаж)",
+
+        # Форма 9 Разрешение на внесение изменений
+        "perm_role_chg": "Изм. внес (Изменение внес)",
+        "perm_role_prep": "Составил (Разработал)",
+        "perm_role_gip": "ГИП (Главный инженер)",
+        "perm_role_appr": "Утв. (Утвердил)",
+        "btn_add_change": "＋ Добавить изменение",
+        "ph_surname": "Фамилия",
+        "ph_date": "ДД.ММ.ГГ",
+        "tooltip_sample_form9": "Загрузить стандартные проектные данные",
+        "tooltip_clear_form9": "Очистить все поля и открыть пустой шаблон",
     }
 }
 
@@ -749,6 +863,8 @@ def get_module_display_title(module_or_id) -> str:
 
     if "elements" in mod_id or "elementov" in mod_id:
         return i18n.t("module_elements_schedule")
+    elif "title_sheet" in mod_id or "titul" in mod_id:
+        return i18n.t("module_title_sheet")
     elif "title_block" in mod_id or "antet" in mod_id:
         return i18n.t("module_title_block")
     elif "reference" in mod_id or "doc" in mod_id:
@@ -757,7 +873,10 @@ def get_module_display_title(module_or_id) -> str:
         return i18n.t("module_working_drawings")
     elif "main_drawings" in mod_id or "drawings" in mod_id or "main_sets" in mod_id:
         return i18n.t("module_main_drawings")
+    elif "change_permission" in mod_id or "permission" in mod_id or "form9" in mod_id or "razreshenie" in mod_id:
+        return i18n.t("module_change_permission")
     elif "steel" in mod_id or "raskhod" in mod_id or "sarfiyat" in mod_id:
         return i18n.t("module_steel_consumption")
     else:
         return raw_name.split("(")[0].strip() if raw_name else mod_id
+

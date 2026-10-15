@@ -112,6 +112,18 @@ class PresetManager:
             items = getattr(document, "items", document if isinstance(document, list) else [])
             return {"items": [it.to_dict() if hasattr(it, "to_dict") else asdict(it) for it in items]}
 
+        # 6. Change Permission (Form 9)
+        elif "change_permission" in module_id or "permission" in module_id or "form9" in module_id:
+            if hasattr(document, "to_dict"):
+                return document.to_dict()
+            return asdict(document)
+
+        # 7. Title Sheet (Form 12 / Приложение С)
+        elif "title_sheet" in module_id:
+            if hasattr(document, "to_dict"):
+                return document.to_dict()
+            return asdict(document)
+
         # Genel Dataclass veya List
         if hasattr(document, "to_dict"):
             return document.to_dict()
@@ -175,6 +187,16 @@ class PresetManager:
         elif "reference" in module_id or "doc" in module_id:
             raw_items = data.get("items", [])
             return [ReferenceDocItem.from_dict(it) for it in raw_items]
+
+        # 6. Change Permission (Form 9)
+        elif "change_permission" in module_id or "permission" in module_id or "form9" in module_id:
+            from src.tables.change_permission.model import ChangePermissionDocument
+            return ChangePermissionDocument.from_dict(data)
+
+        # 7. Title Sheet (Form 12 / Приложение С)
+        elif "title_sheet" in module_id:
+            from src.tables.title_sheet.model import TitleSheetDocument
+            return TitleSheetDocument.from_dict(data)
 
         return data
 

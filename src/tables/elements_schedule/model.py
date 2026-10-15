@@ -47,7 +47,7 @@ def build_sample_items() -> List[ScheduleItem]:
         ScheduleItem(
             mark="Б2",
             sketch=SectionSketch(SketchType.RECT_TUBE, symbol_text="□"),
-            parts=[ElementPart("", "140x100x6.0")],
+            parts=[ElementPart("", "Гн. □ 140x100x6.0")],
             force_a="23", force_n="3", force_m="0",
             steel_grade="С255-4"
         ),
@@ -64,14 +64,14 @@ def build_sample_items() -> List[ScheduleItem]:
         ScheduleItem(
             mark="Б4",
             sketch=SectionSketch(SketchType.ROUND_TUBE, symbol_text="○"),
-            parts=[ElementPart("", "∅ 70x4.0")],
+            parts=[ElementPart("", "○ ⌀ 70x4.0")],
             force_a="0", force_n="70", force_m="0",
             steel_grade="С255-4"
         ),
         ScheduleItem(
             mark="Б5",
             sketch=SectionSketch(SketchType.RECT_TUBE, symbol_text="□"),
-            parts=[ElementPart("", "200x160x10.0")],
+            parts=[ElementPart("", "Гн. □ 200x160x10.0")],
             force_a="", force_n="", force_m="",
             steel_grade="С255-4"
         ),
@@ -88,7 +88,7 @@ def build_sample_items() -> List[ScheduleItem]:
         ScheduleItem(
             mark="К2",
             sketch=SectionSketch(SketchType.RECT_TUBE, symbol_text="□"),
-            parts=[ElementPart("", "140x120x6.0")],
+            parts=[ElementPart("", "Гн. □ 140x120x6.0")],
             force_a="10", force_n="10", force_m="0",
             steel_grade="С255-4"
         ),

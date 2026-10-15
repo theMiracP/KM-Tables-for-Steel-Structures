@@ -5,7 +5,7 @@ CAD ve önizleme motoru için generic `Table` matrisine dönüştürür.
 """
 from typing import List, Optional, Union
 from src.models.table import Table, TableCell, TableRow, TableColumn, HAlign, VAlign
-from src.models.sketch import SectionSketch
+from src.models.sketch import SectionSketch, SketchType
 from src.tables.elements_schedule.model import ScheduleItem, ElementPart, ElementsScheduleDocument
 from src.tables.elements_schedule.config import ElementsScheduleConfig, DEFAULT_ELEMENTS_CONFIG
 
@@ -74,13 +74,18 @@ def create_elements_schedule_table(
 
         for p_idx in range(part_count):
             part = item.parts[p_idx] if p_idx < len(item.parts) else ElementPart()
+            comp_text = part.composition
+            if part_count == 1 and item.sketch.sketch_type != SketchType.NONE:
+                from src.tables.elements_schedule.editor import get_profile_full_name, WELDED_SKETCH_TYPES
+                if item.sketch.sketch_type not in WELDED_SKETCH_TYPES:
+                    comp_text = get_profile_full_name(comp_text, item.sketch.sketch_type)
 
             if p_idx == 0:
                 row_cells = [
                     TableCell(text=item.mark, rowspan=part_count),
                     TableCell(sketch=item.sketch, rowspan=part_count),
                     TableCell(text=part.position_no),
-                    TableCell(text=part.composition, halign=HAlign.LEFT),
+                    TableCell(text=comp_text, halign=HAlign.LEFT),
                     TableCell(text=item.force_a, rowspan=part_count),
                     TableCell(text=item.force_n, rowspan=part_count),
                     TableCell(text=item.force_m, rowspan=part_count),
@@ -92,7 +97,7 @@ def create_elements_schedule_table(
                     TableCell(is_merged_continuation=True),
                     TableCell(is_merged_continuation=True),
                     TableCell(text=part.position_no),
-                    TableCell(text=part.composition, halign=HAlign.LEFT),
+                    TableCell(text=comp_text, halign=HAlign.LEFT),
                     TableCell(is_merged_continuation=True),
                     TableCell(is_merged_continuation=True),
                     TableCell(is_merged_continuation=True),

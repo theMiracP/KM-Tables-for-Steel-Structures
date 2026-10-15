@@ -12,7 +12,7 @@ Bu belge, Rusya GOST standartlarına tam uyumlu KM Çelik Konstrüksiyon çizim 
 
 ---
 
-### 🎯 BÖLÜM 1: Yapılacaklar Listesi (0 Bekleyen / 79 Onay Bekliyor)
+### 🎯 BÖLÜM 1: Yapılacaklar Listesi (0 Bekleyen / 92 Onay Bekliyor)
 
 > **Kural:** Tüm görevlerin geliştirmesi ve birim/entegrasyon testleri başarıyla tamamlanmıştır. Kullanıcı bizzat inceleyip onay verene kadar görevler Bölüm 1'de `🔍 Onay Bekliyor` durumunda tutulur; Bölüm 3'e taşınmaz.
 
@@ -99,6 +99,19 @@ Bu belge, Rusya GOST standartlarına tam uyumlu KM Çelik Konstrüksiyon çizim 
 | **TASK-77** | **Ortak Antet (Title Block) Verilerinin Tüm Tablolar ve Paftalarla Eşzamanlanması (Item 3.2)** | `P1 - High` | `src/ui_v2/window.py`<br>`src/models/sheet.py`<br>`src/models/multi_sheet.py` | 🔍 Onay Bekliyor |
 | **TASK-78** | **Yerel Proje Formatı (.kmproj) Kaydetme, Yükleme ve Proje Yönetimi (Item 4.1)** | `P0 - Blocker` | `src/services/project_manager.py`<br>`src/ui_v2/window.py`<br>`src/ui_v2/top_bar.py` | 🔍 Onay Bekliyor |
 | **TASK-79** | **Geri Al / İleri Al (Undo / Redo) Geri Alma Altyapısı (Item 4.2)** | `P1 - High` | `src/services/undo_manager.py`<br>`src/ui_v2/editor_wrapper.py`<br>`src/ui_v2/window.py` | 🔍 Onay Bekliyor |
+| **TASK-80** | **ГОСТ Р 21.101-2020 Form 9 Değişiklik İzni (Разрешение на изменения) & Değişiklik Kodları (Таблица Л.1)** | `P0 - Blocker` | `src/tables/change_permission/*`<br>`src/ui_v2/sidebar.py`<br>`src/ui_v2/editor_wrapper.py`<br>`src/export/dxf_exporter.py`<br>`src/export/pdf_exporter.py` | 🔍 Onay Bekliyor |
+| **TASK-81** | **Kurgusal / Jenerik Örnek Veri Kuralı & Form 9 Örnek Verilerinin Temizlenmesi** | `P0 - Blocker` | `src/tables/change_permission/*`<br>`src/tables/title_block/*`<br>`gemini.md` | 🔍 Onay Bekliyor |
+| **TASK-82** | **ГОСТ Р 21.101-2020 Form 12 / Приложение С Başlık Sayfası (Титульный лист) & Word (.docx) Export** | `P0 - Blocker` | `src/tables/title_sheet/*`<br>`src/export/docx_exporter.py`<br>`src/ui_v2/window.py` | 🔍 Onay Bekliyor |
+| **TASK-83** | **Çoklu Pafta ve Tekli Pafta Arasında İki Yönlü Geçiş (HUD Toggle & Senkronizasyon)** | `P1 - High` | `src/ui_v2/cad_panel.py`<br>`src/ui_v2/window.py`<br>`src/ui/i18n.py` | 🔍 Onay Bekliyor |
+| **TASK-84** | **Başlık Sayfası Editörü Buton Metni & Açılır Menü Çift Dilli Çevirileri (Kırmızı & Sarı Alanlar)** | `P1 - High` | `src/ui/i18n.py`<br>`src/tables/title_sheet/editor.py`<br>`tests/test_title_sheet.py` | 🔍 Onay Bekliyor |
+| **TASK-85** | **Başlık Sayfası Editörü QScrollArea Entegrasyonu & Kart 3-4 Üst Üste Binme / Kırpılma Düzeltmesi** | `P0 - Blocker` | `src/tables/title_sheet/editor.py`<br>`tests/test_title_sheet.py` | 🔍 Onay Bekliyor |
+| **TASK-86** | **Başlık Sayfası Sorumlu İmzacı Tablosu Hücre İçi Metin Çakışması / Ghosting Giderilmesi (SolidItemDelegate)** | `P0 - Blocker` | `src/tables/title_sheet/editor.py`<br>`src/ui_v2/components.py`<br>`tests/test_title_sheet.py` | 🔍 Onay Bekliyor |
+| **TASK-87** | **Form 9 Şablon Buton Metni (Görsel 2 Temizliği) & Sorumlu İmzacı Rolleri Çift Dilli / Dinamik i18n Çevirisi** | `P1 - High` | `src/tables/change_permission/editor.py`<br>`src/ui/i18n.py`<br>`tests/test_change_permission.py` | 🔍 Onay Bekliyor |
+| **TASK-88** | **Form 9 Değişiklik Neden Kodları (Таблица Л.1) Açılır Menü Çok Dilli (i18n) Çevirisi ve Büyük Harf Düzeltmesi** | `P0 - Blocker` | `src/tables/change_permission/editor.py`<br>`tests/test_change_permission.py` | 🔍 Onay Bekliyor |
+| **TASK-89** | **GOST Profil Seçici Arama Temizleme 'X' Butonu & 'Önerilen Çelik' Sütununun Kaldırılması** | `P1 - High` | `src/ui_v2/profile_picker_dialog.py`<br>`tests/test_profile_picker.py` | 🔍 Onay Bekliyor |
+| **TASK-90** | **Form 9 Değişiklik Neden Kodları Hızlı Atama Butonları Padding ve Metin Görünürlüğü Düzeltmesi** | `P1 - High` | `src/tables/change_permission/editor.py`<br>`tests/test_change_permission.py` | 🔍 Onay Bekliyor |
+| **TASK-91** | **GOST Profil Kütüphanesinin Kesit Kolonuna Doğrudan Bağlanması, Eskiz-Kesit İkon Senkronizasyonu & Dinamik Kesit Düzenleyicisi (WeldedSectionDialog)** | `P0 - Blocker` | `src/tables/elements_schedule/editor.py`<br>`src/tables/elements_schedule/welded_dialog.py`<br>`src/ui_v2/profile_picker_dialog.py`<br>`tests/test_profile_picker.py` | 🔍 Onay Bekliyor |
+| **TASK-92** | **CAD Çiziminde GOST Profil Sembolleri (I, Гн. □), Hücre İçi Hızlı Dropdown Menü ve Kullanıcı Özel Profil Ekleme Altyapısı** | `P0 - Blocker` | `src/services/profile_database.py`<br>`src/ui_v2/profile_picker_dialog.py`<br>`src/tables/elements_schedule/editor.py`<br>`src/tables/elements_schedule/builder.py`<br>`tests/test_profile_picker.py` | 🔍 Onay Bekliyor |
 
 ---
 
@@ -979,17 +992,317 @@ Bu belge, Rusya GOST standartlarına tam uyumlu KM Çelik Konstrüksiyon çizim 
   4. Global klavye kısayolları bağlandı: `Ctrl+Z` (Geri Al), `Ctrl+Y` ve `Ctrl+Shift+Z` (İleri Al).
   5. `tests/test_undo_manager.py` ve `tests/test_ui_v2_new_features.py` testleriyle tam işlevsellik doğrulandı.
 
+##### 🔹 [TASK-80] ГОСТ Р 21.101-2020 Form 9 Değişiklik İzni (Разрешение на внесение изменений) & Değişiklik Neden Kodları (Таблица Л.1) — 🔍 Onay Bekliyor
+- **İstek:** "gost 21.101'deki 9. formu ekleyeceğiz. değişiklik kodlarını iletiyorum bunu kullanıcı için seçilebilir yap . son resimde de bir tane örnek var."
+- **Yapılan İş:**
+  1. **ГОСТ Р 21.101-2020 Form 9 Standart Ölçü ve Geometrisi (`src/tables/change_permission/config.py`):**
+     - A4 Dikey pafta (210 x 297 mm), 20 mm sol cilt payı ve 5 mm dış kenarlıklarla 185 x 287 mm çalışma alanı.
+     - 12 sütunlu GOST Form 9 ızgara yapısı (toplam 185 mm genişlik): 15, 5, 10, 10, 15, 10, 5, 60, 15, 15, 10, 15 mm.
+     - 45 mm üst antet bloğu (10 mm doküman kodu/başlık, 20 mm izin no/tarih/çizim no/sayfa bilgileri, 15 mm sütun başlıkları), dinamik değişiklik satırları ve 20 mm alt imza bloğu (4 satır x 5 mm: Tasarlayan, Kontrol eden, Norm kontrol, Onaylayan).
+  2. **Değişiklik Neden Kodları (Таблица Л.1 / Image 1):**
+     - ГОСТ Р 21.101-2020 Ek Л Tablo Л.1 standardına göre 1..5 arasındaki kodlar tanımlandı:
+       - `1`: Vvedenie usoveršenstvovaniy (İyileştirmelerin yapılması / Введение усовершенствований)
+       - `2`: Izmenenie standartov i norm (Standart ve normların değişmesi / Изменение стандартов и норм)
+       - `3`: Dopolnitel'nye trebovaniya zakazchika (İşverenin ek talepleri / Дополнительные требования заказчика)
+       - `4`: Ustranenie oshibok (Hataların düzeltilmesi / Устранение ошибок)
+       - `5`: Drugie prichiny (Diğer nedenler / Другие причины)
+       - `-`: Belirtilmemiş / Tire
+     - Editör tablosunda 3. sütunda açılır menü (`LinearComboBox`) ile bu kodların seçilebilmesi sağlandı; ayrıca hızlı atama butonları (`[1]`, `[2]`, `[3]`, `[4]`, `[5]`, `[-]`) ve referans kartı yerleştirildi.
+  3. **Şablon Örnek Doküman (Image 2):**
+     - Görseldeki örnek veriler (`008/26`, `РД-2026-Ф1-КМ1-02`, Moskova-City gökdelen nesnesi, 4 değişiklik kalemi, 4 sorumlu imzacı ve firma adı) varsayılan şablon olarak `get_default_sample_document()` içine kodlandı.
+  4. **CAD Önizleme & Çıktı Entegrasyonu (`preview_canvas.py`, `dxf_exporter.py`, `pdf_exporter.py`):**
+     - Form 9 tam sayfa bağımsız A4 dikey form olduğu için, üzerine mükerrer Form 3 başlık bloğu çizilmesi engellendi; paftanın sol-alt koordinatına (20, 5 mm) kilitlendi.
+     - 1:1 ölçekli DXF ve Vektörel PDF çıktıları eksiksiz üretildi.
+  5. **Modüler Entegrasyon & UI v2:**
+     - `ChangePermissionModule` `TableRegistry`'ye kaydedildi.
+     - `sidebar.py`, `editor_wrapper.py`, `i18n.py` (TR, EN, RU) güncellendi.
+     - Proje (`.kmproj`) ve Şablon/Önayar (`preset_manager`) sistemine serileştirme/deserileştirme eklendi.
+  6. **Birim & Entegrasyon Testleri (`tests/test_change_permission.py`):**
+     - 13 yeni test yazılarak toplam test sayısı 197'ye ulaştı ve %100 başarıyla geçti.
+
+##### 🔹 [TASK-81] Kurgusal / Jenerik Örnek Veri Kuralı & Form 9 Örnek Verilerinin Temizlenmesi — 🔍 Onay Bekliyor
+- **İstek:** "bu tablodaki örnek verileri gerçek kişi ve kurum olmayacak şekilde ayarla. kural olarak tüm örnekler gerçek kişi,kurum ve proje olmasın"
+- **Tasarım & Teknik Çözüm:**
+  1. **Genel Mimari İlke (`gemini.md` Kural 6):**
+     - Projedeki tüm tablolarda (Form 3 Ana Antet, Form 9 Değişiklik İzni, Form 1 Pafta Listesi, Form 2 Çizim Takımları vb.) varsayılan şablonların kesinlikle gerçek kişi, gerçek kurum/şirket veya gerçek proje/şantiye ismi içermemesi; daima kurgusal ve jenerik mühendislik verileri kullanması kural olarak tescillendi.
+  2. **Form 9 Değişiklik İzni Veri Modeli (`src/tables/change_permission/model.py`):**
+     - İzin No: `001/26`
+     - Doküman Kodu: `2026-001-КМ`
+     - Proje / Şantiye: Kurgusal `"Производственно-складской комплекс в промышленном парке «Северный»..."`
+     - Şirket / Tasarım Bürosu: Kurgusal `"ООО «ПРОЕКТ-СТРОЙ»"`
+     - Sorumlu İmzalar: Klasik Rus ders kitabı jenerik soyadları:
+       - `Изм. внес`: `Иванов`
+       - `Составил`: `Петров`
+       - `ГИП`: `Сидоров`
+       - `Утв.`: `Кузнецов`
+     - Değişiklik Açıklamaları: Jenerik mühendislik revizyon notlarına dönüştürüldü (özel kule/çekirdek detayları yerine kiriş/kolon ve eleman şeması genel notları).
+  3. **Editör Yer Tutucuları (Placeholders):**
+     - `src/tables/change_permission/editor.py`: Şirket yer tutucusu `örn: ООО «ПРОЕКТ-СТРОЙ»` olarak güncellendi.
+     - `src/tables/title_block/editor.py`: Şirket yer tutucusundaki eski firma adı temizlenerek `ООО «ПРОЕКТ-СТРОЙ»` yapıldı.
+  4. **Birim ve Entegrasyon Testleri (`tests/test_change_permission.py`):**
+     - Tüm test iddiaları yeni jenerik kurgusal verilere göre güncellendi. 197 testin tamamı (%100) başarıyla yeşile ulaştırıldı.
+
+##### 🔹 [TASK-82] ГОСТ Р 21.101-2020 Form 12 / Приложение С Başlık Sayfası (Титульный лист) & Word (.docx) Export — 🔍 Onay Bekliyor
+- **İstek:** "/goal GOST 21.101_2020_RU yönetmeliğindeki Приложение С bölümündeki tabloyuda ekleyelim. bu tabloda ayrıca word'e export seçeneğinide olsun"
+- **Yapılan İş:**
+  1. **ГОСТ Р 21.101-2020 Form 12 Standart Ölçü ve Geometrisi (`src/tables/title_sheet/config.py`, `builder.py`):**
+     - Standart A4 Dikey pafta (210 x 297 mm), sol kenar 20 mm cilt payı, üst/sağ/alt 5 mm kenar boşlukları ile net 185.0 x 287.0 mm çalışma alanı.
+     - 3 sütunlu oranlı ızgara (85 mm Unvan/Onay, 35 mm İmza/Tarih, 65 mm Ad Soyad = toplam 185 mm).
+     - Standart ГОСТ п. Р.2 kuralı: Form 12'deki tüm iç alan sınır çizgileri nihai çizimde gizlenir (`border_left=False, border_right=False, border_top=False, border_bottom=False`); yalnızca dış pafta çerçevesi çizilir.
+     - Dinamik dolgu satırı sayesinde toplam yükseklik tavizsiz olarak tam 287.0 mm'ye kilitlenir.
+  2. **Doğrudan Microsoft Word (.docx) Dışa Aktarma Motoru (`src/export/docx_exporter.py`):**
+     - `python-docx` kütüphanesi entegre edildi (`requirements.txt` güncellendi).
+     - Sayfa kenar payları GOST standartlarına birebir uyarlandı (Sol 20 mm, Üst/Sağ/Alt 5 mm).
+     - `w:pgBorders` XML manipülasyonu ile A4 çerçeve kenarlığı Word sayfasına otomatik yerleştirildi.
+     - Üst kuruluş (Поле 1), Hazırlayan Kuruluş (Поле 2), Onay Grifleri (Поле 3 - СОГЛАСОВАНО / УТВЕРЖДАЮ), İnşaat Nesnesi (Поле 4, BÜYÜK HARFLERLE), Doküman Türü (Поле 5), Doküman Adı (Поле 6), Doküman Kodu (Поле 7), Cilt No (Поле 8), Sorumlu İmzacı Kadrosu (Поля 9, 10, 11 - Görev, İmza Çizgisi, Soyadı, Tarih) ve Yıl (Поле 12) milimetrik GOST tipografisiyle stillendirildi.
+  3. **Kurgusal / Jenerik Örnek Şablon (GEMINI.md Kural 6):**
+     - Kesinlikle gerçek kişi, kurum veya proje içermeyecek şekilde kurgusal örnek şablon (`ООО «ПРОЕКТ-СТРОЙ»`, `2026-001-КМ`, `Иванов`, `Петров`, `Сидоров`, `Кузнецов`, `2026`) hazırlandı.
+  4. **Notion/Linear SaaS Veri Giriş Editörü (`src/tables/title_sheet/editor.py`):**
+     - Editör üst çubuğunda belirgin "📄 Word'e Aktar (.docx)" butonu, "📋 Örnek Şablon" ve "🧹 Temizle" butonları.
+     - Kuruluş & Logo kartı, Onay Grifi kartı, Proje & Doküman kartı ve Yetkili Ekle/Sil/Yukarı/Aşağı dinamik tablosu.
+     - Düzenleme anında canlı CAD tuvaline (WYSIWYG) 0 ms debounced veri senkronizasyonu.
+  5. **CAD Tuvali, DXF ve PDF Entegrasyonu (`preview_canvas.py`, `dxf_exporter.py`, `pdf_exporter.py`):**
+     - Form 12 tam sayfa bağımsız form (`is_special_form = True`) olarak tescillendi; mükerrer Form 3 başlık bloğu çizilmesi engellendi ve paftanın sol-alt koordinatına (20, 5 mm) kenetlendi.
+     - 1:1 ölçekli DXF ($INSUNITS=4) ve Vektörel PDF çıktıları üretildi.
+  6. **Proje & Şablon Yönetimi (`preset_manager.py`, `project_manager.py`, `window.py`):**
+     - Bağımsız `.json` preset olarak kaydetme/yükleme ve tüm projeyi `.kmproj` dosyasında saklama yeteneği kazandırıldı.
+     - `window.py` içinde `title_sheet` modülü otomatik olarak A4 Dikey ve CENTER_SHEET düzeniyle başlatıldı.
+  7. **Çok Dilli i18n & Çakışma Önleme (`i18n.py`, `sidebar.py`):**
+     - Türkçe, İngilizce ve Rusça çeviriler eklendi; `title_sheet` kontrolü `title_block` önüne alınarak isim çakışması önlendi.
+  8. **Birim & Entegrasyon Testleri (`tests/test_title_sheet.py`):**
+     - Model, konfigürasyon, builder, validator, Word docx export, DXF export, PDF export, preset/project manager, UI editör ve i18n başlıklarını kapsayan 15 yeni test yazıldı; 212 testin tamamı (%100) başarıyla geçti.
+
+##### 🔹 [TASK-83] Çoklu Pafta ve Tekli Pafta Arasında İki Yönlü Geçiş (HUD Toggle & Senkronizasyon) — 🔍 Onay Bekliyor
+- **İstek:** "burada çoklu paftaya geçiş var. çoklu paftdan tekli paftayada geçiş olsun" (Kullanıcı CAD tuvali altındaki Floating HUD çubuğundaki '📑 Çoklu Pafta' butonunun ekran görüntüsünü paylaştı).
+- **Yapılan İş:**
+  1. **İki Yönlü Durum Yönetimi (`src/ui_v2/window.py`):**
+     - `_toggle_multi_sheet_layout()` metodu geliştirildi.
+     - Görünüm halihazırda çoklu pafta modundaysa (`_current_multi_sheet_layout is not None`), `_show_single_sheet_layout()` çağrılarak aktif tablonun tekil pafta görünümüne dönülür; tekli moddaysa `_show_multi_sheet_layout()` çağrılarak çoklu pafta yerleşimi hesaplanıp tuvale yerleştirilir.
+     - `_show_single_sheet_layout()`: `_current_multi_sheet_layout` sıfırlanır, `cad_panel.set_multi_sheet_mode(False)` tetiklenir, aktif tablo CAD tuvaline çizilir, görünüm sığdırılır (`fit_view`) ve durum çubuğunda "Tekli Pafta Görünümüne Geri Dönüldü" bildirilir.
+     - Modül değiştirildiğinde (`_switch_to_module`), yeni proje başlatıldığında (`_new_project`) veya proje açıldığında (`_open_project`) çoklu pafta durumu otomatik sıfırlanıp tekli moda döner.
+     - `_export_dxf`: Çoklu pafta aktifken varsayılan dosya adı `KM_Coklu_Pafta_{Boyut}.dxf`, tekli modda ise aktif tablonun varsayılan dosya adı atanır.
+  2. **Floating Glass HUD Buton Dinamik Görsel Durumu (`src/ui_v2/cad_panel.py`):**
+     - `FloatingHudToolbar` butonuna `set_multi_sheet_mode(is_multi)` ve `_update_multi_sheet_button()` eklendi.
+     - Tekli pafta modunda: `📑 Çoklu Pafta` (İndigo yarı-saydam arka plan).
+     - Çoklu pafta modunda: `📄 Tekli Pafta` (Yeşil/Zümrüt `active="true"` vurgulu arka plan ve çerçeve).
+  3. **CAD Tuvali Sol Üst Rozet Eşzamanlaması (`CadViewportPanel`):**
+     - Çoklu moda geçildiğinde rozet `📑 ÇOKLU PAFTA DÜZENİ ({N} Pafta)` şeklinde güncellenir.
+     - Tekli moda dönüldüğünde rozet `📐 CANLI CAD TUVALİ` haline geri döner.
+  4. **Çok Dilli i18n (`src/ui/i18n.py`):**
+     - TR: `btn_single_sheet: "Tekli Pafta"`, `tooltip_single_sheet`, `badge_multi_sheet: "ÇOKLU PAFTA DÜZENİ"`, `sheets_count: "Pafta"`.
+     - EN: `btn_single_sheet: "Single Sheet"`, `tooltip_single_sheet`, `badge_multi_sheet: "MULTI-SHEET LAYOUT"`, `sheets_count: "Sheets"`.
+     - RU: `btn_single_sheet: "Один лист"`, `tooltip_single_sheet`, `badge_multi_sheet: "МНОГОЛИСТОВОЙ ПЛАН"`, `sheets_count: "Листов"`.
+  5. **Birim & Entegrasyon Testleri (`tests/test_single_multi_sheet_toggle.py`):**
+     - HUD butonu geçişleri, CadViewportPanel rozet ve buton senkronizasyonu, ana pencere `_toggle_multi_sheet_layout` yaşam döngüsü ve 3 dilli i18n metin doğrulamalarını içeren 4 yeni test eklendi; 216 testin tamamı (%100) başarıyla geçti.
+
+##### 🔹 [TASK-84] Başlık Sayfası Editörü Buton Metni & Açılır Menü Çift Dilli Çevirileri (Kırmızı & Sarı Alanlar) — 🔍 Onay Bekliyor
+- **İstek:** "kırmızı yerde butonu düzelt. sarı işaretl yerlde çeviri gerekli değil mi?"
+- **Kök Neden Analizi:**
+  1. **Kırmızı Kutu (Örnek Şablon Butonu):** `src/tables/title_sheet/editor.py` içerisindeki `self.btn_sample = LinearButton(i18n.t("preset_btn_sample"))` çağrısında `preset_btn_sample` anahtarı `src/ui/i18n.py` sözlüğünde tanımlı olmadığı için arayüzde ham string anahtarı ("preset_btn_sample") olarak görüntülenmekteydi.
+  2. **Sarı Kutu 1 (Onay Grifi / cmb_app_title):** `setFixedWidth(140)` kısıtlaması nedeniyle `СОГЛАСОВАНО` kelimesi pencerede `СОГЛАСОВАН` olarak kesilmekteydi ve Türkçe/İngilizce mühendislik açıklaması bulunmamaktaydı.
+  3. **Sarı Kutu 2 (Doküman Türü / cmb_doc_type):** Yalnızca ham Rusça büyük harflerle (`ПРОЕКТНАЯ ДОКУМЕНТАЦИЯ` ve `РАБОЧАЯ ДОКУМЕНТАЦИЯ`) yer alıyor, tasarım aşamalarını açıklayan Türkçe ve İngilizce karşılıklar sunulmuyordu.
+- **Yapılan İş:**
+  1. **Çok Dilli Sözlük Genişletmesi (`src/ui/i18n.py`):**
+     - TR: `preset_btn_sample` & `btn_sample_template` -> `"📋 Örnek Şablon"`.
+     - EN: `preset_btn_sample` & `btn_sample_template` -> `"📋 Sample Template"`.
+     - RU: `preset_btn_sample` & `btn_sample_template` -> `"📋 Пример шаблона"`.
+     - `approval_soglasovano`:
+       - TR: `"СОГЛАСОВАНО — (Uygunluk / İnceleme Onayı)"`
+       - EN: `"СОГЛАСОВАНО — (Agreed / Concurrence)"`
+       - RU: `"СОГЛАСОВАНО — (Согласующая организация)"`
+     - `approval_utverzhdayu`:
+       - TR: `"УТВЕРЖДАЮ — (Tasdik / Yürürlük Onayı)"`
+       - EN: `"УТВЕРЖДАЮ — (Approved / Adoption)"`
+       - RU: `"УТВЕРЖДАЮ — (Утверждающая инстанция)"`
+     - `doc_type_project`:
+       - TR: `"ПРОЕКТНАЯ ДОКУМЕНТАЦИЯ — (Proje Dokümantasyonu / Tasarım & Ruhsat Aşaması)"`
+       - EN: `"ПРОЕКТНАЯ ДОКУМЕНТАЦИЯ — (Design Documentation / Permitting Stage)"`
+       - RU: `"ПРОЕКТНАЯ ДОКУМЕНТАЦИЯ — (Стадия «П» / Экспертиза и утверждение)"`
+     - `doc_type_working`:
+       - TR: `"РАБОЧАЯ ДОКУМЕНТАЦИЯ — (Çalışma Çizimleri / Uygulama & İmalat Aşaması)"`
+       - EN: `"РАБОЧАЯ ДОКУМЕНТАЦИЯ — (Working Documentation / Construction Stage)"`
+       - RU: `"РАБОЧАЯ ДОКУМЕНТАЦИЯ — (Стадия «Р» / Строительство и монтаж)"`
+  2. **Başlık Sayfası Editörü Düzeltmeleri (`src/tables/title_sheet/editor.py`):**
+     - Kırmızı alandaki buton metni `i18n.t("preset_btn_sample")` ile dinamik bağlandı, ham anahtar görüntüsü giderildi.
+     - `cmb_app_title` için `setFixedWidth(140)` kaldırıldı, yerine `setMinimumWidth(280)` uygulandı ve `_populate_approval_combos()` ile çift dilli seçenekler eklendi.
+     - `cmb_doc_type` için `_populate_doc_type_combos()` ile aşama açıklamalı çift dilli seçenekler tanımlandı.
+     - `get_document()` ve `set_document()` metodları `currentData()` ve `findData()` üzerinden saf GOST değerlerini okuyacak ve `—` ayracı korumasıyla hatasız eşleşecek şekilde güncellendi. CAD ve Word çıktıları kesinlikle standart GOST verisini korur.
+     - `i18n.language_changed` sinyali bağlanarak dil değiştirildiğinde (TR/EN/RU) buton ve açılır menü metinlerinin seçili veriyi kaybetmeden anında güncellenmesi sağlandı.
+  3. **Birim & Entegrasyon Testleri (`tests/test_title_sheet.py`):**
+     - `test_title_sheet_editor_translations_and_combos` testi yazıldı. Buton metni doğruluğu, açılır kutu minimum genişliği, Türkçe açıklamalar, saf GOST `userData` ve dil değişim döngüsü test edildi; 217 testin tamamı (%100) başarıyla geçti.
+
+##### 🔹 [TASK-85] Başlık Sayfası Editörü QScrollArea Entegrasyonu & Kart 3-4 Üst Üste Binme / Kırpılma Düzeltmesi — 🔍 Onay Bekliyor
+- **İstek:** "/goal bu kısmın düzeltilmesi gerekiyor." (Kullanıcı Form 12 Başlık Sayfası editöründe Kart 3 "Proje ve Doküman Başlığı" ile Kart 4 "Sorumlu İmzacı Kadrosu" alanlarının üst üste bindiği ve tablonun kesildiği ekran görüntüsünü paylaştı).
+- **Kök Neden Analizi:**
+  1. `TitleSheetEditorWidget` bileşeni doğrudan ana layout içine yerleştirilmişti ve `QScrollArea` içermiyordu.
+  2. Pencere dikey boyutu kartların toplam yüksekliğinden (~850px) küçük olduğunda Qt'nin `QVBoxLayout` yerleşim motoru minimum boyutları aşarak Kart 3 içerisindeki `txt_object_name` ile `r_type` açılır kutusunu ve `txt_doc_title` ile `r_code` satırını birbirinin üzerine bindiriyordu.
+  3. Kart 4 içerisindeki `table_sigs` tablosu sabit minimum yüksekliği olmadığı için pencere tabanına sıkışıyor ve satırları kesiliyordu.
+  4. Sorumlu taşıma butonlarındaki (`btn_up_sig`, `btn_down_sig`) `LinearButton` dolgusu (`padding: 4px 12px`) `28x26` boyutundaki butonlarda `▲` ve `▼` karakterlerini ezerek `|` çizgisi gibi görünmesine neden oluyordu.
+- **Yapılan İş:**
+  1. **QScrollArea ve Konteyner Entegrasyonu (`src/tables/title_sheet/editor.py`):**
+     - `TitleSheetEditorWidget._setup_ui` içerisine `ChangePermissionEditorWidget` ve `TitleBlockEditorWidget` ile birebir uyumlu `QScrollArea` entegre edildi (`setWidgetResizable(True)`, `background: transparent`, `border: none`, dikey akıcı kaydırma çubuğu).
+     - Tüm kartlar bağımsız `container` widget'ı içerisine toplandı ve altına `addStretch()` eklendi.
+  2. **Kart 3 Geometri ve Boşluk Güçlendirmesi:**
+     - `self.txt_object_name` yüksekliği 56px, `self.txt_doc_title` yüksekliği 68px yapıldı; çok satırlı inşaat nesnesi ve doküman başlıkları çakışmasız, ferah yerleşti.
+     - `cmb_doc_type`, `txt_doc_code`, `txt_volume`, `txt_year` elemanlarına 28px standart yükseklik verildi; `lay.setSpacing(8)` ile kart içi boşluklar ayrıştırıldı.
+  3. **Kart 4 İmzacı Tablosu ve Yön Butonları İyileştirmesi:**
+     - `btn_up_sig` ve `btn_down_sig` butonları sıfır iç boşluklu (`padding: 0px`) ve 11px kalın yazı tipiyle yapılandırıldı; `▲` ve `▼` ok işaretlerinin kırpılması/ezilmesi kesin olarak engellendi.
+     - `table_sigs` için `setMinimumHeight(140)` uygulandı; `_adjust_signatories_table_height()` metodu eklenerek satır eklendikçe/silindikçe tablonun 140px ile 280px arasında dinamik olarak genişlemesi sağlandı.
+  4. **Birim & Entegrasyon Testleri (`tests/test_title_sheet.py`):**
+     - `test_title_sheet_editor_scroll_and_layout` testi eklendi. Kasıtlı olarak 400x500 küçük pencerede `QScrollArea`, widget yükseklikleri, çakışmasızlık ve ok butonları doğrulandı; 218 testin tamamı (%100) başarıyla geçti.
+
+##### 🔹 [TASK-86] Başlık Sayfası Sorumlu İmzacı Tablosu Hücre İçi Metin Çakışması / Ghosting Giderilmesi (SolidItemDelegate) — 🔍 Onay Bekliyor
+- **Sorun Tanımı:**
+  - Form 12 Başlık Sayfası Editöründe (`TitleSheetEditorWidget`) "4. SORUMLU İMZACI KADROSU" tablosundaki hücrelere veri girilirken / hücre düzenleme moduna geçildiğinde eski hücre metninin silinmeyip arka planda görünmeye devam ettiği (çift metin / ghosting artefaktı) ve varsayılan QLineEdit editörünün altındaki metni örtmediği tespit edildi.
+- **Yapılan İş:**
+  1. **SolidItemDelegate Entegrasyonu (`src/tables/title_sheet/editor.py`):**
+     - `self.table_sigs` tablosuna `SolidItemDelegate(self.table_sigs, font_size=12)` bağlandı.
+     - Düzenleme esnasında (`EditingState`) alttaki metin `opt.text = ""` ve `option.text = ""` ile %100 gizlenerek üst üste binme kesin olarak engellendi; editör zemini `#1E293B` opak solid arka plan ve 1.5px odak kenarlığıyla kaplandı.
+  2. **Ortalanmış Sütun Düzenleme Desteği (`src/ui_v2/components.py`):**
+     - `SolidItemDelegate.createEditor` metoduna `index.data(Qt.ItemDataRole.TextAlignmentRole)` ve `option.displayAlignment` kontrolleri eklendi.
+     - 1. sütundaki İmza / Paraf (`✓`) gibi ortalanmış hücreler düzenleme moduna girdiğinde `QLineEdit` içeriğinin de ortalanmış olarak düzenlenmesi sağlandı.
+  3. **Birim & Entegrasyon Testleri (`tests/test_title_sheet.py`):**
+     - `test_title_sheet_signatories_solid_delegate_no_text_overlap` testi eklendi; `table_sigs` tablosunun delege tipi, düzenleme esnasında opak `QLineEdit` varlığı, alttaki metnin delegate tarafından gizlenmesi ve ortalanmış imza sütunu doğrulamaları yapıldı.
+     - Toplam 219 testin tamamı (%100) başarıyla yeşile ulaştı.
+
+##### 🔹 [TASK-87] Form 9 Şablon Buton Metni (Görsel 2 Temizliği) & Sorumlu İmzacı Rolleri Çift Dilli / Dinamik i18n Çevirisi — 🔍 Onay Bekliyor
+- **Sorun Tanımı:**
+  - Kullanıcı ekran görüntüsü ile Form 9 Değişiklik İzni editöründe iki husus bildirdi:
+    1. Kırmızı işaretli üst bar butonunda "📋 Örnek Şablon (Görsel 2)" yazıyordu; buton içindeki "(Görsel 2)" ifadesinin kaldırılması istendi.
+    2. Sarı işaretli "Sorumlu ve Onay Makamı İmzaları" kartında imzacı rollerinin (`Изм. внес`, `Составил`, `ГИП`, `Утв.`) yalnızca Rusça olduğu ve aktif dile göre çevirisinin bulunmadığı belirtildi.
+- **Yapılan İş:**
+  1. **Şablon Buton Metni & İpucu Temizliği (`src/tables/change_permission/editor.py`):**
+     - Üst araç çubuğundaki `btn_load_sample` butonu `i18n.t("preset_btn_sample")` anahtarına bağlandı. Artık TR'de "📋 Örnek Şablon", RU'da "📋 Пример шаблона", EN'de "📋 Sample Template" olarak görüntülenir; "(Görsel 2)" metni tamamen temizlendi.
+     - Temizle (`btn_clear_all`), satır ekle (`btn_add_row`) ve sil (`btn_del_row`) butonları da merkezi `i18n` altyapısına bağlandı.
+  2. **İmzacı Rollerinin Çift Dilli / Dinamik i18n Entegrasyonu (`src/ui/i18n.py` & `src/tables/change_permission/editor.py`):**
+     - `i18n.py` içerisine Form 9 rolleri için anahtarlar eklendi:
+       - TR: `Изм. внес (Rev. Yapan)`, `Составил (Hazırlayan)`, `ГИП (Proje Baş Müh.)`, `Утв. (Onaylayan)`.
+       - RU: `Изм. внес (Изменение внес)`, `Составил (Разработал)`, `ГИП (Главный инженер)`, `Утв. (Утвердил)`.
+       - EN: `Изм. внес (Revised by)`, `Составил (Prepared by)`, `ГИП (Chief Project Eng.)`, `Утв. (Approved by)`.
+     - `lbl_role` etiket genişliği 80px'den 175px'e çıkarılarak çevirilerin tek satırda ferah ve hizalı görünmesi sağlandı.
+     - Soyadı ve tarih yer tutucuları dile göre dinamik bağlandı (`ph_surname`, `ph_date`).
+     - `_update_translations()` metoduna imzacı etiketleri entegre edilerek üst bardan dil değiştirildiğinde (TR/EN/RU) anında güncellenmesi sağlandı.
+  3. **Standart GOST Model Uyumluluğu:**
+     - Arayüzde kullanıcı ergonomisi için zengin çift dilli etiketler sunulurken, `_build_document_from_ui()` içinde model nesnesine daima standart saf GOST rolleri (`Изм. внес`, `Составил`, `ГИП`, `Утв.`) aktarılır; CAD tuvali, DXF ve PDF çizim çıktıları Rusya standardına %100 sadık kalır.
+  4. **Birim & Entegrasyon Testleri (`tests/test_change_permission.py`):**
+     - `test_change_permission_i18n` testi güncellenerek buton metninde "(Görsel 2)" bulunmadığı, TR/EN/RU dillerinde imzacı rollerinin ve buton metinlerinin doğru dönüştüğü ve model GOST rollerinin korunduğu doğrulandı; 219 testin tamamı (%100) başarıyla geçti.
+
+##### 🔹 [TASK-88] Form 9 Değişiklik Neden Kodları (Таблица Л.1) Açılır Menü Çok Dilli (i18n) Çevirisi ve Büyük Harf Düzeltmesi — 🔍 Onay Bekliyor
+- **Sorun Tanımı:**
+  - Kullanıcı ekran görüntüsü ile Form 9 Değişiklik İzni tablosundaki "Код (Neden Kodu)" sütununda açılır menü (ComboBox) metinlerinin arayüz dili Türkçe olmasına rağmen Rusça görüntülendiğini (`1 — Введение усовершенствований...`, `4 — Устранение ошибок`) belirterek bu alanın da çeviriye uygun hale getirilmesini talep etti.
+- **Kök Neden Analizi:**
+  - `i18n.current_language` özelliği merkezi `LocalizationManager` sınıfı tarafından büyük harflerle (`"TR"`, `"EN"`, `"RU"`) döndürülmektedir.
+  - `ChangePermissionEditorWidget` içerisinde `active_lang = i18n.current_language` alındıktan sonra `.lower()` uygulanmadan doğrudan küçük harfli `active_lang == "tr"` ve `active_lang == "en"` karşılaştırması yapıldığı için eşitlikler `False` dönmüş ve kod daima `else: label = f"{c_val} — {ru_t}"` Rusça dalına düşmüştür.
+- **Yapılan İş:**
+  1. **Açılır Menü Metin Formatlayıcı (`_format_reason_code_label`) & Doldurucu (`_populate_code_combobox`):**
+     - `_format_reason_code_label` ve `_populate_code_combobox` yardımcı metodları eklendi. `(lang_code or i18n.current_language).lower()` kontrolüyle büyük/küçük harf bağımsız tam uyum sağlandı.
+     - Türkçe aktifken: `1 — İyileştirmelerin uygulanması`, `2 — Standart ve yönetmeliklerdeki değişiklikler`, `3 — Ek müşteri gereksinimleri`, `4 — Hataların giderilmesi`, `5 — Diğer nedenler`, `- (Yok / Belirtilmemiş)`.
+     - İngilizce aktifken: `1 — Implementation of improvements`, `2 — Changes in standards and regulations`, vb.
+     - Rusça aktifken: `1 — Введение усовершенствований`, `2 — Изменение стандартов и норм`, vb.
+  2. **Dinamik Dil Güncellemesi Entegrasyonu (`_update_translations`):**
+     - Üst bardan dil değiştirildiğinde tablodaki tüm mevcut satırların ComboBox seçenekleri kullanıcının seçtiği kodu kaybetmeden yeni dile anında çevrilir.
+  3. **Model & CAD Çıktı Standardı:**
+     - ComboBox etiketleri kullanıcının dilinde görüntülenirken, `userData` olarak daima saf GOST kodları (`"1"`, `"2"`, vb.) saklanır; CAD tuvali ve DXF çıktısında standart 15 mm sütun genişliği korunarak yalnızca kod rakamı çizilir.
+  4. **Birim & Entegrasyon Testleri (`tests/test_change_permission.py`):**
+     - `test_change_permission_i18n` testine TR, EN ve RU dillerinde `cb0` ve `cb3` ComboBox metinlerinin ilgili dilde doğru açıklamaları içerdiği ve dil geçişlerinde seçili verinin korunduğu assertion'ları eklendi; 219 testin tamamı (%100) başarıyla geçti.
+
+##### 🔹 [TASK-89] GOST Profil Seçici Arama Temizleme 'X' Butonu & 'Önerilen Çelik' Sütununun Kaldırılması — 🔍 Onay Bekliyor
+- **İstek:** "kırmızı ile işaretli noktaya arama temizleme için X koy. sarı işaretli alana gerek yok. ayrıca sana soru. kesitlerin özelliklerini nereden aldın?"
+- **Yapılan İş:**
+  1. **Arama Kutusu Temizleme 'X' Butonu & Esc Kısayolu (`src/ui_v2/profile_picker_dialog.py`):**
+     - `self.search_edit.setClearButtonEnabled(True)` özelliği aktif edildi.
+     - Koyu temada yüksek kontrast sağlamak ve Windows'un varsayılan koyu gri/siyah ikonunun arka planda kaybolmasını önlemek amacıyla `QToolButton` butonuna `#94A3B8` renginde vektörel `icons.ICON_CLOSE` (fa5s.times) ikonu atandı.
+     - `QLineEdit` için `padding: 0 28px 0 10px;` ve hover durumu için `background-color: #334155;` stil ayarları yapıldı.
+     - `Esc` kısayolu eklenerek arama kutusunda metin varken basıldığında aramayı temizlemesi (`clear()`), metin yokken ise diyaloğu kapatması (`reject()`) sağlandı.
+  2. **"Önerilen Çelik" Sütununun Kaldırılması:**
+     - Tablo sütun sayısı 6'dan 5'e indirildi (`Profil`, `Kategori`, `Standart`, `Kesit Boyutları`, `Ağırlık`).
+     - "Önerilen Çelik" başlığı, sütun genişlik ayarı ve `_refresh_list` içerisindeki sütun doldurma adımları kaldırıldı.
+     - Seçim alt bilgi etiketindeki (`lbl_selected_info`) `• {profile.default_steel}` metni temizlenerek sadeleştirildi.
+  3. **Birim & Entegrasyon Testleri (`tests/test_profile_picker.py`):**
+     - `test_profile_picker_dialog` testi güncellenerek tablonun 5 sütun içerdiği, "Çelik" başlıklı sütun bulunmadığı, `isClearButtonEnabled()`'ın aktif olduğu ve arama temizlendiğinde 40+ profilin listelendiği doğrulandı. 219 testin tamamı (%100) başarıyla geçti.
+
+##### 🔹 [TASK-90] Form 9 Değişiklik Neden Kodları Hızlı Atama Butonları Padding ve Metin Görünürlüğü Düzeltmesi — 🔍 Onay Bekliyor
+- **İstek:** "burada ne olduğu anlaşılmıyor" (Kullanıcı Form 9 Değişiklik İzni altındaki Таблица Л.1 kartında yer alan boş kutuları sarı daire içine alarak iletti).
+- **Kök Neden Analizi:**
+  1. `src/ui_v2/theme_linear.py` içerisinde QPushButton bileşenlerine küresel olarak `padding: 5px 12px;` uygulanmaktadır.
+  2. 26px genişliğindeki mini butonlara özel `padding: 0px;` tanımlanmadığı için sağ ve sol 12'şer piksellik iç boşluk butonun içerik genişliğini 0 piksele indirmiş; Qt motoru '1', '2', '3', '4', '5', '-' metinlerini tamamen kırparak butonları kullanıcının ekranında tamamen boş gri kutular olarak göstermiştir.
+- **Yapılan İş:**
+  1. **Buton Metin ve Padding Düzeltmesi (`src/tables/change_permission/editor.py`):**
+     - Buton genişliği 28px'e çıkarıldı; `padding: 0px;`, `color: #FFFFFF;`, `font-weight: 700;` ve `text-align: center;` ile `1`, `2`, `3`, `4`, `5`, `—` metinleri net ve yüksek kontrastla görünür hale getirildi.
+     - Etiket "Hızlı Ata:" yerine "Seçili Satıra Ata:" olarak güncellendi.
+     - Her butona `Seçili satıra Kod {N} ata` ve `Seçili satırın kodunu temizle (—)` açıklayıcı ipuçları (tooltip) eklendi.
+  2. **Kod Temizliği:**
+     - `src/tables/change_permission/editor.py` içerisindeki mükerrer `_update_translations` tanımı temizlendi.
+  3. **Birim & Entegrasyon Testleri (`tests/test_change_permission.py`):**
+     - 13 testin tamamı ve genel süitteki 219 testin %100'ü başarıyla doğrulandı.
+
+##### 🔹 [TASK-91] GOST Profil Kütüphanesinin Kesit Kolonuna Doğrudan Bağlanması, Eskiz-Kesit İkon Senkronizasyonu & Dinamik Kesit Düzenleyicisi (WeldedSectionDialog) — 🔍 Onay Bekliyor
+- **İstek:** "sarı ile işaretli kütüphane turuncu ile işaretli alana bağlı değil. yine aynı tabloda eskiz kısımından tip seçilince kesit profil kolonundaki şeklinde güncellenmesi gerekir.hatta eskiz'e göre kesit alanı değişken olmalıdır"
+- **Kök Neden Analizi:**
+  1. Kütüphane butonu üst araç çubuğunda (`📚 GOST Profil...`) yer alırken 2. kolondaki kesit hücresinden (turuncu alan) çift tıklama veya hücre içi kısayol ile doğrudan tetiklenemiyordu.
+  2. `_on_sketch_changed` içinde `item.setIcon` çağrıldığında Qt `cellChanged` sinyali yayıyor; `_on_cell_changed` eski metindeki profili (örn. `20К1`) okuyarak eskiz tipini tekrar `I_BEAM` olarak algılıyor ve ComboBox'ı kullanıcının seçtiği yeni tipten geriye (eski tipe) döndürüyordu (Signal Feedback Loop).
+  3. Kaynaklı (1-2, 1-2-3) kesitler ile haddelenmiş standart profiller aynı arayüzle girilemiyordu; ГОСТ 21.502 Tablo 1 kuralına uygun flanş/gövde (-b × t) levha bileşenleri için özel bir diyalog bulunmuyordu.
+- **Yapılan İş:**
+  1. **Doğrudan Kütüphane & Hücre Bağlantısı (`src/tables/elements_schedule/editor.py`):**
+     - 2. kolondaki (Сечение / Состав) hücreye **çift tıklandığında** veya **F4** tuşuna basıldığında ilgili satır için doğrudan kesit/profil düzenleyici açılması sağlandı.
+     - `ProfileCellDelegate.createEditor` içerisindeki `QLineEdit` için sağ kenara (TrailingPosition) kütüphane arama aksiyon ikonu (`ICON_SEARCH`) eklendi.
+     - Üst araç çubuğundaki `📚 GOST Profil...` butonu da aktif satırın eskiz tipine duyarlı olarak bağlandı.
+  2. **Eskiz Tipine Göre Dinamik Değişken Kesit Düzenleyicisi (`src/tables/elements_schedule/welded_dialog.py`):**
+     - Haddelenmiş standart profiller (`I`, `[`, `L`, `Гн. □`, `○`): `GostProfilePickerDialog` ilgili kategori (`Двутавры`, `Швеллеры`, `Уголки`, `Трубы профильные`, `Трубы круглые`) otomatik filtrelenmiş olarak açılır.
+     - Kaynaklı / bileşik kesitler (`WELDED_I_BEAM`, `COMPOUND_BOX_WELDED`, `WELDED_T`, `WELDED_I_PACKAGE`, `WELDED_CRUCIFORM`): Sıfırdan geliştirilen `WeldedSectionDialog` açılır. ГОСТ 21.502 standartlarına göre Поз. 1, Поз. 2, Поз. 3 flanş ve gövde levhaları parametrik olarak girilir, canlı `-b x t` önizlemesi ve hızlı ölçü butonlarıyla tabloya aktarılır.
+  3. **Eskiz-Kesit İkon ve Sembol Senkronizasyonu Düzeltmesi (`src/tables/elements_schedule/editor.py`):**
+     - `_on_sketch_changed` fonksiyonu `self._block_signals = True` koruması altına alınarak sinyal döngüsü tamamen kırıldı.
+     - `clean_profile_prefix` ve `_auto_format_composition` fonksiyonları ile tip değiştirildiğinde eski tipe ait ön ekler (`I `, `[ `, `L ` vb.) temizlenerek yeni tipin sembolü ve ikonu anında uygulandı.
+  4. **Birim & Entegrasyon Testleri (`tests/test_profile_picker.py`):**
+     - Kategori ön filtreleme, WeldedSectionDialog bileşenleri/önizlemesi, eskiz senkronizasyonu ve hücre içi aksiyon butonu için 5 yeni test eklendi.
+     - Genel test süiti 224 teste yükseldi ve %100 başarıyla geçti.
+
+##### 🔹 [TASK-92] CAD Çiziminde GOST Profil Sembolleri (I, Гн. □), Hücre İçi Hızlı Dropdown Menü ve Kullanıcı Özel Profil Ekleme Altyapısı — 🔍 Onay Bekliyor
+- **İstek:** "sağ tarafta profil şekilleri olmalı. kutu için keist şeklinin yanında bir de ufak bir yazı vardı. soldaki resimde kesit kolnunda kesit şekilleri görünüyor aslında. ayırca kesileri dropdown meüden seçmek kolay olacak. kütüphaneye gerekirse kullanıcı custom profilde eklesin" (Kullanıcı sol editör tablosundaki `[I] 20Б1` ile sağ CAD tuvalindeki `Состав` boşluğu ve kutu profil için `Гн. □` sembolünü işaretleyen ekran görüntüsünü paylaştı).
+- **Kök Neden Analizi:**
+  1. `elements_schedule/model.py` ve `GostProfilePickerDialog` haddelenmiş profilleri eklerken yalın kod (örn. `20Б1`, `140x100x6.0`) kullanıyor, `builder.py` ise `part.composition` değerini doğrudan hücreye basıyordu. Bu nedenle CAD tuvalinde ve DXF/PDF çıktılarında profil GOST ön ekleri (`I `, `Гн. □ `, `[ `, `L `, `○ ⌀ `) eksik kalıyordu.
+  2. Kullanıcı her kesit seçiminde büyük modal diyalog açmak zorunda kalıyordu; hücreye tıklandığında eskiz tipine ait standart profillerin açılır bir ComboBox menüsüyle 1-tıkla hızlıca seçilebilmesi ergonomiyi ciddi derecede artıracaktır.
+  3. GOST kütüphanesinde bulunmayan özel/proje profilleri için kullanıcının kendi profilini kütüphaneye tanımlayıp kalıcı olarak saklayabileceği bir mekanizma yoktu.
+- **Yapılan İş:**
+  1. **CAD Çizimi & DXF/PDF Çıktılarında GOST Profil Sembolleri ve `Гн. □` (`builder.py`, `model.py`, `editor.py`):**
+     - `get_profile_full_name(designation, sketch_type)` fonksiyonu geliştirildi:
+       - `I_BEAM`: `I 20Б1`, `I 20К1`...
+       - `RECT_TUBE`: ГОСТ 30245 standardına uygun olarak küçük harfli `Гн.` (глухосварной / гнутый) ve kare sembolü `□`: `Гн. □ 140x100x6.0`...
+       - `CHANNEL`: `[ 16П`...
+       - `ANGLE`: `L 75х5`...
+       - `ROUND_TUBE`: `○ ⌀ 70x4.0`...
+       - `CHECKERED_PLATE`: `Рифл. -4x1000`...
+       - `PLATE`: `-12x250`...
+     - `builder.py` içerisindeki `create_elements_schedule_table` fonksiyonu güncellenerek tüm tek parçalı haddelenmiş kesitlerin CAD tablosuna daima standart GOST sembolü ve ön ekiyle aktarılması garanti edildi.
+     - `model.py` içerisindeki örnek şablon verileri (`build_sample_items`) standart GOST sembolleriyle (`I 20K1`, `Гн. □ 140x100x6.0`, `Гн. □ 200x160x10.0`, `○ ⌀ 70x4.0`, `Гн. □ 140x120x6.0`) donatıldı.
+  2. **Hücre İçi Hızlı Açılır Menü (LinearComboBox Dropdown) (`editor.py`):**
+     - `ProfileCellDelegate` sıfırdan geliştirilerek `QComboBox` (`LinearComboBox`) tabanlı bir hücre içi editör haline getirildi.
+     - Kullanıcı 2. kolondaki (Сечение / Состав) hücreye tıkladığında veya düzenlemeye başladığında, ilgili satırın eskiz tipine (`I_BEAM`, `RECT_TUBE`, `CHANNEL`, `ANGLE` vb.) ait tüm standart GOST profilleri ve özel profiller anında açılır menüde listelenir (`editor.showPopup()`).
+     - Kullanıcı tek tıklamayla profilini seçebilir, isterse hücre içinde serbest arama/tamamlama yapabilir.
+     - Menünün en altına `📚 GOST Profil Kütüphanesi (F4)...` ve `➕ Yeni Özel Profil Ekle...` aksiyon maddeleri ile hücre içi arama ikonu (`browse_act`) eklendi.
+  3. **Kullanıcı Tanımlı Özel Profil (Custom Profiles) Altyapısı (`profile_database.py`, `profile_picker_dialog.py`):**
+     - `GostProfileDatabase` sınıfına `src/config/custom_profiles.json` kalıcı dosya desteği eklendi.
+     - `add_custom_profile(rec)` ve `delete_custom_profile(designation)` metodları yazılarak eklenen özel profillerin hem anlık belleğe hem de JSON dosyasına otomatik olarak kaydedilmesi sağlandı.
+     - `AddCustomProfileDialog` modal diyaloğu geliştirildi: Profil kodu/adı, kategorisi, standardı, kesit boyutları, birim ağırlığı (kg/m) ve varsayılan çelik kalitesi girilerek tek tıkla kütüphaneye eklenebilir.
+     - `GostProfilePickerDialog` penceresine `➕ Yeni Profil Ekle` butonu eklendi; ayrıca hücre içi açılır menüden de doğrudan açılabilir hale getirildi.
+  4. **Birim & Entegrasyon Testleri (`tests/test_profile_picker.py`):**
+     - Profil delegesi LinearComboBox ve aksiyon butonu doğrulaması, dropdown içeriğinin eskiz tipine göre yüklenmesi, `GostProfileDatabase` özel profil ekleme/silme yaşam döngüsü, `AddCustomProfileDialog` form veri toplama/kaydetme ve `builder.py` CAD tablosunda `I ` ve `Гн. □` ön eklerinin garantilenmesini içeren 3 yeni test yazıldı. Toplam test sayısı 227'ye yükseldi ve %100 başarıyla geçti.
+
 ---
 
+
 ## 🧪 BÖLÜM 2: Test ve Kalite Güvencesi (QA)
-- **Toplam Test Sayısı:** 184 adet test (`python -m pytest` ile %100 başarılı).
+- **Toplam Test Sayısı:** 227 adet test (`python -m pytest` ile %100 başarılı).
 - **Yeni Doğrulama Testleri:**
-  - `tests/test_profile_picker.py`: GOST Profil veritabanı, filtreleme ve seçim modalı testleri.
+  - `tests/test_profile_picker.py`: GOST Profil veritabanı, kategori filtreleme, WeldedSectionDialog çok parçalı levha düzenleyicisi, ElementsScheduleWidget eskiz-kesit ikon/ön ek senkronizasyonu, dinamik kesit düzenleyici dispatch, hücre içi LinearComboBox dropdown menüsü, özel profil ekleme/silme/JSON kalıcılığı ve CAD tablosunda GOST sembollerinin (`I`, `Гн. □`) garantilenmesi testleri (11 test).
+  - `tests/test_title_sheet.py`: Form 12 Başlık Sayfası QScrollArea ve layout çakışmasızlığı, sorumlu imzacı tablosu SolidItemDelegate ve çift metin engelleme, buton metni ve açılır menü çift dilli çevirileri, model, CAD builder, Word docx export, DXF/PDF export, preset/proje yönetimi ve UI editör testleri (18 test).
+  - `tests/test_single_multi_sheet_toggle.py`: Çoklu ve tekli pafta arasında geçiş, HUD butonu, sol üst rozet ve çok dilli senkronizasyon testleri (4 test).
+  - `tests/test_change_permission.py`: ГОСТ Р 21.101 Form 9 model, tablo kurucu, neden kodları, editör widget, DXF/PDF dışa aktarım, şablon/proje serileştirme ve i18n testleri (13 test).
   - `tests/test_pdf_exporter.py`: 1:1 vektörel PDF tekli ve çok sayfalı dışa aktarma testleri.
   - `tests/test_project_manager.py`: Yerel `.kmproj` projesi serileştirme ve yükleme testleri.
   - `tests/test_undo_manager.py`: QUndoStack snapshot komutları, undo/redo geçmişi ve temizleme testleri.
   - `tests/test_ui_v2_new_features.py`: Window entegrasyonu, başlık bloğu senkronizasyonu, undo/redo ve proje kaydetme yaşam döngüsü testleri.
-- DXF ve PDF çıktılarının **1:1 ölçekli** (`$INSUNITS = 4`) ve Form 3 antetinin **sağ altta sabit** olduğu doğrulandı.
+- DXF ve PDF çıktılarının **1:1 ölçekli** (`$INSUNITS = 4`) ve Form 3 antetinin **sağ altta sabit** olduğu (özel Form 9 için ise 185x287 mm çalışma alanına oturduğu) doğrulandı.
 - Git commit işlemi kullanıcı talimatına istinaden **yapılmamış**, tüm değişiklikler test edilmek üzere çalışma dizininde temiz bırakılmıştır.
 
 ---

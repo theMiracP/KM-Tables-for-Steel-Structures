@@ -477,7 +477,7 @@ class TitleBlockEditorWidget(QWidget):
         l_cmp.addWidget(self.lbl_cmp_t)
 
         self.txt_company_name = QLineEdit()
-        self.txt_company_name.setPlaceholderText("стадиа инжиниринг")
+        self.txt_company_name.setPlaceholderText("ООО «ПРОЕКТ-СТРОЙ»")
         self.txt_company_name.setFixedHeight(32)
         self.txt_company_name.setStyleSheet(f"""
             QLineEdit {{

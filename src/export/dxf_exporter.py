@@ -61,25 +61,27 @@ class DxfExporter(BaseExporter):
         calc_layout = SheetLayoutCalculator.calculate(table, layout_config, title_clearance=title_clearance)
         msp = doc.modelspace()
 
-        # Tablonun kendisi Title Block (Form 3 Antet) mi?
-        is_title_block = (
-            getattr(table, "id", "") == "title_block" or
+        # Tablonun kendisi bağımsız özel form mu (Form 3 Antet, Form 9 Değişiklik İzni veya Form 12 Başlık Sayfası)?
+        is_special_form = (
+            getattr(table, "id", "") in ("title_block", "change_permission", "title_sheet") or
             (hasattr(table, "columns") and len(table.columns) == 10 and abs(table.total_width - 185.0) < 0.1)
         )
 
         # 5. Sayfa ve Antet Çizimi (Eğer Sayfa Düzeni modu seçildiyse)
         if calc_layout.sheet_rect and calc_layout.inner_frame_rect:
-            if is_title_block:
+            if is_special_form:
                 # Sadece sayfa çerçevelerini çiz, standart Form 3 antetini mükerrer çizme
                 self._draw_sheet_frames_only(msp, calc_layout, layout_cfg=layout_config)
             else:
                 self._draw_sheet_and_titleblock(msp, calc_layout, layout_config, table_config, doc=doc)
 
         # 6. Tabloyu Çiz
-        if is_title_block and calc_layout.sheet_rect:
-            # Title block sayfa modunda doğrudan sağ alt köşedeki antet konumuna çizilir
-            tb_rect = calc_layout.title_block_rect
-            origin = Point2D(tb_rect.x_min, tb_rect.y_min)
+        if is_special_form and calc_layout.sheet_rect:
+            if getattr(table, "id", "") in ("change_permission", "title_sheet"):
+                origin = Point2D(calc_layout.inner_frame_rect.x_min, calc_layout.inner_frame_rect.y_min)
+            else:
+                tb_rect = calc_layout.title_block_rect
+                origin = Point2D(tb_rect.x_min, tb_rect.y_min)
             self._draw_table(msp, table, origin, table_config, doc=doc)
         else:
             self._draw_table(msp, table, calc_layout.table_origin, table_config, doc=doc)

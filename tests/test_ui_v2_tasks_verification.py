@@ -613,7 +613,7 @@ def test_task_29_cell_editor_geometry_and_cursor_height(qapp):
     t1 = elem_editor.table_widget
     assert isinstance(t1.itemDelegate(), SolidItemDelegate)
 
-    item1 = t1.item(0, 2)
+    item1 = t1.item(0, 0)
     assert item1 is not None
     t1.editItem(item1)
     qapp.processEvents()

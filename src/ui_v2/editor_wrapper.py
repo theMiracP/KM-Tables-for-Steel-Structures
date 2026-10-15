@@ -217,6 +217,10 @@ class TableEditorWrapper(QWidget):
             return "📋", title, i18n.t("wrapper_subtitle_working_drawings")
         elif "main_drawings" in module_id or "drawings" in module_id or "main_sets" in module_id:
             return "📑", title, i18n.t("wrapper_subtitle_main_drawings")
+        elif "title_sheet" in module_id or "titul" in module_id:
+            return "📖", title, i18n.t("wrapper_subtitle_title_sheet")
+        elif "change_permission" in module_id or "permission" in module_id or "form9" in module_id:
+            return "📝", title, i18n.t("wrapper_subtitle_change_permission")
         else:
             return "📊", title, i18n.t("wrapper_subtitle_generic")
 

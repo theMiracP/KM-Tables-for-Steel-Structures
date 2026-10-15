@@ -27,6 +27,8 @@ def get_module_display_title(module_or_id) -> str:
     raw_name = getattr(module_or_id, "name", "")
     if "elements" in mod_id or "elementov" in mod_id:
         return i18n.t("module_elements_schedule")
+    elif "title_sheet" in mod_id or "titul" in mod_id:
+        return i18n.t("module_title_sheet")
     elif "title_block" in mod_id or "antet" in mod_id:
         return i18n.t("module_title_block")
     elif "reference" in mod_id or "doc" in mod_id:
@@ -35,6 +37,8 @@ def get_module_display_title(module_or_id) -> str:
         return i18n.t("module_working_drawings")
     elif "main_drawings" in mod_id or "drawings" in mod_id or "main_sets" in mod_id:
         return i18n.t("module_main_drawings")
+    elif "change_permission" in mod_id or "permission" in mod_id or "form9" in mod_id or "razreshenie" in mod_id:
+        return i18n.t("module_change_permission")
     else:
         return raw_name.split("(")[0].strip() if raw_name else mod_id
 
@@ -44,6 +48,8 @@ def get_module_icon_name(module_or_id) -> str:
     mod_id = getattr(module_or_id, "id", str(module_or_id))
     if "elements" in mod_id or "elementov" in mod_id:
         return icons.ICON_DOC_REGULAR
+    elif "title_sheet" in mod_id or "titul" in mod_id:
+        return "fa5s.file-alt"
     elif "title_block" in mod_id or "antet" in mod_id:
         return "fa5r.id-badge"
     elif "reference" in mod_id or "doc" in mod_id:
@@ -52,6 +58,8 @@ def get_module_icon_name(module_or_id) -> str:
         return icons.ICON_CLIPBOARD_REGULAR
     elif "main_drawings" in mod_id or "drawings" in mod_id or "main_sets" in mod_id:
         return "fa5r.copy"
+    elif "change_permission" in mod_id or "permission" in mod_id or "form9" in mod_id or "razreshenie" in mod_id:
+        return "fa5s.file-signature"
     return icons.ICON_DOC_REGULAR
 
 

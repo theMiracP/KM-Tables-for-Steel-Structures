@@ -146,7 +146,7 @@ class KmLinearMainWindow(QMainWindow):
         self.cad_panel = CadViewportPanel(self.splitter)
         self.cad_panel.setMinimumWidth(250)
         self.cad_panel.toggle_requested.connect(self._toggle_cad_panel)
-        self.cad_panel.multi_sheet_requested.connect(self._show_multi_sheet_layout)
+        self.cad_panel.multi_sheet_requested.connect(self._toggle_multi_sheet_layout)
         self.splitter.addWidget(self.cad_panel)
 
         self.splitter.setStretchFactor(0, 1)
@@ -212,7 +212,12 @@ class KmLinearMainWindow(QMainWindow):
         tb_doc = self.module_documents.get("title_block", getattr(self.layout_config, "title_block_doc", None))
         if module_id not in self.module_layout_configs:
             import copy
+            from src.config.sheet_config import SheetSize, SheetOrientation, TablePlacement
             cfg = copy.deepcopy(DEFAULT_LAYOUT_CONFIG)
+            if module_id in ("change_permission", "title_sheet"):
+                cfg.size = SheetSize.A4
+                cfg.orientation = SheetOrientation.PORTRAIT
+                cfg.placement = TablePlacement.CENTER_SHEET
             cfg.title_block_doc = tb_doc
             self.module_layout_configs[module_id] = cfg
         self.layout_config = self.module_layout_configs[module_id]
@@ -301,6 +306,7 @@ class KmLinearMainWindow(QMainWindow):
 
         # 1. Modülün generic Table nesnesini inşa et
         self._current_multi_sheet_layout = None
+        self.cad_panel.set_multi_sheet_mode(False)
         try:
             self.current_table = self.active_module.build_table(self.current_document)
         except Exception as e:
@@ -392,7 +398,11 @@ class KmLinearMainWindow(QMainWindow):
             QMessageBox.warning(self, "Hata", "Dışa aktarılacak aktif bir tablo bulunamadı.")
             return
 
-        default_name = self.active_module.default_export_filename(self.current_document)
+        default_name = (
+            f"KM_Coklu_Pafta_{self.layout_config.size.value}.dxf"
+            if getattr(self, "_current_multi_sheet_layout", None)
+            else self.active_module.default_export_filename(self.current_document)
+        )
         out_path, _ = QFileDialog.getSaveFileName(
             self,
             "DXF Olarak Dışa Aktar (Linear Studio)",
@@ -434,10 +444,34 @@ class KmLinearMainWindow(QMainWindow):
             self.status_bar.set_status(f"DXF Dışa Aktarma Başarısız: {e}", is_success=False)
             QMessageBox.critical(self, "Hata", f"DXF dışa aktarılırken hata oluştu:\n{e}")
 
+    def _toggle_multi_sheet_layout(self):
+        """Çoklu pafta ve tekli pafta görünümü arasında geçiş yapar."""
+        if getattr(self, "_current_multi_sheet_layout", None) is not None:
+            self._show_single_sheet_layout()
+        else:
+            self._show_multi_sheet_layout()
+
+    def _show_single_sheet_layout(self):
+        """Çoklu pafta görünümünden aktif tablonun tekil paftasına geri döner."""
+        self._current_multi_sheet_layout = None
+        self.cad_panel.set_multi_sheet_mode(False)
+        self._do_refresh_table_and_cad()
+        self.cad_panel.fit_view()
+        self.status_bar.set_status("Tekli Pafta Görünümüne Geri Dönüldü", is_success=True)
+
     def _show_multi_sheet_layout(self):
         """Tüm proje tablolarını sayfa boyutuna göre otomatik olarak paftalara yerleştirir."""
         from src.models.multi_sheet import MultiSheetLayoutManager
         tables = self._get_all_project_tables()
+        if not tables:
+            QMessageBox.information(
+                self,
+                "Bilgi",
+                "Çoklu paftaya yerleştirilecek çizim tablosu bulunamadı.\n"
+                "(Form 3, Form 9 ve Form 12 bağımsız tam sayfa formlarıdır)."
+            )
+            return
+
         tb_doc = self.module_documents.get("title_block", getattr(self.layout_config, "title_block_doc", None))
         ms_layout = MultiSheetLayoutManager.calculate_layout(
             tables=tables,
@@ -446,6 +480,7 @@ class KmLinearMainWindow(QMainWindow):
         )
         self._current_multi_sheet_layout = ms_layout
         self.cad_panel.canvas.render_multi_sheet(ms_layout, auto_fit=True)
+        self.cad_panel.set_multi_sheet_mode(True, sheet_count=ms_layout.total_sheets)
         self.status_bar.set_status(
             f"Otomatik Çoklu Pafta: {ms_layout.total_sheets} Pafta Oluşturuldu (Antet Ortak)",
             is_success=True
@@ -458,8 +493,8 @@ class KmLinearMainWindow(QMainWindow):
             # Yalnızca aktif tablolar dahil edilir (pasif / iptal edilen tablolar hariç)
             if not getattr(mod, "is_active", True):
                 continue
-            # Antet (Form 3) her paftada ortak antet olarak çizilir, içerik tablosu değildir
-            if mod.id in ("title_block", "antet"):
+            # Antet (Form 3), Değişiklik İzni (Form 9) ve Başlık Sayfası (Form 12) bağımsız tam sayfa formlarıdır, çizim içerik tablosu değildir
+            if mod.id in ("title_block", "antet", "change_permission", "title_sheet"):
                 continue
             # Çelik sarfiyat tablosu henüz standart onaylanmadığı için hariç tutulur
             if "raskhod" in mod.id or "steel_consumption" in mod.id or "sarfiyat" in mod.id:
@@ -541,6 +576,8 @@ class KmLinearMainWindow(QMainWindow):
         self.current_document = None
         self.current_project_path = None
         self.undo_manager.clear()
+        self._current_multi_sheet_layout = None
+        self.cad_panel.set_multi_sheet_mode(False)
         self._update_window_title()
 
         first_mod = TableRegistry.all()[0]
@@ -566,6 +603,8 @@ class KmLinearMainWindow(QMainWindow):
             self.active_module = None
             self.current_document = None
             self.current_project_path = file_path
+            self._current_multi_sheet_layout = None
+            self.cad_panel.set_multi_sheet_mode(False)
             self.undo_manager.clear()
             self._update_window_title()
 

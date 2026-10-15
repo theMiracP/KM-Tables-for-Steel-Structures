@@ -28,6 +28,7 @@ class FloatingHudToolbar(QFrame):
 
     def __init__(self, parent=None):
         super().__init__(parent)
+        self._is_multi_sheet: bool = False
         self.setObjectName("floatingHudToolbar")
         self.setFixedHeight(36)
         self.setStyleSheet(f"""
@@ -70,6 +71,20 @@ class FloatingHudToolbar(QFrame):
             QPushButton#hudMultiSheet:hover {{
                 background-color: rgba(99, 102, 241, 0.35);
                 border-color: rgba(99, 102, 241, 0.65);
+                color: #ffffff;
+            }}
+            QPushButton#hudMultiSheet[active="true"] {{
+                background-color: rgba(16, 185, 129, 0.24);
+                color: #a7f3d0;
+                border: 1px solid rgba(16, 185, 129, 0.55);
+                border-radius: 12px;
+                padding: 2px 10px;
+                font-weight: 600;
+                font-size: 11px;
+            }}
+            QPushButton#hudMultiSheet[active="true"]:hover {{
+                background-color: rgba(16, 185, 129, 0.40);
+                border-color: rgba(16, 185, 129, 0.80);
                 color: #ffffff;
             }}
             QPushButton#hudClose {{
@@ -162,11 +177,27 @@ class FloatingHudToolbar(QFrame):
 
         i18n.language_changed.connect(self._update_translations)
 
+    def set_multi_sheet_mode(self, is_multi: bool):
+        self._is_multi_sheet = is_multi
+        self._update_multi_sheet_button()
+
+    def _update_multi_sheet_button(self):
+        if self._is_multi_sheet:
+            self.btn_multi_sheet.setText(f"📄 {i18n.t('btn_single_sheet')}")
+            self.btn_multi_sheet.setToolTip(i18n.t("tooltip_single_sheet"))
+            self.btn_multi_sheet.setProperty("active", "true")
+        else:
+            self.btn_multi_sheet.setText(f"📑 {i18n.t('btn_multi_sheet')}")
+            self.btn_multi_sheet.setToolTip(i18n.t("tooltip_multi_sheet"))
+            self.btn_multi_sheet.setProperty("active", "false")
+        self.btn_multi_sheet.style().unpolish(self.btn_multi_sheet)
+        self.btn_multi_sheet.style().polish(self.btn_multi_sheet)
+        self.btn_multi_sheet.update()
+
     def _update_translations(self, lang_code: str = ""):
         try:
             self.btn_fit.setText(f"⛶ {i18n.t('zoom_fit')}")
-            self.btn_multi_sheet.setText(f"📑 {i18n.t('btn_multi_sheet')}")
-            self.btn_multi_sheet.setToolTip(i18n.t("tooltip_multi_sheet"))
+            self._update_multi_sheet_button()
             self.btn_close.setToolTip(i18n.t("btn_cad_panel_close_tooltip"))
         except RuntimeError:
             pass
@@ -221,9 +252,24 @@ class CadViewportPanel(QWidget):
         layout.setContentsMargins(0, 0, 0, 0)
         layout.addWidget(self.canvas)
 
+    def set_multi_sheet_mode(self, is_multi: bool, sheet_count: int = 0):
+        self._is_multi_sheet = is_multi
+        self._last_sheet_count = sheet_count
+        self.hud.set_multi_sheet_mode(is_multi)
+        self._update_badge_title()
+        self.badge_title.adjustSize()
+
+    def _update_badge_title(self):
+        if getattr(self, "_is_multi_sheet", False):
+            count = getattr(self, "_last_sheet_count", 0)
+            count_str = f" ({count} {i18n.t('sheets_count')})" if count > 0 else ""
+            self.badge_title.setText(f"📑 {i18n.t('badge_multi_sheet')}{count_str}")
+        else:
+            self.badge_title.setText(f"📐 {i18n.t('badge_cad_viewport')}")
+
     def _on_language_changed(self, lang_code: str = ""):
         try:
-            self.badge_title.setText(f"📐 {i18n.t('badge_cad_viewport')}")
+            self._update_badge_title()
         except RuntimeError:
             pass
 
@@ -240,8 +286,9 @@ class CadViewportPanel(QWidget):
         y = self.height() - hud_h - 16
         self.hud.setGeometry(x, y, hud_w, hud_h)
 
-        # Başlık rozetini sol üste yerleştir
-        self.badge_title.setGeometry(16, 16, 160, 26)
+        # Başlık rozetini sol üste yerleştir (metne göre genişlik)
+        badge_w = max(self.badge_title.sizeHint().width() + 20, 180)
+        self.badge_title.setGeometry(16, 16, badge_w, 26)
 
     def fit_view(self):
         """Tuvali pencereye sığdırır."""

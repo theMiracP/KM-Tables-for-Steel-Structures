@@ -165,17 +165,19 @@ class CadGraphicsView(QGraphicsView):
         self._calc_layout = calc
 
         is_sheet = self._layout_config.placement != TablePlacement.STANDALONE
-        is_title_block = (
-            getattr(self._table, "id", "") == "title_block" or
+        is_special_form = (
+            getattr(self._table, "id", "") in ("title_block", "change_permission", "title_sheet") or
             (hasattr(self._table, "columns") and len(self._table.columns) == 10 and abs(self._table.total_width - 185.0) < 0.1)
         )
 
         # 1. Sayfa Çizimi (Pafta kağıdı, çerçeve ve Form 3 antet)
         if is_sheet and calc.sheet_rect and calc.inner_frame_rect:
-            self._draw_sheet(calc, suppress_title_block=is_title_block)
+            self._draw_sheet(calc, suppress_title_block=is_special_form)
 
         # 2. Tablo Çizimi (Eğer tablo kendisi antet ise paftada tek kez sağ alta çizilir)
-        if is_sheet and is_title_block and calc.title_block_rect:
+        if is_sheet and getattr(self._table, "id", "") in ("change_permission", "title_sheet") and calc.inner_frame_rect:
+            self._draw_table_content(Point2D(calc.inner_frame_rect.x_min, calc.inner_frame_rect.y_min), is_sheet)
+        elif is_sheet and is_special_form and calc.title_block_rect:
             self._draw_table_content(Point2D(calc.title_block_rect.x_min, calc.title_block_rect.y_min), is_sheet)
         else:
             self._draw_table_content(calc.table_origin, is_sheet)
